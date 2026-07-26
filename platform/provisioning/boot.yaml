@@ -5,7 +5,16 @@ metadata:
 spec:
   triggers:
     - boot
-  deviceSelector: {}
+  # Scoped to CWMP devices. The seed scripts write
+  # `canonical.mgmt.connection_request_*` and the PeriodicInform pair —
+  # TR-069 ManagementServer parameters that a TR-369 agent does not
+  # implement, so on a USP device this rule could only ever produce a
+  # failed task. USP contact provisioning gets its own rules when there
+  # is USP-shaped seed configuration to apply.
+  deviceSelector:
+    matchExpressions:
+      - key: "protocol:cwmp"
+        operator: Exists
   desired:
     script: "boot.ts"
   priority: 50
