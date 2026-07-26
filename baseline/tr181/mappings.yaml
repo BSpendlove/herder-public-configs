@@ -80,3 +80,52 @@ spec:
     - canonical: canonical.mgmt.provisioning_code
       valueType: string
       devicePath: Device.DeviceInfo.ProvisioningCode
+---
+# Baseline fallback mapping profile for any TR-181 device, over CWMP or
+# USP. Mirror of baseline-tr098 for the `Device.*` root; see that profile
+# for why a data-model-wide fallback is required rather than optional.
+#
+# Carries device-info only. `Device.DeviceInfo.*` is part of the data
+# model on both protocols, so this is safe for every TR-181 device.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingProfile
+metadata:
+  name: baseline-tr181
+spec:
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:device"
+        operator: Exists
+  parameterMappings:
+    - device-info-tr181
+---
+# CWMP-only half of the TR-181 baseline: the `canonical.mgmt.*` table.
+#
+# `Device.ManagementServer.*` is the TR-069 CPE WAN Management Protocol
+# object. A TR-369 agent runs the same TR-181 data model but has no
+# ManagementServer at all (its controller relationship lives under
+# `Device.LocalAgent.*` and its transport under `Device.MQTT.*`), so
+# binding this table to a USP device produces canonicals that resolve to
+# paths the agent will reject: obuspa answers err 7026
+# "Path (Device.ManagementServer) does not exist in the schema".
+#
+# Scoping it with `protocol:cwmp` (#569) means a rule targeting
+# `canonical.mgmt.*` on a USP device now fails with a clear
+# canonical_unmapped instead of a confusing schema error from the agent
+# — the rule is what is wrong, and the error should say so.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingProfile
+metadata:
+  name: baseline-tr181-cwmp
+spec:
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:device"
+        operator: Exists
+      - key: "protocol:cwmp"
+        operator: Exists
+  parameterMappings:
+    - device-info-tr181
+    - mgmt-tr181

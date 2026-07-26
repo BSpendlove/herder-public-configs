@@ -180,3 +180,34 @@ spec:
     - canonical: canonical.diagnostics.upload.tcp_open_response_time
       valueType: datetime
       devicePath: InternetGatewayDevice.UploadDiagnostics.TCPOpenResponseTime
+---
+# Baseline fallback mapping profile for any TR-098 device.
+#
+# Priority 10 (the same tier the baseline telemetry profiles use) with a
+# `dataModel:igd` Exists selector, so it binds to every device that ever
+# reported an `InternetGatewayDevice.*` path and loses to any
+# vendor-specific profile (those ship at priority 50+).
+#
+# Why a fallback has to exist: canonical→raw resolution needs a bound
+# profile, and connection-request dispatch resolves the CPE's URL through
+# `canonical.mgmt.connection_request_url`. With only vendor profiles
+# shipped, any CPE outside those vendor tuples resolved with
+# reason=no_binding, so the ACS reported "no connection request URL" and
+# could never reach the device — every task silently waited for the next
+# periodic Inform instead. Operator-authored vendor profiles then look
+# like the only way to make a CPE manageable at all, which is exactly
+# backwards.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingProfile
+metadata:
+  name: baseline-tr098
+spec:
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:igd"
+        operator: Exists
+  parameterMappings:
+    - device-info-tr098
+    - mgmt-tr098
+    - diagnostics-tr098
