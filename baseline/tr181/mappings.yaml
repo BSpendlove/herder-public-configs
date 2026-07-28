@@ -99,6 +99,7 @@ spec:
         operator: Exists
   parameterMappings:
     - device-info-tr181
+    - wifi-tr181
 ---
 # CWMP-only half of the TR-181 baseline: the `canonical.mgmt.*` table.
 #
@@ -129,3 +130,134 @@ spec:
   parameterMappings:
     - device-info-tr181
     - mgmt-tr181
+    - wifi-tr181
+
+---
+# Canonical WiFi mappings for TR-181 (Device.*) devices.
+#
+# WiFi is the first canonical namespace with multi-instance objects, and it
+# exposes a property of the resolver worth knowing before editing this file:
+# a canonical wildcard (`canonical.wifi.ssid.*.ssid`) is expanded by walking
+# the DECLARED entries in this table, not by scanning the device's stored
+# parameters. An instance therefore only exists northbound if it is written
+# out below. That is why the ranges are enumerated rather than expressed as
+# a pattern.
+#
+# The ranges cover what residential gateways actually expose: 2 radios, 4 SSIDs, 4 access points.
+# Operators serving devices with more radios or SSIDs extend this table at a
+# higher-priority profile; nothing in Go caps the count.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: wifi-tr181
+spec:
+  mappings:
+    - canonical: canonical.wifi.radio.1.enable
+      valueType: boolean
+      devicePath: Device.WiFi.Radio.1.Enable
+    - canonical: canonical.wifi.radio.1.status
+      valueType: string
+      devicePath: Device.WiFi.Radio.1.Status
+    - canonical: canonical.wifi.radio.1.channel
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.1.Channel
+    - canonical: canonical.wifi.radio.1.band
+      valueType: string
+      devicePath: Device.WiFi.Radio.1.OperatingFrequencyBand
+    - canonical: canonical.wifi.radio.2.enable
+      valueType: boolean
+      devicePath: Device.WiFi.Radio.2.Enable
+    - canonical: canonical.wifi.radio.2.status
+      valueType: string
+      devicePath: Device.WiFi.Radio.2.Status
+    - canonical: canonical.wifi.radio.2.channel
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.2.Channel
+    - canonical: canonical.wifi.radio.2.band
+      valueType: string
+      devicePath: Device.WiFi.Radio.2.OperatingFrequencyBand
+    - canonical: canonical.wifi.ssid.1.enable
+      valueType: boolean
+      devicePath: Device.WiFi.SSID.1.Enable
+    - canonical: canonical.wifi.ssid.1.status
+      valueType: string
+      devicePath: Device.WiFi.SSID.1.Status
+    - canonical: canonical.wifi.ssid.1.ssid
+      valueType: string
+      devicePath: Device.WiFi.SSID.1.SSID
+    - canonical: canonical.wifi.ssid.1.bssid
+      valueType: string
+      devicePath: Device.WiFi.SSID.1.BSSID
+    - canonical: canonical.wifi.ssid.2.enable
+      valueType: boolean
+      devicePath: Device.WiFi.SSID.2.Enable
+    - canonical: canonical.wifi.ssid.2.status
+      valueType: string
+      devicePath: Device.WiFi.SSID.2.Status
+    - canonical: canonical.wifi.ssid.2.ssid
+      valueType: string
+      devicePath: Device.WiFi.SSID.2.SSID
+    - canonical: canonical.wifi.ssid.2.bssid
+      valueType: string
+      devicePath: Device.WiFi.SSID.2.BSSID
+    - canonical: canonical.wifi.ssid.3.enable
+      valueType: boolean
+      devicePath: Device.WiFi.SSID.3.Enable
+    - canonical: canonical.wifi.ssid.3.status
+      valueType: string
+      devicePath: Device.WiFi.SSID.3.Status
+    - canonical: canonical.wifi.ssid.3.ssid
+      valueType: string
+      devicePath: Device.WiFi.SSID.3.SSID
+    - canonical: canonical.wifi.ssid.3.bssid
+      valueType: string
+      devicePath: Device.WiFi.SSID.3.BSSID
+    - canonical: canonical.wifi.ssid.4.enable
+      valueType: boolean
+      devicePath: Device.WiFi.SSID.4.Enable
+    - canonical: canonical.wifi.ssid.4.status
+      valueType: string
+      devicePath: Device.WiFi.SSID.4.Status
+    - canonical: canonical.wifi.ssid.4.ssid
+      valueType: string
+      devicePath: Device.WiFi.SSID.4.SSID
+    - canonical: canonical.wifi.ssid.4.bssid
+      valueType: string
+      devicePath: Device.WiFi.SSID.4.BSSID
+    - canonical: canonical.wifi.ap.1.enable
+      valueType: boolean
+      devicePath: Device.WiFi.AccessPoint.1.Enable
+    - canonical: canonical.wifi.ap.1.security_mode
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.1.Security.ModeEnabled
+    - canonical: canonical.wifi.ap.1.client_count
+      valueType: unsignedint
+      devicePath: Device.WiFi.AccessPoint.1.AssociatedDeviceNumberOfEntries
+    - canonical: canonical.wifi.ap.2.enable
+      valueType: boolean
+      devicePath: Device.WiFi.AccessPoint.2.Enable
+    - canonical: canonical.wifi.ap.2.security_mode
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.2.Security.ModeEnabled
+    - canonical: canonical.wifi.ap.2.client_count
+      valueType: unsignedint
+      devicePath: Device.WiFi.AccessPoint.2.AssociatedDeviceNumberOfEntries
+    - canonical: canonical.wifi.ap.3.enable
+      valueType: boolean
+      devicePath: Device.WiFi.AccessPoint.3.Enable
+    - canonical: canonical.wifi.ap.3.security_mode
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.3.Security.ModeEnabled
+    - canonical: canonical.wifi.ap.3.client_count
+      valueType: unsignedint
+      devicePath: Device.WiFi.AccessPoint.3.AssociatedDeviceNumberOfEntries
+    - canonical: canonical.wifi.ap.4.enable
+      valueType: boolean
+      devicePath: Device.WiFi.AccessPoint.4.Enable
+    - canonical: canonical.wifi.ap.4.security_mode
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.4.Security.ModeEnabled
+    - canonical: canonical.wifi.ap.4.client_count
+      valueType: unsignedint
+      devicePath: Device.WiFi.AccessPoint.4.AssociatedDeviceNumberOfEntries
+
