@@ -66,15 +66,15 @@ spec:
     # Client lifecycle — the killer feature.
     - notifType: ObjectCreation
       referenceList:
-        - Device.WiFi.AccessPoint.*.AssociatedDevice.
+        - Device.WiFi.AccessPoint.{i}.AssociatedDevice.
     - notifType: ObjectDeletion
       referenceList:
-        - Device.WiFi.AccessPoint.*.AssociatedDevice.
+        - Device.WiFi.AccessPoint.{i}.AssociatedDevice.
     # WiFi state changes.
     - notifType: ValueChange
       referenceList:
-        - Device.WiFi.SSID.*.Status
-        - Device.WiFi.SSID.*.Enable
-        - Device.WiFi.SSID.*.SSID
-        - Device.WiFi.Radio.*.Status
-        - Device.WiFi.AccessPoint.*.AssociatedDevice.*.AuthenticationState
+        - Device.WiFi.SSID.{i}.Status
+        - Device.WiFi.SSID.{i}.Enable
+        - Device.WiFi.SSID.{i}.SSID
+        - Device.WiFi.Radio.{i}.Status
+        - Device.WiFi.AccessPoint.{i}.AssociatedDevice.{i}.AuthenticationState

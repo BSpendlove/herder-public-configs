@@ -61,5 +61,5 @@ spec:
     matchLabels:
       productClass: "GenericIGD"
   parameters:
-    - path: "InternetGatewayDevice.LANDevice.*.WLANConfiguration.*.AssociatedDevice.*.SignalStrength"
+    - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.AssociatedDevice.{i}.SignalStrength"
       interval: 0

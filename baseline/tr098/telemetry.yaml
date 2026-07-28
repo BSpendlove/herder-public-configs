@@ -45,11 +45,11 @@ spec:
       interval: 0
     # --- TemperatureStatus (firmware-dependent; wildcard-safe if absent) ---
     # Name is operator-facing label; Value in °C; Status is Enabled/Disabled/Error.
-    - path: "InternetGatewayDevice.DeviceInfo.TemperatureStatus.TemperatureSensor.*.Name"
+    - path: "InternetGatewayDevice.DeviceInfo.TemperatureStatus.TemperatureSensor.{i}.Name"
       interval: 0
-    - path: "InternetGatewayDevice.DeviceInfo.TemperatureStatus.TemperatureSensor.*.Value"
+    - path: "InternetGatewayDevice.DeviceInfo.TemperatureStatus.TemperatureSensor.{i}.Value"
       interval: 0
-    - path: "InternetGatewayDevice.DeviceInfo.TemperatureStatus.TemperatureSensor.*.Status"
+    - path: "InternetGatewayDevice.DeviceInfo.TemperatureStatus.TemperatureSensor.{i}.Status"
       interval: 0
 ---
 # Telemetry profile: TR-098 WAN link + L3 connection state.
@@ -86,86 +86,86 @@ spec:
         operator: Exists
   parameters:
     # --- WANCommonInterfaceConfig: L1 state (always present) ---
-    - path: "InternetGatewayDevice.WANDevice.*.WANCommonInterfaceConfig.WANAccessType"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANCommonInterfaceConfig.WANAccessType"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANCommonInterfaceConfig.PhysicalLinkStatus"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANCommonInterfaceConfig.PhysicalLinkStatus"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANCommonInterfaceConfig.EnabledForInternet"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANCommonInterfaceConfig.EnabledForInternet"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANCommonInterfaceConfig.Layer1UpstreamMaxBitRate"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANCommonInterfaceConfig.Layer1UpstreamMaxBitRate"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANCommonInterfaceConfig.Layer1DownstreamMaxBitRate"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANCommonInterfaceConfig.Layer1DownstreamMaxBitRate"
       interval: 0
     # --- WANCommonInterfaceConfig: aggregate counters (covers both IP and PPP) ---
-    - path: "InternetGatewayDevice.WANDevice.*.WANCommonInterfaceConfig.TotalBytesSent"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANCommonInterfaceConfig.TotalBytesSent"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANCommonInterfaceConfig.TotalBytesReceived"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANCommonInterfaceConfig.TotalBytesReceived"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANCommonInterfaceConfig.TotalPacketsSent"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANCommonInterfaceConfig.TotalPacketsSent"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANCommonInterfaceConfig.TotalPacketsReceived"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANCommonInterfaceConfig.TotalPacketsReceived"
       interval: 0
     # --- WANIPConnection: L3 DHCP/static (wildcard-safe if absent) ---
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANIPConnection.*.ConnectionStatus"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.ConnectionStatus"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANIPConnection.*.ConnectionType"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.ConnectionType"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANIPConnection.*.Uptime"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.Uptime"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANIPConnection.*.LastConnectionError"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.LastConnectionError"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANIPConnection.*.AddressingType"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.AddressingType"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANIPConnection.*.ExternalIPAddress"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.ExternalIPAddress"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANIPConnection.*.SubnetMask"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.SubnetMask"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANIPConnection.*.DefaultGateway"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.DefaultGateway"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANIPConnection.*.DNSServers"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.DNSServers"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANIPConnection.*.MACAddress"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.MACAddress"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANIPConnection.*.NATEnabled"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.NATEnabled"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANIPConnection.*.Stats.EthernetBytesSent"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.Stats.EthernetBytesSent"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANIPConnection.*.Stats.EthernetBytesReceived"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.Stats.EthernetBytesReceived"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANIPConnection.*.Stats.EthernetPacketsSent"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.Stats.EthernetPacketsSent"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANIPConnection.*.Stats.EthernetPacketsReceived"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.Stats.EthernetPacketsReceived"
       interval: 0
     # --- WANPPPConnection: L3 PPPoE/PPPoA (wildcard-safe if absent) ---
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANPPPConnection.*.ConnectionStatus"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANPPPConnection.{i}.ConnectionStatus"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANPPPConnection.*.ConnectionType"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANPPPConnection.{i}.ConnectionType"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANPPPConnection.*.Uptime"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANPPPConnection.{i}.Uptime"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANPPPConnection.*.LastConnectionError"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANPPPConnection.{i}.LastConnectionError"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANPPPConnection.*.ExternalIPAddress"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANPPPConnection.{i}.ExternalIPAddress"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANPPPConnection.*.DNSServers"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANPPPConnection.{i}.DNSServers"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANPPPConnection.*.MACAddress"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANPPPConnection.{i}.MACAddress"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANPPPConnection.*.TransportType"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANPPPConnection.{i}.TransportType"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANPPPConnection.*.PPPoEACName"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANPPPConnection.{i}.PPPoEACName"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANPPPConnection.*.PPPoEServiceName"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANPPPConnection.{i}.PPPoEServiceName"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANPPPConnection.*.Username"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANPPPConnection.{i}.Username"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANPPPConnection.*.Stats.EthernetBytesSent"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANPPPConnection.{i}.Stats.EthernetBytesSent"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANPPPConnection.*.Stats.EthernetBytesReceived"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANPPPConnection.{i}.Stats.EthernetBytesReceived"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANPPPConnection.*.Stats.EthernetPacketsSent"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANPPPConnection.{i}.Stats.EthernetPacketsSent"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANPPPConnection.*.Stats.EthernetPacketsReceived"
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANPPPConnection.{i}.Stats.EthernetPacketsReceived"
       interval: 0
 ---
 # Telemetry profile: TR-098 WiFi per-SSID/radio.
@@ -208,49 +208,49 @@ spec:
         operator: Exists
   parameters:
     # --- Radio / SSID state ---
-    - path: "InternetGatewayDevice.LANDevice.*.WLANConfiguration.*.Status"
+    - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.Status"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.*.WLANConfiguration.*.Enable"
+    - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.Enable"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.*.WLANConfiguration.*.SSID"
+    - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.SSID"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.*.WLANConfiguration.*.BSSID"
+    - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.BSSID"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.*.WLANConfiguration.*.Channel"
+    - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.Channel"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.*.WLANConfiguration.*.Standard"
+    - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.Standard"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.*.WLANConfiguration.*.BeaconType"
+    - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.BeaconType"
       interval: 0
     # --- Security / auth posture ---
-    - path: "InternetGatewayDevice.LANDevice.*.WLANConfiguration.*.BasicAuthenticationMode"
+    - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.BasicAuthenticationMode"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.*.WLANConfiguration.*.WPAEncryptionModes"
+    - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.WPAEncryptionModes"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.*.WLANConfiguration.*.IEEE11iEncryptionModes"
+    - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.IEEE11iEncryptionModes"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.*.WLANConfiguration.*.SSIDAdvertisementEnabled"
+    - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.SSIDAdvertisementEnabled"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.*.WLANConfiguration.*.TransmitPower"
+    - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.TransmitPower"
       interval: 0
     # --- Byte counters ---
-    - path: "InternetGatewayDevice.LANDevice.*.WLANConfiguration.*.Stats.BytesSent"
+    - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.Stats.BytesSent"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.*.WLANConfiguration.*.Stats.BytesReceived"
+    - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.Stats.BytesReceived"
       interval: 0
     # --- Association counts ---
-    - path: "InternetGatewayDevice.LANDevice.*.WLANConfiguration.*.TotalAssociations"
+    - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.TotalAssociations"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.*.WLANConfiguration.*.AssociatedDeviceNumberOfEntries"
+    - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.AssociatedDeviceNumberOfEntries"
       interval: 0
     # --- Associated clients (standard TR-098 only, no X_<VENDOR>_*) ---
-    - path: "InternetGatewayDevice.LANDevice.*.WLANConfiguration.*.AssociatedDevice.*.AssociatedDeviceMACAddress"
+    - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.AssociatedDevice.{i}.AssociatedDeviceMACAddress"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.*.WLANConfiguration.*.AssociatedDevice.*.AssociatedDeviceIPAddress"
+    - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.AssociatedDevice.{i}.AssociatedDeviceIPAddress"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.*.WLANConfiguration.*.AssociatedDevice.*.AssociatedDeviceAuthenticationState"
+    - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.AssociatedDevice.{i}.AssociatedDeviceAuthenticationState"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.*.WLANConfiguration.*.AssociatedDevice.*.LastDataTransmitRate"
+    - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.AssociatedDevice.{i}.LastDataTransmitRate"
       interval: 0
 ---
 # Telemetry profile: TR-098 LAN Ethernet interface.
@@ -281,13 +281,13 @@ spec:
       - key: "dataModel:igd"
         operator: Exists
   parameters:
-    - path: "InternetGatewayDevice.LANDevice.*.LANEthernetInterfaceConfig.*.Status"
+    - path: "InternetGatewayDevice.LANDevice.{i}.LANEthernetInterfaceConfig.{i}.Status"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.*.LANEthernetInterfaceConfig.*.MACAddress"
+    - path: "InternetGatewayDevice.LANDevice.{i}.LANEthernetInterfaceConfig.{i}.MACAddress"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.*.LANEthernetInterfaceConfig.*.Stats.BytesSent"
+    - path: "InternetGatewayDevice.LANDevice.{i}.LANEthernetInterfaceConfig.{i}.Stats.BytesSent"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.*.LANEthernetInterfaceConfig.*.Stats.BytesReceived"
+    - path: "InternetGatewayDevice.LANDevice.{i}.LANEthernetInterfaceConfig.{i}.Stats.BytesReceived"
       interval: 0
 ---
 # Telemetry profile: TR-098 connected hosts table.
@@ -324,26 +324,26 @@ spec:
         operator: Exists
   parameters:
     # --- Table cardinality ---
-    - path: "InternetGatewayDevice.LANDevice.*.Hosts.HostNumberOfEntries"
+    - path: "InternetGatewayDevice.LANDevice.{i}.Hosts.HostNumberOfEntries"
       interval: 0
     # --- Per-host fields ---
-    - path: "InternetGatewayDevice.LANDevice.*.Hosts.Host.*.Active"
+    - path: "InternetGatewayDevice.LANDevice.{i}.Hosts.Host.{i}.Active"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.*.Hosts.Host.*.HostName"
+    - path: "InternetGatewayDevice.LANDevice.{i}.Hosts.Host.{i}.HostName"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.*.Hosts.Host.*.IPAddress"
+    - path: "InternetGatewayDevice.LANDevice.{i}.Hosts.Host.{i}.IPAddress"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.*.Hosts.Host.*.MACAddress"
+    - path: "InternetGatewayDevice.LANDevice.{i}.Hosts.Host.{i}.MACAddress"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.*.Hosts.Host.*.AddressSource"
+    - path: "InternetGatewayDevice.LANDevice.{i}.Hosts.Host.{i}.AddressSource"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.*.Hosts.Host.*.InterfaceType"
+    - path: "InternetGatewayDevice.LANDevice.{i}.Hosts.Host.{i}.InterfaceType"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.*.Hosts.Host.*.Layer2Interface"
+    - path: "InternetGatewayDevice.LANDevice.{i}.Hosts.Host.{i}.Layer2Interface"
       interval: 0
     # --- IPv6: legacy scalar form (older TR-098 variants) ---
-    - path: "InternetGatewayDevice.LANDevice.*.Hosts.Host.*.IPv6Address"
+    - path: "InternetGatewayDevice.LANDevice.{i}.Hosts.Host.{i}.IPv6Address"
       interval: 0
     # --- IPv6: modern instance-table form ---
-    - path: "InternetGatewayDevice.LANDevice.*.Hosts.Host.*.IPv6Address.*.IPAddress"
+    - path: "InternetGatewayDevice.LANDevice.{i}.Hosts.Host.{i}.IPv6Address.{i}.IPAddress"
       interval: 0

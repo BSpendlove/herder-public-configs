@@ -82,16 +82,16 @@ spec:
     # AssociatedDevice idx) tuple so the enrichment script can correlate
     # with the X_0000C5_WLANStats.*.AssociatedDevice.*.Stats.*.ClientRSSI
     # tree below (same index tuple on both sides).
-    - path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.*.AssociatedDevice.*.AssociatedDeviceMACAddress"
+    - path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.{i}.AssociatedDevice.{i}.AssociatedDeviceMACAddress"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.*.AssociatedDevice.*.X_0000C5_SignalStrength"
+    - path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.{i}.AssociatedDevice.{i}.X_0000C5_SignalStrength"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.*.AssociatedDevice.*.X_0000C5_RSSI"
+    - path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.{i}.AssociatedDevice.{i}.X_0000C5_RSSI"
       interval: 0
     # --- Per-client WLAN stats (Arris RSSI tree) ---
     # The real RSSI path on NVG/SURFboard firmware — AssociatedDevice lives
     # at WLANStats.<wlan>.AssociatedDevice.<ad>.Stats.<n>.ClientRSSI.
-    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_WLANStats.*.AssociatedDevice.*.Stats.*.ClientRSSI"
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_WLANStats.{i}.AssociatedDevice.{i}.Stats.{i}.ClientRSSI"
       interval: 0
     # --- Mesh node identity (HNC.HNE tree) ---
     # The arris-hnc topology rule roots the mesh off these: HNE.{i}.Type
@@ -99,70 +99,70 @@ spec:
     # Radio band + SSID name classify client edges (2.4/5/6 GHz) and skip
     # backhaul SSIDs. Without these the script sees only STA leaves and
     # can't resolve the gateway.
-    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.HNE.*.MACAddress"
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.HNE.{i}.MACAddress"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.HNE.*.Type"
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.HNE.{i}.Type"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.HNE.*.Model"
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.HNE.{i}.Model"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.HNE.*.SoftwareVersion"
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.HNE.{i}.SoftwareVersion"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.HNE.*.Radio.*.OperatingFrequencyBand"
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.HNE.{i}.Radio.{i}.OperatingFrequencyBand"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.HNE.*.Radio.*.SSID.*.SSID"
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.HNE.{i}.Radio.{i}.SSID.{i}.SSID"
       interval: 0
     # --- Extender-attached WiFi clients (HNC mesh tree) ---
-    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.HNE.*.Radio.*.SSID.*.STA.*.MACAddress"
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.HNE.{i}.Radio.{i}.SSID.{i}.STA.{i}.MACAddress"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.HNE.*.Radio.*.SSID.*.STA.*.RSSI"
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.HNE.{i}.Radio.{i}.SSID.{i}.STA.{i}.RSSI"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.HNE.*.Radio.*.SSID.*.STA.*.TxPHYRate"
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.HNE.{i}.Radio.{i}.SSID.{i}.STA.{i}.TxPHYRate"
       interval: 0
     # --- Per-client steering stats (HNC.Steer.SummaryStats) ---
-    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.*.MACAddress"
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.{i}.MACAddress"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.*.STAStatus"
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.{i}.STAStatus"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.*.BandSupport"
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.{i}.BandSupport"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.*.DualBandCapable"
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.{i}.DualBandCapable"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.*.LastSteerTime"
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.{i}.LastSteerTime"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.*.SelfSteerCount"
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.{i}.SelfSteerCount"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.*.BTMAttempts"
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.{i}.BTMAttempts"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.*.BTMSuccesses"
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.{i}.BTMSuccesses"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.*.BlacklistAttempts"
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.{i}.BlacklistAttempts"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.*.BlacklistSuccesses"
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.{i}.BlacklistSuccesses"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.*.SteeringUnfriendly"
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.{i}.SteeringUnfriendly"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.*.WiFiChannelUtilizationEvents"
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.{i}.WiFiChannelUtilizationEvents"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.*.WiFiLinkQualityEvents"
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.{i}.WiFiLinkQualityEvents"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.*.BHUtilizationEvents"
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.Steer.SummaryStats.STA.{i}.BHUtilizationEvents"
       interval: 0
     # --- Host "last active" timestamp (Arris extension) ---
-    - path: "InternetGatewayDevice.LANDevice.1.Hosts.Host.*.X_0000C5_LastActive"
+    - path: "InternetGatewayDevice.LANDevice.1.Hosts.Host.{i}.X_0000C5_LastActive"
       interval: 0
     # --- WLAN X_0000C5 link-layer extensions ---
-    - path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.*.X_0000C5_CurrentBitRate"
+    - path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.{i}.X_0000C5_CurrentBitRate"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.*.X_0000C5_CurrentDuplexMode"
+    - path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.{i}.X_0000C5_CurrentDuplexMode"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.*.X_0000C5_OperatingFrequencyBand"
+    - path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.{i}.X_0000C5_OperatingFrequencyBand"
       interval: 0
     # --- LAN Ethernet X_0000C5 link-layer extensions ---
-    - path: "InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.*.X_0000C5_CurrentBitRate"
+    - path: "InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.{i}.X_0000C5_CurrentBitRate"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.*.X_0000C5_CurrentDuplexMode"
+    - path: "InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.{i}.X_0000C5_CurrentDuplexMode"
       interval: 0
-    - path: "InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.*.X_0000C5_OperatingFrequencyBand"
+    - path: "InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.{i}.X_0000C5_OperatingFrequencyBand"
       interval: 0
 ---
 # Reference enrichment rule: Arris TR-098 per-client WiFi labels.

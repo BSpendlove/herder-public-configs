@@ -20,7 +20,7 @@ spec:
     - "InternetGatewayDevice.LANDevice.1.Hosts.Host.*"
   changeHash:
     paths:
-      - "InternetGatewayDevice.LANDevice.1.Hosts.Host.*.MACAddress"
+      - "InternetGatewayDevice.LANDevice.1.Hosts.Host.{i}.MACAddress"
   coalesceWindow: 60s
   config:
     # includeInactiveHosts: when false (default), Active=false hosts drop

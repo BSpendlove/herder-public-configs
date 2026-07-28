@@ -26,9 +26,9 @@ spec:
     - "InternetGatewayDevice.LANDevice.1.Hosts.Host.*"
   changeHash:
     paths:
-      - "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.HNE.*.MACAddress"
-      - "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.HNE.*.Type"
-      - "InternetGatewayDevice.LANDevice.1.Hosts.Host.*.PhysAddress"
+      - "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.HNE.{i}.MACAddress"
+      - "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.HNC.HNE.{i}.Type"
+      - "InternetGatewayDevice.LANDevice.1.Hosts.Host.{i}.PhysAddress"
   coalesceWindow: 60s
   config:
     # Regex matched against SSID name; matching SSIDs are treated as

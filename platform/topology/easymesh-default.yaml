@@ -49,10 +49,10 @@ spec:
     - "Device.Hosts.Host.*"
   changeHash:
     paths:
-      - "Device.WiFi.AccessPoint.*.AssociatedDevice.*.MACAddress"
-      - "Device.WiFi.MultiAP.APDevice.*.MACAddress"
-      - "Device.WiFi.MultiAP.APDevice.*.Radio.*.AP.*.AssociatedDevice.*.MACAddress"
-      - "Device.Hosts.Host.*.PhysAddress"
+      - "Device.WiFi.AccessPoint.{i}.AssociatedDevice.{i}.MACAddress"
+      - "Device.WiFi.MultiAP.APDevice.{i}.MACAddress"
+      - "Device.WiFi.MultiAP.APDevice.{i}.Radio.{i}.AP.{i}.AssociatedDevice.{i}.MACAddress"
+      - "Device.Hosts.Host.{i}.PhysAddress"
   coalesceWindow: 60s
   config:
     # rssiEncoding: "dbm" (default for MultiAP) or "rcpi". RCPI converts

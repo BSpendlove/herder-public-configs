@@ -47,11 +47,11 @@ spec:
       interval: 0
     # --- TemperatureStatus (firmware-dependent; wildcard-safe if absent) ---
     # Name is operator-facing label; Value in °C; Status is Enabled/Disabled/Error.
-    - path: "Device.DeviceInfo.TemperatureStatus.TemperatureSensor.*.Name"
+    - path: "Device.DeviceInfo.TemperatureStatus.TemperatureSensor.{i}.Name"
       interval: 0
-    - path: "Device.DeviceInfo.TemperatureStatus.TemperatureSensor.*.Value"
+    - path: "Device.DeviceInfo.TemperatureStatus.TemperatureSensor.{i}.Value"
       interval: 0
-    - path: "Device.DeviceInfo.TemperatureStatus.TemperatureSensor.*.Status"
+    - path: "Device.DeviceInfo.TemperatureStatus.TemperatureSensor.{i}.Status"
       interval: 0
 ---
 # Telemetry profile: TR-181 WiFi — Radio + SSID + AccessPoint bundle.
@@ -115,61 +115,61 @@ spec:
         operator: Exists
   parameters:
     # --- Radio state ---
-    - path: "Device.WiFi.Radio.*.Enable"
+    - path: "Device.WiFi.Radio.{i}.Enable"
       interval: 0
-    - path: "Device.WiFi.Radio.*.Status"
+    - path: "Device.WiFi.Radio.{i}.Status"
       interval: 0
-    - path: "Device.WiFi.Radio.*.OperatingFrequencyBand"
+    - path: "Device.WiFi.Radio.{i}.OperatingFrequencyBand"
       interval: 0
-    - path: "Device.WiFi.Radio.*.Channel"
+    - path: "Device.WiFi.Radio.{i}.Channel"
       interval: 0
-    - path: "Device.WiFi.Radio.*.OperatingStandards"
+    - path: "Device.WiFi.Radio.{i}.OperatingStandards"
       interval: 0
-    - path: "Device.WiFi.Radio.*.OperatingChannelBandwidth"
+    - path: "Device.WiFi.Radio.{i}.OperatingChannelBandwidth"
       interval: 0
     # --- Radio byte counters ---
-    - path: "Device.WiFi.Radio.*.Stats.BytesSent"
+    - path: "Device.WiFi.Radio.{i}.Stats.BytesSent"
       interval: 0
-    - path: "Device.WiFi.Radio.*.Stats.BytesReceived"
+    - path: "Device.WiFi.Radio.{i}.Stats.BytesReceived"
       interval: 0
     # --- SSID interface state + byte counters ---
-    - path: "Device.WiFi.SSID.*.Enable"
+    - path: "Device.WiFi.SSID.{i}.Enable"
       interval: 0
-    - path: "Device.WiFi.SSID.*.Status"
+    - path: "Device.WiFi.SSID.{i}.Status"
       interval: 0
-    - path: "Device.WiFi.SSID.*.SSID"
+    - path: "Device.WiFi.SSID.{i}.SSID"
       interval: 0
-    - path: "Device.WiFi.SSID.*.BSSID"
+    - path: "Device.WiFi.SSID.{i}.BSSID"
       interval: 0
-    - path: "Device.WiFi.SSID.*.LowerLayers"
+    - path: "Device.WiFi.SSID.{i}.LowerLayers"
       interval: 0
-    - path: "Device.WiFi.SSID.*.Stats.BytesSent"
+    - path: "Device.WiFi.SSID.{i}.Stats.BytesSent"
       interval: 0
-    - path: "Device.WiFi.SSID.*.Stats.BytesReceived"
+    - path: "Device.WiFi.SSID.{i}.Stats.BytesReceived"
       interval: 0
     # --- AccessPoint config + security mode ---
-    - path: "Device.WiFi.AccessPoint.*.Enable"
+    - path: "Device.WiFi.AccessPoint.{i}.Enable"
       interval: 0
-    - path: "Device.WiFi.AccessPoint.*.SSIDReference"
+    - path: "Device.WiFi.AccessPoint.{i}.SSIDReference"
       interval: 0
-    - path: "Device.WiFi.AccessPoint.*.SSIDAdvertisementEnabled"
+    - path: "Device.WiFi.AccessPoint.{i}.SSIDAdvertisementEnabled"
       interval: 0
-    - path: "Device.WiFi.AccessPoint.*.Security.ModeEnabled"
+    - path: "Device.WiFi.AccessPoint.{i}.Security.ModeEnabled"
       interval: 0
-    - path: "Device.WiFi.AccessPoint.*.AssociatedDeviceNumberOfEntries"
+    - path: "Device.WiFi.AccessPoint.{i}.AssociatedDeviceNumberOfEntries"
       interval: 0
     # --- Associated clients (TR-181 spellings) ---
-    - path: "Device.WiFi.AccessPoint.*.AssociatedDevice.*.MACAddress"
+    - path: "Device.WiFi.AccessPoint.{i}.AssociatedDevice.{i}.MACAddress"
       interval: 0
-    - path: "Device.WiFi.AccessPoint.*.AssociatedDevice.*.AuthenticationState"
+    - path: "Device.WiFi.AccessPoint.{i}.AssociatedDevice.{i}.AuthenticationState"
       interval: 0
-    - path: "Device.WiFi.AccessPoint.*.AssociatedDevice.*.LastDataDownlinkRate"
+    - path: "Device.WiFi.AccessPoint.{i}.AssociatedDevice.{i}.LastDataDownlinkRate"
       interval: 0
-    - path: "Device.WiFi.AccessPoint.*.AssociatedDevice.*.LastDataUplinkRate"
+    - path: "Device.WiFi.AccessPoint.{i}.AssociatedDevice.{i}.LastDataUplinkRate"
       interval: 0
-    - path: "Device.WiFi.AccessPoint.*.AssociatedDevice.*.SignalStrength"
+    - path: "Device.WiFi.AccessPoint.{i}.AssociatedDevice.{i}.SignalStrength"
       interval: 0
-    - path: "Device.WiFi.AccessPoint.*.AssociatedDevice.*.Active"
+    - path: "Device.WiFi.AccessPoint.{i}.AssociatedDevice.{i}.Active"
       interval: 0
 ---
 # Telemetry profile: TR-181 Ethernet interfaces.
@@ -203,17 +203,17 @@ spec:
       - key: "dataModel:device"
         operator: Exists
   parameters:
-    - path: "Device.Ethernet.Interface.*.Status"
+    - path: "Device.Ethernet.Interface.{i}.Status"
       interval: 0
-    - path: "Device.Ethernet.Interface.*.Upstream"
+    - path: "Device.Ethernet.Interface.{i}.Upstream"
       interval: 0
-    - path: "Device.Ethernet.Interface.*.MACAddress"
+    - path: "Device.Ethernet.Interface.{i}.MACAddress"
       interval: 0
-    - path: "Device.Ethernet.Interface.*.LowerLayers"
+    - path: "Device.Ethernet.Interface.{i}.LowerLayers"
       interval: 0
-    - path: "Device.Ethernet.Interface.*.Stats.BytesSent"
+    - path: "Device.Ethernet.Interface.{i}.Stats.BytesSent"
       interval: 0
-    - path: "Device.Ethernet.Interface.*.Stats.BytesReceived"
+    - path: "Device.Ethernet.Interface.{i}.Stats.BytesReceived"
       interval: 0
 ---
 # Telemetry profile: TR-181 IP interfaces + IPv4/IPv6 address tables.
@@ -252,23 +252,23 @@ spec:
         operator: Exists
   parameters:
     # --- IP.Interface state ---
-    - path: "Device.IP.Interface.*.Enable"
+    - path: "Device.IP.Interface.{i}.Enable"
       interval: 0
-    - path: "Device.IP.Interface.*.Status"
+    - path: "Device.IP.Interface.{i}.Status"
       interval: 0
-    - path: "Device.IP.Interface.*.Type"
+    - path: "Device.IP.Interface.{i}.Type"
       interval: 0
-    - path: "Device.IP.Interface.*.LowerLayers"
+    - path: "Device.IP.Interface.{i}.LowerLayers"
       interval: 0
     # --- IPv4 addresses ---
-    - path: "Device.IP.Interface.*.IPv4Address.*.IPAddress"
+    - path: "Device.IP.Interface.{i}.IPv4Address.{i}.IPAddress"
       interval: 0
-    - path: "Device.IP.Interface.*.IPv4Address.*.SubnetMask"
+    - path: "Device.IP.Interface.{i}.IPv4Address.{i}.SubnetMask"
       interval: 0
     # --- IPv6 addresses ---
-    - path: "Device.IP.Interface.*.IPv6Address.*.IPAddress"
+    - path: "Device.IP.Interface.{i}.IPv6Address.{i}.IPAddress"
       interval: 0
-    - path: "Device.IP.Interface.*.IPv6Address.*.Origin"
+    - path: "Device.IP.Interface.{i}.IPv6Address.{i}.Origin"
       interval: 0
 ---
 # Telemetry profile: TR-181 connected hosts table.
@@ -317,19 +317,19 @@ spec:
     - path: "Device.Hosts.HostNumberOfEntries"
       interval: 0
     # --- Per-host fields (TR-181 spellings) ---
-    - path: "Device.Hosts.Host.*.Active"
+    - path: "Device.Hosts.Host.{i}.Active"
       interval: 0
-    - path: "Device.Hosts.Host.*.HostName"
+    - path: "Device.Hosts.Host.{i}.HostName"
       interval: 0
-    - path: "Device.Hosts.Host.*.IPAddress"
+    - path: "Device.Hosts.Host.{i}.IPAddress"
       interval: 0
-    - path: "Device.Hosts.Host.*.PhysAddress"
+    - path: "Device.Hosts.Host.{i}.PhysAddress"
       interval: 0
-    - path: "Device.Hosts.Host.*.AddressSource"
+    - path: "Device.Hosts.Host.{i}.AddressSource"
       interval: 0
-    - path: "Device.Hosts.Host.*.Layer1Interface"
+    - path: "Device.Hosts.Host.{i}.Layer1Interface"
       interval: 0
-    - path: "Device.Hosts.Host.*.Layer3Interface"
+    - path: "Device.Hosts.Host.{i}.Layer3Interface"
       interval: 0
 ---
 apiVersion: telemetry.herder.io/v1alpha1
@@ -343,44 +343,44 @@ spec:
       - key: "dataModel:device"
         operator: Exists
   parameters:
-    - path: "Device.WiFi.MultiAP.APDevice.*.MACAddress"
+    - path: "Device.WiFi.MultiAP.APDevice.{i}.MACAddress"
       interval: 0
-    - path: "Device.WiFi.MultiAP.APDevice.*.Manufacturer"
+    - path: "Device.WiFi.MultiAP.APDevice.{i}.Manufacturer"
       interval: 0
-    - path: "Device.WiFi.MultiAP.APDevice.*.ManufacturerOUI"
+    - path: "Device.WiFi.MultiAP.APDevice.{i}.ManufacturerOUI"
       interval: 0
-    - path: "Device.WiFi.MultiAP.APDevice.*.ModelName"
+    - path: "Device.WiFi.MultiAP.APDevice.{i}.ModelName"
       interval: 0
-    - path: "Device.WiFi.MultiAP.APDevice.*.SerialNumber"
+    - path: "Device.WiFi.MultiAP.APDevice.{i}.SerialNumber"
       interval: 0
-    - path: "Device.WiFi.MultiAP.APDevice.*.SoftwareVersion"
+    - path: "Device.WiFi.MultiAP.APDevice.{i}.SoftwareVersion"
       interval: 0
     # Backhaul link RSSI from this extender to its parent controller
     # (the gateway). Used by the topology enrichment script to colour
     # the gateway→extender edge by signal strength.
-    - path: "Device.WiFi.MultiAP.APDevice.*.SignalStrength"
+    - path: "Device.WiFi.MultiAP.APDevice.{i}.SignalStrength"
       interval: 0
-    - path: "Device.WiFi.MultiAP.APDevice.*.Radio.*.Enable"
+    - path: "Device.WiFi.MultiAP.APDevice.{i}.Radio.{i}.Enable"
       interval: 0
-    - path: "Device.WiFi.MultiAP.APDevice.*.Radio.*.OperatingFrequencyBand"
+    - path: "Device.WiFi.MultiAP.APDevice.{i}.Radio.{i}.OperatingFrequencyBand"
       interval: 0
-    - path: "Device.WiFi.MultiAP.APDevice.*.Radio.*.Channel"
+    - path: "Device.WiFi.MultiAP.APDevice.{i}.Radio.{i}.Channel"
       interval: 0
-    - path: "Device.WiFi.MultiAP.APDevice.*.Radio.*.AP.*.BSSID"
+    - path: "Device.WiFi.MultiAP.APDevice.{i}.Radio.{i}.AP.{i}.BSSID"
       interval: 0
-    - path: "Device.WiFi.MultiAP.APDevice.*.Radio.*.AP.*.SSID"
+    - path: "Device.WiFi.MultiAP.APDevice.{i}.Radio.{i}.AP.{i}.SSID"
       interval: 0
-    - path: "Device.WiFi.MultiAP.APDevice.*.Radio.*.AP.*.AssociatedDevice.*.MACAddress"
+    - path: "Device.WiFi.MultiAP.APDevice.{i}.Radio.{i}.AP.{i}.AssociatedDevice.{i}.MACAddress"
       interval: 0
-    - path: "Device.WiFi.MultiAP.APDevice.*.Radio.*.AP.*.AssociatedDevice.*.SignalStrength"
+    - path: "Device.WiFi.MultiAP.APDevice.{i}.Radio.{i}.AP.{i}.AssociatedDevice.{i}.SignalStrength"
       interval: 0
-    - path: "Device.WiFi.MultiAP.APDevice.*.Radio.*.AP.*.AssociatedDevice.*.LastDataDownlinkRate"
+    - path: "Device.WiFi.MultiAP.APDevice.{i}.Radio.{i}.AP.{i}.AssociatedDevice.{i}.LastDataDownlinkRate"
       interval: 0
     - path: "Device.WiFi.DataElements.Network.ID"
       interval: 0
     - path: "Device.WiFi.DataElements.Network.ControllerID"
       interval: 0
-    - path: "Device.WiFi.DataElements.Network.Device.*.ID"
+    - path: "Device.WiFi.DataElements.Network.Device.{i}.ID"
       interval: 0
-    - path: "Device.WiFi.DataElements.Network.Device.*.Manufacturer"
+    - path: "Device.WiFi.DataElements.Network.Device.{i}.Manufacturer"
       interval: 0
