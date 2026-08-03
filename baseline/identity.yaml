@@ -27,7 +27,7 @@ spec:
         - InternetGatewayDevice.DeviceInfo.Manufacturer
 ---
 # Baseline identity enrichment for TR-369 / USP agents.
-# Ships with OpenACS at priority 10; operators layer vendor-specific
+# Ships with Herder at priority 10; operators layer vendor-specific
 # profiles at priority 50+ by convention. See
 # context/specs/224-identity-enrichment-profiles/ for the full design
 # of the identity-enrichment runtime, and #529 for the USP-specific
