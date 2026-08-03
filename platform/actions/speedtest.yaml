@@ -1,0 +1,77 @@
+# Baseline speedtest, TR-143 HTTP.
+#
+# Provides the `speedtest` capability on any CPE exposing the standard
+# TR-143 diagnostics. Priority 10, so a vendor implementation at 50 or
+# above wins on hardware that has something better. That matters here
+# more than for most profiles: the HTTP transfer runs on the CPE's own
+# CPU, so on a multi-gigabit line it measures the device rather than the
+# circuit, and a chipset-accelerated vendor test is not just faster but
+# measuring a different thing.
+#
+# Download and upload run as separate steps rather than together. TR-143
+# has one DiagnosticsState per direction and a CPE running both at once
+# would have each test competing with the other for the same line, which
+# is not what either number is meant to represent.
+#
+# The test server comes from config, falling back to the deployment-wide
+# DIAGNOSTICS_TEST_SERVER. An operator with regional servers overrides it
+# per profile copy and scopes each with a narrower selector.
+apiVersion: actions.herder.io/v1alpha1
+kind: ActionProfile
+metadata:
+  name: speedtest-tr143
+spec:
+  capability: speedtest
+  priority: 10
+
+  # TR-098 devices. The TR-181 equivalent lives under
+  # Device.IP.Diagnostics.*, which is a different parameter tree and so a
+  # separate profile rather than a branch inside this one.
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:igd"
+        operator: Exists
+
+  config:
+    # 10MB is a compromise: long enough to be a measurement rather than
+    # a burst, short enough that a slow line does not sit in the step
+    # timeout. Operators on faster or slower fleets change the path and
+    # raise the step timeouts to match.
+    test_file: 10MB.bin
+
+  # Generous, because the step timeouts are what actually bound the work
+  # and this only has to stop a run whose steps individually stay under
+  # budget from running forever.
+  timeout: 20m
+
+  steps:
+    - name: download
+      set:
+        canonical.diagnostics.download.url: "{{ .config.test_server }}/{{ .config.test_file }}"
+        # Writing Requested is what starts the test. It must be set in
+        # the same RPC as the URL, or the CPE starts against whatever
+        # URL it still held.
+        canonical.diagnostics.download.state: Requested
+      awaitParam: canonical.diagnostics.download.state
+      # Anything outside this set is terminal, including the several
+      # Error_* values TR-143 defines. Listing only the success value
+      # would leave a failed test polling until it timed out instead of
+      # reporting why it failed.
+      awaitNotIn: [Requested, None]
+      pollInterval: 5s
+      timeout: 5m
+      collect:
+        - InternetGatewayDevice.DownloadDiagnostics.
+    - name: upload
+      set:
+        canonical.diagnostics.upload.url: "{{ .config.test_server }}/upload"
+        canonical.diagnostics.upload.test_file_length: "10000000"
+        canonical.diagnostics.upload.state: Requested
+      awaitParam: canonical.diagnostics.upload.state
+      awaitNotIn: [Requested, None]
+      pollInterval: 5s
+      timeout: 5m
+      collect:
+        - InternetGatewayDevice.UploadDiagnostics.
+
+  normalize: platform/actions/speedtest-tr143.ts
