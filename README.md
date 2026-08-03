@@ -1,55 +1,120 @@
 # herder-public-configs
 
-Default provisioning rules, scripts, and device mappings for Herder.
+The default configuration Herder ships with: mapping profiles, telemetry
+profiles, provisioning rules, identity enrichment, topology scripts and
+dashboards.
 
-Add this repo as a Config Source in Herder to get working defaults out of the box. Operators can fork this repo and customize the rules for their network.
+Every Herder deployment already has this. The configservice image bakes a
+copy to `/etc/herder/configs` and points its default config source at it, so
+a fresh install renders dashboards and provisions devices without cloning
+anything. This repo is where that content is maintained, and what you fork
+if you want to change it.
 
-## Structure
+## Layout
+
+Files are grouped by what they describe, not by kind. A single file usually
+holds several documents, because the things that belong to one data model
+are easier to read together than scattered across four directories.
 
 ```
-provisioning/
-├── rules/           # Declarative YAML provisioning rules
-│   ├── boot.yaml          # Refreshes device state on reboot
-│   ├── first_contact.yaml # Full discovery on first bootstrap
-│   └── periodic.yaml      # Periodic maintenance (firmware, WAN IP)
-└── scripts/         # JavaScript provisioning scripts (goja ES6)
-    ├── boot.js
-    ├── first_contact.js
-    └── periodic.js
+baseline/            Vendor-neutral defaults, keyed by data model
+├── tr098/           TR-098 (InternetGatewayDevice.*) mappings, telemetry, dashboards
+├── tr181/           TR-181 (Device.*) mappings and telemetry
+├── usp/             USP-specific telemetry (subscription-driven, not polled)
+├── identity.yaml    Identity enrichment for CWMP and USP
+└── client-wifi-labels.yaml + generic-client-rssi-labels.ts
 
-mapping/
-├── profiles/        # Device profile selectors
-│   └── dev-sim-tr098.yaml       # Dev TR-098 CPE simulator profile
-├── mappings/        # Canonical-to-vendor path mappings
-│   └── diagnostics-tr098.yaml   # TR-143 diagnostics mapping
-└── identity/        # Identity enrichment profiles (content type: `identity`)
-    └── tr069-standard-identity.yaml  # Baseline firmwareVersion / model / productClass / manufacturer for any TR-069 CPE
+platform/            Behaviour that is not tied to a vendor or data model
+├── provisioning/    boot, first_contact and periodic rules with their scripts
+└── topology/        EasyMesh and TR-098 topology enrichment, plus a dashboard
+
+vendors/             Overrides for specific hardware
+├── arris/           ARRIS NVG578LX: X_0000C5_* extensions, HNC topology
+├── cpe-sim/         cpe-labs simulator profiles
+└── dev-sim/         genieacs-sim profile
 ```
 
-## Usage
+Scripts are TypeScript. The config walker only accepts `.ts`, and each one
+is transpiled and type-checked at upload against the SDK declarations, so a
+typo in a global fails when you push it rather than at 3am on a live fleet.
 
-In the Herder UI, go to **Config → Sources → Add Source** and point to this repo's URL. Set the type mappings to match the content you want to sync — `mapping/profiles` and `mapping/mappings` under the `mapping` source type, `mapping/identity` under the `identity` source type, `provisioning/*` under `provisioning`.
+## What is in here
 
-See the [Identity Enrichment guide](https://ispx-ltd.github.io/herder-docs/guides/identity-enrichment/) for what the baseline profile covers and when you need to ship your own vendor override.
+| Kind | Count | What it does |
+|------|-------|--------------|
+| `TelemetryProfile` | 14 | Which parameters to collect, and how often |
+| `MappingTable` | 7 | Canonical name to raw CPE path |
+| `MappingProfile` | 7 | Which mapping tables apply to which devices |
+| `EnrichmentRule` | 5 | Per-row telemetry labelling and topology emit |
+| `Dashboard` | 4 | Panel layouts over the telemetry and device data |
+| `ProvisioningRule` | 3 | What to do on boot, first contact and periodically |
+| `IdentityProfile` | 2 | Populating manufacturer, model and firmware |
 
-## Selector vocabulary
+## Using it
 
-Profiles, dashboards, and provisioning rules use a selector to decide which devices they apply to. Selectors match against labels Herder derives from each device row at evaluation time. Available label keys:
+Nothing to do for the defaults. They are already loaded.
+
+To run your own, add a config source pointing at your fork. Every domain
+walks the whole repository, because since Config Format v2 a document's kind
+comes from its own `apiVersion`/`kind` envelope rather than from where it
+sits on disk. Organise your fork however reads best; the path hints in a
+source only exist to scope the walk if the repository is large.
+
+Layering is by priority, and the direction is not the same for every kind.
+Mapping, telemetry and identity profiles resolve highest-first, which is why
+the baselines here sit at 10 and the vendor profiles at 50 or 100. Enrichment
+rules resolve lowest-first, which is why `generic-client-wifi` sits at 200 so
+a narrower vendor rule at 100 beats it. Check the guide for the kind you are
+writing rather than assuming, and copy the priority of the nearest existing
+file.
+
+Adding hardware support usually means one new file under `vendors/`, not
+editing anything in `baseline/`.
+
+## Selectors
+
+Every profile, rule and dashboard carries a `deviceSelector` deciding which
+devices it applies to. Selectors match labels Herder derives per device at
+evaluation time, from `backend/internal/mapping/selector/labels.go`:
 
 | Key | Source | Example |
 |-----|--------|---------|
-| `oui` | `devices.oui` (always present) | `oui: "001122"` |
-| `manufacturer` | Identity-enrichment populated | `manufacturer: "Acme"` |
-| `productClass` | CWMP DeviceID envelope or identity profile | `productClass: "BM632w"` |
-| `model` | Identity-enrichment populated | `model: "X100"` |
-| `firmwareVersion` | Identity-enrichment populated | `firmwareVersion: "2.1.0"` |
-| `tag:<value>` (Exists) | `devices.tags` | `key: "tag:vip", operator: Exists` |
-| `dataModel:<id>` (Exists) | Path-prefix detection at telemetry time | `dataModel:device` (TR-181 — both CWMP and USP), `dataModel:igd` (TR-098 legacy IGD) |
-| `protocol:<value>` (Exists) | `devices.protocols` | `protocol:cwmp`, `protocol:usp` — disambiguates wire protocol when `dataModel:device` matches both stacks |
+| `oui` | `devices.oui`, always present | `oui: "0000C5"` |
+| `manufacturer` | Identity enrichment | `manufacturer: "ARRIS"` |
+| `model` | Identity enrichment | `model: "NVG578LX"` |
+| `productClass` | CWMP DeviceID envelope, or identity enrichment | `productClass: "NVG578LX"` |
+| `firmwareVersion` | Identity enrichment | `firmwareVersion: "9.3.0h0d70"` |
+| `tag:<value>` | `devices.tags`, one label per tag, empty value | `{key: "tag:vip", operator: Exists}` |
+| `dataModel:<id>` | Path-prefix detection during telemetry | `dataModel:igd` for TR-098, `dataModel:device` for TR-181 |
+| `protocol:<value>` | `devices.protocols` | `protocol:cwmp`, `protocol:usp` |
 
-**Selector tips:**
+`matchLabels` is exact-match and ANDs across keys. `matchExpressions`
+supports `In`, `NotIn`, `Exists`, `DoesNotExist` and `SemverRange`, and also
+ANDs. The `tag:`, `dataModel:` and `protocol:` families encode their value
+in the key and carry an empty string, so they are matched with `Exists`
+rather than by value.
 
-- `matchLabels` is exact-match-AND across keys (e.g. `{ manufacturer: "Acme", productClass: "X100" }` requires both).
-- `matchExpressions` supports operators (`Exists`, `In`, `NotIn`, `DoesNotExist`, `SemverRange`) and is also AND across entries.
-- For OR semantics across two values of the same key (e.g. "TR-098 OR TR-181"), use `In` on the parent attribute or layer separate profiles.
-- `dataModel:device` matches both CWMP-TR-181 and USP-TR-181 devices because TR-181 is wire-protocol-agnostic. Use `protocol:cwmp` / `protocol:usp` only when behaviour genuinely differs by wire protocol — e.g. a future profile that runs CWMP-session-bound RPCs and shouldn't accidentally fire on USP devices, or vice versa. Most baseline TR-181 profiles in this repo correctly target the data model alone.
+There is no OR. For alternatives on the same key use `In`; for genuinely
+different targets, ship two profiles.
+
+Pick `dataModel:` over `protocol:` unless the wire protocol is what actually
+matters. TR-181 runs under both CWMP and USP, so `dataModel:device` matches
+either, which is normally what you want. Reach for `protocol:` when the
+behaviour is protocol-bound, such as a rule issuing CWMP session RPCs that
+would be meaningless against a USP agent.
+
+## Contributing
+
+Vendor support is the most useful thing to add: a `vendors/<name>/` file with
+a selector narrow enough not to capture anyone else's hardware. Model it on
+`vendors/arris/`, which covers the parameter mappings, the vendor telemetry
+extensions and a topology script.
+
+Two rules worth knowing before opening a PR. Baseline files must stay
+vendor-neutral, since they match every device with the matching data model.
+And paths use `{i}` for instance wildcards, not `*` or a literal index.
+
+Guides for each content type live in
+[ispx-limited/herder-docs](https://github.com/ispx-limited/herder-docs)
+under `docs/guides/`, including `device-selectors.md`, `mapping-profiles.md`,
+`telemetry-profiles.md`, `provisioning-rules.md` and `script-sdk.md`.
