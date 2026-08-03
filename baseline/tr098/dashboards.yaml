@@ -416,7 +416,7 @@ spec:
           version: 1
           datasource: prometheus
           query:
-            promql: "sum(rate(openacs_cwmp_informs_total[5m]))"
+            promql: "sum(rate(herder_cwmp_informs_total[5m]))"
             mode: instant
       config:
         unit: null
@@ -436,7 +436,7 @@ spec:
           version: 1
           datasource: prometheus
           query:
-            promql: "sum(rate(openacs_http_requests_total[5m]))"
+            promql: "sum(rate(herder_http_requests_total[5m]))"
             mode: instant
       config:
         unit: null
@@ -456,7 +456,7 @@ spec:
           version: 1
           datasource: prometheus
           query:
-            promql: "histogram_quantile(0.95, sum by (le) (openacs_cwmp_session_duration_seconds_bucket))"
+            promql: "histogram_quantile(0.95, sum by (le) (herder_cwmp_session_duration_seconds_bucket))"
             mode: instant
       config:
         unit: " s"
@@ -476,7 +476,7 @@ spec:
           version: 1
           datasource: prometheus
           query:
-            promql: "sum(rate(openacs_http_requests_total{status=~\"5..\"}[5m])) / clamp_min(sum(rate(openacs_http_requests_total[5m])), 1)"
+            promql: "sum(rate(herder_http_requests_total{status=~\"5..\"}[5m])) / clamp_min(sum(rate(herder_http_requests_total[5m])), 1)"
             mode: instant
       config:
         unit: null

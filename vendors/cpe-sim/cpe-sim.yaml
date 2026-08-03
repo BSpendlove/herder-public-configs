@@ -2,7 +2,7 @@
 # (github.com/herder-labs/cpe-labs, profile example-tr098-gateway).
 #
 # Matched on the synthetic ProductClass `GenericIGD` exposed by the
-# example-tr098-gateway profile so the same OpenACS dev stack can host
+# example-tr098-gateway profile so the same Herder dev stack can host
 # both genieacs-sim (dev-sim-tr098, OUI 202BC1) and the cpe-sim
 # alternate without either profile poaching the other.
 #
