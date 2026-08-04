@@ -33,18 +33,15 @@ spec:
         operator: Exists
 
   config:
-    # Time-based download (TR-143 section 4.3): the server streams for a
-    # fixed duration instead of a fixed size. A sized test on a fast line
-    # is over in a blink — 10MB at 700 Mbit/s is a tenth of a second —
-    # which both starves the live needle and measures a burst rather
-    # than a sustained rate. Eight seconds is long enough to watch and
-    # to mean something, on any line speed.
-    test_file: dntimebasedmode_8.txt
-    # Upload is time-based too, for the same reason as download: a sized
-    # upload on a fast line is over before it can be watched or trusted
-    # as a sustained rate. Firmware that ignores TimeBasedTestDuration
+    # Both directions run time-based (TR-143 section 4.3) for this many
+    # seconds: the server streams for a fixed duration instead of a
+    # fixed size, so the test measures a sustained rate at any line
+    # speed and lasts long enough to watch. The data model caps
+    # TimeBasedTestDuration at 999 seconds; eight is the default because
+    # a diagnostic should cost the subscriber's line seconds, not
+    # minutes. Firmware that ignores TimeBasedTestDuration on upload
     # needs a vendor profile with a sized upload instead.
-    upload_seconds: "8"
+    test_seconds: "8"
 
   # Generous, because the step timeouts are what actually bound the work
   # and this only has to stop a run whose steps individually stay under
@@ -58,7 +55,7 @@ spec:
         # endpoint can attribute the in-flight transfer to exactly this
         # run — that is what moves the UI needle on measured bytes while
         # the CPE is still silent.
-        canonical.diagnostics.download.url: "{{ .config.test_server }}/{{ .config.test_file }}?ref={{ .run.id }}"
+        canonical.diagnostics.download.url: "{{ .config.test_server }}/dntimebasedmode_{{ .config.test_seconds }}.txt?ref={{ .run.id }}"
         # Writing Requested is what starts the test. It must be set in
         # the same RPC as the URL, or the CPE starts against whatever
         # URL it still held.
@@ -83,7 +80,7 @@ spec:
       set:
         canonical.diagnostics.upload.url: "{{ .config.test_server }}/upload?ref={{ .run.id }}"
         canonical.diagnostics.upload.test_file_length: "0"
-        InternetGatewayDevice.UploadDiagnostics.TimeBasedTestDuration: "{{ .config.upload_seconds }}"
+        InternetGatewayDevice.UploadDiagnostics.TimeBasedTestDuration: "{{ .config.test_seconds }}"
         canonical.diagnostics.upload.state: Requested
       awaitParam: canonical.diagnostics.upload.state
       awaitNotIn: [Requested, None]
