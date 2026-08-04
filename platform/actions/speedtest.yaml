@@ -33,11 +33,18 @@ spec:
         operator: Exists
 
   config:
-    # 10MB is a compromise: long enough to be a measurement rather than
-    # a burst, short enough that a slow line does not sit in the step
-    # timeout. Operators on faster or slower fleets change the path and
-    # raise the step timeouts to match.
-    test_file: 10MB.bin
+    # Time-based download (TR-143 section 4.3): the server streams for a
+    # fixed duration instead of a fixed size. A sized test on a fast line
+    # is over in a blink — 10MB at 700 Mbit/s is a tenth of a second —
+    # which both starves the live needle and measures a burst rather
+    # than a sustained rate. Eight seconds is long enough to watch and
+    # to mean something, on any line speed.
+    test_file: dntimebasedmode_8.txt
+    # Upload is time-based too, for the same reason as download: a sized
+    # upload on a fast line is over before it can be watched or trusted
+    # as a sustained rate. Firmware that ignores TimeBasedTestDuration
+    # needs a vendor profile with a sized upload instead.
+    upload_seconds: "8"
 
   # Generous, because the step timeouts are what actually bound the work
   # and this only has to stop a run whose steps individually stay under
@@ -47,7 +54,11 @@ spec:
   steps:
     - name: download
       set:
-        canonical.diagnostics.download.url: "{{ .config.test_server }}/{{ .config.test_file }}"
+        # The ref tag is this run's id, so the test server's /live
+        # endpoint can attribute the in-flight transfer to exactly this
+        # run — that is what moves the UI needle on measured bytes while
+        # the CPE is still silent.
+        canonical.diagnostics.download.url: "{{ .config.test_server }}/{{ .config.test_file }}?ref={{ .run.id }}"
         # Writing Requested is what starts the test. It must be set in
         # the same RPC as the URL, or the CPE starts against whatever
         # URL it still held.
@@ -60,17 +71,27 @@ spec:
       awaitNotIn: [Requested, None]
       pollInterval: 5s
       timeout: 5m
+      probe:
+        # Filtered server-side to this run's transfers: attribution is
+        # transactional (the ref minted per run), never by peer address,
+        # which NAT makes ambiguous.
+        url: "{{ .config.probe_server }}/live?ref={{ .run.id }}"
+        interval: 1s
       collect:
         - InternetGatewayDevice.DownloadDiagnostics.
     - name: upload
       set:
-        canonical.diagnostics.upload.url: "{{ .config.test_server }}/upload"
-        canonical.diagnostics.upload.test_file_length: "10000000"
+        canonical.diagnostics.upload.url: "{{ .config.test_server }}/upload?ref={{ .run.id }}"
+        canonical.diagnostics.upload.test_file_length: "0"
+        InternetGatewayDevice.UploadDiagnostics.TimeBasedTestDuration: "{{ .config.upload_seconds }}"
         canonical.diagnostics.upload.state: Requested
       awaitParam: canonical.diagnostics.upload.state
       awaitNotIn: [Requested, None]
       pollInterval: 5s
       timeout: 5m
+      probe:
+        url: "{{ .config.probe_server }}/live?ref={{ .run.id }}"
+        interval: 1s
       collect:
         - InternetGatewayDevice.UploadDiagnostics.
 

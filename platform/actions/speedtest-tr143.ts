@@ -71,6 +71,33 @@ function mbps(bytes: number | null, startRaw: string | undefined, endRaw: string
 
 const p = action.params;
 
+// Server-side observation of the same transfer, captured by the step
+// probe from the test server's /live endpoint. Some firmware runs a
+// time-based test perfectly and then files an empty report (this
+// ARRIS leaves TestBytesReceived* at zero and the timestamps blank in
+// timed mode). The transfer still happened and the server measured it
+// byte for byte, so the probe is the result's fallback: a real
+// measurement of the same wire, attributed by this run's ref tag.
+function probeRate(step: string, kind: string): { mbps: number; bytes: number } | null {
+  const raw = p["probe." + step];
+  if (!raw) return null;
+  try {
+    const body = JSON.parse(raw) as {
+      transfers?: { test: string; ref: string; bytes: number; elapsed_ms: number }[];
+    };
+    const t = (body.transfers ?? []).find(
+      (x) => x.test.startsWith(kind) && x.ref === action.runId,
+    );
+    if (!t || t.elapsed_ms <= 0 || t.bytes <= 0) return null;
+    return {
+      mbps: Math.round(((t.bytes * 8) / (t.elapsed_ms / 1000) / 1e6) * 100) / 100,
+      bytes: t.bytes,
+    };
+  } catch {
+    return null;
+  }
+}
+
 // Connect time doubles as the latency estimate. It is a TCP handshake to
 // the test server, not an ICMP RTT, so it includes server accept latency
 // and is a ceiling on the true path RTT rather than a measurement of it.
@@ -82,18 +109,33 @@ const latency = (() => {
   return d >= 0 ? Math.round(d * 100) / 100 : null;
 })();
 
-const bytesDown = num(p[DL + "TestBytesReceived"]);
-const bytesUp = num(p[UL + "TestBytesSent"]);
+// Timed tests report the spec-preferred figure under "full loading"
+// (the window with every connection saturated); sized tests report the
+// plain counters. Prefer full-loading when it is present and non-zero.
+const bytesDown =
+  num(p[DL + "TestBytesReceivedUnderFullLoading"]) ||
+  num(p[DL + "TestBytesReceived"]);
+const bytesUp =
+  num(p[UL + "TestBytesSentUnderFullLoading"]) ||
+  num(p[UL + "TestBytesSent"]);
+
+const dlProbe = probeRate("download", "http_download");
+const ulProbe = probeRate("upload", "http_upload");
+const dlCpe = mbps(bytesDown, p[DL + "BOMTime"], p[DL + "EOMTime"]);
+const ulCpe = mbps(bytesUp, p[UL + "BOMTime"], p[UL + "EOMTime"]);
 
 const out: Result = {
   capability: action.capability,
-  method: "tr143-http",
-  download_mbps: mbps(bytesDown, p[DL + "BOMTime"], p[DL + "EOMTime"]),
-  upload_mbps: mbps(bytesUp, p[UL + "BOMTime"], p[UL + "EOMTime"]),
+  // The CPE'"'"'s own figure wins when it exists; the server'"'"'s observation
+  // of the same transfer fills vendor gaps, and the method says which.
+  method:
+    dlCpe === null && dlProbe !== null ? "tr143-http+server" : "tr143-http",
+  download_mbps: dlCpe ?? dlProbe?.mbps ?? null,
+  upload_mbps: ulCpe ?? ulProbe?.mbps ?? null,
   latency_ms: latency,
-  bytes_down: bytesDown,
-  bytes_up: bytesUp,
-  measured_at: p[DL + "EOMTime"] ?? null,
+  bytes_down: bytesDown || dlProbe?.bytes || null,
+  bytes_up: bytesUp || ulProbe?.bytes || null,
+  measured_at: p[DL + "EOMTime"] || p[UL + "EOMTime"] || null,
   limits: {
     // The transfer is terminated by the CPE's own CPU, so on a
     // multi-gigabit line this measures the device rather than the
