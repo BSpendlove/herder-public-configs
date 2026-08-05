@@ -99,6 +99,7 @@ spec:
         operator: Exists
   parameterMappings:
     - device-info-tr181
+    - firmware-tr181
     - wifi-tr181
 ---
 # CWMP-only half of the TR-181 baseline: the `canonical.mgmt.*` table.
@@ -129,6 +130,7 @@ spec:
         operator: Exists
   parameterMappings:
     - device-info-tr181
+    - firmware-tr181
     - mgmt-tr181
     - wifi-tr181
 
@@ -260,4 +262,44 @@ spec:
     - canonical: canonical.wifi.ap.4.client_count
       valueType: unsignedint
       devicePath: Device.WiFi.AccessPoint.4.AssociatedDeviceNumberOfEntries
-
+---
+# Firmware, TR-181.
+#
+# canonical.firmware.download is the command a USP firmware campaign
+# invokes. USP has no Download message: fetching and applying an image
+# is a command on the data model, so the campaign asks the device's
+# mapping profile where that command lives rather than assuming a path.
+#
+# Instance 1 because TR-181 numbers firmware images from one, and a
+# single-bank agent has only that. A dual-bank device exposes two and
+# has a policy about which to overwrite; an operator running those
+# copies this table, narrows the profile's selector and points the
+# canonical name at the slot they want. That choice is theirs, which is
+# exactly why the command is a mapping and not a constant in the engine.
+#
+# The remaining entries are the image's own state. They are what tells
+# an operator whether a campaign that reported success actually left the
+# fleet running the new build, which the campaign itself cannot know: a
+# CPE reporting a completed transfer has taken the file, not necessarily
+# applied it.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: firmware-tr181
+spec:
+  mappings:
+    - canonical: canonical.firmware.download
+      valueType: string
+      devicePath: Device.DeviceInfo.FirmwareImage.1.Download()
+    - canonical: canonical.firmware.image.name
+      valueType: string
+      devicePath: Device.DeviceInfo.FirmwareImage.1.Name
+    - canonical: canonical.firmware.image.version
+      valueType: string
+      devicePath: Device.DeviceInfo.FirmwareImage.1.Version
+    - canonical: canonical.firmware.image.status
+      valueType: string
+      devicePath: Device.DeviceInfo.FirmwareImage.1.Status
+    - canonical: canonical.firmware.image.available
+      valueType: boolean
+      devicePath: Device.DeviceInfo.FirmwareImage.1.Available
