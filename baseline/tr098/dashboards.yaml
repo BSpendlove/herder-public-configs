@@ -364,7 +364,7 @@ spec:
       kind: pie
       title: Lifecycle distribution
       description: Fleet split by current lifecycle state
-      layout: {x: 0, y: 4, w: 6, h: 6}
+      layout: {x: 0, y: 4, w: 4, h: 6}
       queries:
         - refId: A
           version: 1
@@ -387,7 +387,7 @@ spec:
       kind: bar
       title: Top firmware versions
       description: Devices grouped by reported firmware version
-      layout: {x: 6, y: 4, w: 6, h: 6}
+      layout: {x: 4, y: 4, w: 8, h: 6}
       queries:
         - refId: A
           version: 1
@@ -404,13 +404,37 @@ spec:
           displayMode: hidden
           placement: bottom
           calcs: []
-    # ── Platform activity row (Prometheus) ─────────────────────────────
+    # ── Fleet activity row ─────────────────────────────────────────────
+    - id: panel-inform-activity
+      kind: line
+      title: Inform activity
+      description: Telemetry samples per interval across the fleet
+      layout: {x: 0, y: 10, w: 8, h: 6}
+      queries:
+        - refId: A
+          version: 1
+          datasource: telemetry_history
+          query:
+            agg: count
+            filters: {path: "InternetGatewayDevice.DeviceInfo.UpTime"}
+      config:
+        showPoints: false
+        interpolation: monotone
+        yAxis: {kind: auto}
+        unit: null
+        legend:
+          displayMode: hidden
+          placement: bottom
+          calcs: []
+    # ── Platform activity row (Prometheus; live in the split-service
+    #    deployment — the monolith does not export these domain metrics
+    #    yet, so this row shows compact empty tiles there) ──────────────
     - id: panel-informs-rate
       kind: stat
       title: Informs / sec
       description: 5-minute rate of CWMP Inform events
       descriptionPlacement: bottom
-      layout: {x: 0, y: 10, w: 3, h: 4}
+      layout: {x: 0, y: 22, w: 3, h: 4}
       queries:
         - refId: A
           version: 1
@@ -430,7 +454,7 @@ spec:
       title: HTTP req / sec
       description: API request rate (5-min average)
       descriptionPlacement: bottom
-      layout: {x: 3, y: 10, w: 3, h: 4}
+      layout: {x: 3, y: 22, w: 3, h: 4}
       queries:
         - refId: A
           version: 1
@@ -450,7 +474,7 @@ spec:
       title: Session p95
       description: 95th percentile CWMP session duration
       descriptionPlacement: bottom
-      layout: {x: 6, y: 10, w: 3, h: 4}
+      layout: {x: 6, y: 22, w: 3, h: 4}
       queries:
         - refId: A
           version: 1
@@ -470,7 +494,7 @@ spec:
       title: HTTP error rate
       description: Fraction of 5xx responses
       descriptionPlacement: bottom
-      layout: {x: 9, y: 10, w: 3, h: 4}
+      layout: {x: 9, y: 22, w: 3, h: 4}
       queries:
         - refId: A
           version: 1
@@ -482,18 +506,17 @@ spec:
         unit: null
         format: percent
         thresholds:
-          - {at: 0.01, color: "var(--chart-3)"}
-          - {at: 0.05, color: "var(--chart-4)"}
+          - {at: 0.01, color: "var(--warning)"}
+          - {at: 0.05, color: "var(--destructive)"}
         showSparkline: false
         showPriorPeriodDelta: false
         icon: alert
-    # ── Detail row ─────────────────────────────────────────────────────
     - id: panel-uptime-stat
       kind: stat
       title: Avg uptime (current)
       description: Last reported InternetGatewayDevice.DeviceInfo.UpTime
       descriptionPlacement: bottom
-      layout: {x: 0, y: 14, w: 4, h: 5}
+      layout: {x: 8, y: 10, w: 4, h: 6}
       queries:
         - refId: A
           version: 1
@@ -505,16 +528,16 @@ spec:
         unit: null
         format: duration_seconds
         thresholds:
-          - {at: 86400, color: "var(--chart-2)"}
-          - {at: 604800, color: "var(--chart-1)"}
-        showSparkline: false
+          - {at: 86400, color: "var(--success)"}
+        showSparkline: true
         showPriorPeriodDelta: false
         icon: clock
+    # ── Detail row ─────────────────────────────────────────────────────
     - id: panel-recent-table
       kind: table
       title: Devices by latest WiFi signal
       description: Sortable; last RSSI sample per device
-      layout: {x: 4, y: 14, w: 8, h: 5}
+      layout: {x: 0, y: 16, w: 12, h: 6}
       queries:
         - refId: A
           version: 1
