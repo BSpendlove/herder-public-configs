@@ -74,7 +74,7 @@ spec:
     - id: panel-rssi
       kind: line
       title: Client signal strength (RSSI)
-      layout: {x: 0, y: 0, w: 12, h: 6}
+      layout: {x: 0, y: 0, w: 12, h: 8}
       queries:
         - refId: A
           version: 1
@@ -91,7 +91,7 @@ spec:
         unit: " dBm"
         legend:
           displayMode: table
-          placement: right
+          placement: bottom
           calcs: [last, mean, min, max]
     # Per-band RSSI radars (#434). One radar each for 2.4 / 5 / 6 GHz.
     # Each is a polar snapshot of every client currently associated on
@@ -103,7 +103,7 @@ spec:
     - id: panel-rssi-radar-2_4ghz
       kind: radar
       title: WiFi 2.4 GHz client signals
-      layout: {x: 0, y: 6, w: 4, h: 6}
+      layout: {x: 0, y: 8, w: 4, h: 8}
       queries:
         - refId: A
           version: 1
@@ -133,7 +133,7 @@ spec:
     - id: panel-rssi-radar-5ghz
       kind: radar
       title: WiFi 5 GHz client signals
-      layout: {x: 4, y: 6, w: 4, h: 6}
+      layout: {x: 4, y: 8, w: 4, h: 8}
       queries:
         - refId: A
           version: 1
@@ -163,7 +163,7 @@ spec:
     - id: panel-rssi-radar-6ghz
       kind: radar
       title: WiFi 6 GHz client signals
-      layout: {x: 8, y: 6, w: 4, h: 6}
+      layout: {x: 8, y: 8, w: 4, h: 8}
       queries:
         - refId: A
           version: 1
@@ -195,7 +195,7 @@ spec:
       # (the original Active WiFi clients panel below was at y=6 — bumped down.)
       kind: line
       title: Active WiFi clients
-      layout: {x: 0, y: 12, w: 12, h: 4}
+      layout: {x: 0, y: 16, w: 12, h: 5}
       queries:
         - refId: A
           version: 1
@@ -216,7 +216,7 @@ spec:
     - id: panel-self-steer
       kind: line
       title: Cumulative self-steer count per client
-      layout: {x: 0, y: 16, w: 6, h: 5}
+      layout: {x: 0, y: 21, w: 6, h: 6}
       queries:
         - refId: A
           version: 1
@@ -238,7 +238,7 @@ spec:
     - id: panel-steering-unfriendly
       kind: line
       title: Steering-unfriendly events per client
-      layout: {x: 6, y: 16, w: 6, h: 5}
+      layout: {x: 6, y: 21, w: 6, h: 6}
       queries:
         - refId: A
           version: 1
