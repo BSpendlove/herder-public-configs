@@ -1,0 +1,230 @@
+# Wi-Fi Alliance Data Elements: the RF tree, mapped to canonicals.
+#
+# WHY THIS FILE IS WORTH MORE THAN ANY VENDOR PROFILE.
+#
+# Every other source of Wi-Fi RF data in this repository is a per-vendor
+# spelling of one quantity. Data Elements (`Device.WiFi.DataElements.*`,
+# TR-181 Issue 2, defined by the Wi-Fi Alliance alongside EasyMesh) is the
+# only standardised place where channel utilisation, the noise floor, the
+# own-versus-other airtime split, per-BSS counters and neighbour scan
+# results all exist as one coherent tree with one set of names. Any
+# EasyMesh-certified CPE has it, which by now is most of what an ISP is
+# shipping.
+#
+# So a fleet with Data Elements gets the whole RF surface with no vendor
+# work at all, and the operator's alternative is a mapping profile per
+# gateway model.
+#
+# WHAT THIS BUYS THAT TR-181 PROPER DOES NOT.
+#
+# `Device.WiFi.Radio.{i}.ChannelUtilization` is one number: the channel
+# was 70% busy. It cannot say whether that was this home streaming or the
+# neighbours. Data Elements splits it at the source:
+#
+#   Transmit      time this radio spent transmitting
+#   ReceiveSelf   time it spent receiving from its own BSSs
+#   ReceiveOther  time it spent receiving from everything else
+#
+# That is the stacked bar eero draws, measured rather than estimated, and
+# it is the difference between telling an operator "this home is busy" and
+# telling them "this home is busy because of its neighbours, so a channel
+# change will help and a better gateway will not".
+#
+# WHICH DEVICE IS THIS CPE.
+#
+# `Network.Device.{i}` enumerates every AP in the mesh, controller and
+# agents together, so index 1 is the gateway on the CPE this profile is
+# bound to only by convention. It is the convention every implementation
+# observed so far follows (the controller enumerates itself first), and
+# the cost of it being wrong is that an extender's radios are reported
+# under the gateway's canonical names, which is the same home either way.
+# An operator running a fleet that orders them differently narrows this
+# table on their own profile. Mesh nodes as separate radios are S2's
+# problem, not this file's.
+#
+# WHY THE INSTANCES ARE ENUMERATED.
+#
+# A canonical wildcard is expanded by walking the DECLARED entries in the
+# table, not by scanning the device's parameters, so an instance only
+# exists northbound if it is written out. Three radios rather than the
+# two wifi-tr181 declares, because a Data Elements CPE is by definition
+# recent enough to be tri-band.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: wifi-rf-dataelements
+spec:
+  mappings:
+    # Utilization, Transmit, ReceiveSelf and ReceiveOther are all the
+    # IEEE 802.11 BSS Load encoding the Data Elements spec inherits: a
+    # linear 0-255 scale where 255 is 100% of the measurement window.
+    # The canonical is a percentage, so every one of them carries the
+    # 100/255 conversion here, in the profile, never in a reader.
+    #
+    # The noise floor is ANPI-encoded (defined in the same units as
+    # RCPI): value = (dBm + 110) * 2, so 0 is -110 dBm and 220 is 0 dBm.
+    # The canonical is dBm, hence multiplier 0.5 and offset -110.
+    # --- Radio 1 ---
+    - canonical: canonical.wifi.radio.1.channel
+      valueType: unsignedint
+      devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.1.CurrentOperatingClasses.1.Channel
+    - canonical: canonical.wifi.radio.1.utilization
+      valueType: unsignedint
+      devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.1.Utilization
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.392156862745   # 100/255
+    - canonical: canonical.wifi.radio.1.airtime.transmit
+      valueType: unsignedint
+      devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.1.Transmit
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.392156862745   # 100/255
+    - canonical: canonical.wifi.radio.1.airtime.receive_self
+      valueType: unsignedint
+      devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.1.ReceiveSelf
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.392156862745   # 100/255
+    - canonical: canonical.wifi.radio.1.airtime.receive_other
+      valueType: unsignedint
+      devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.1.ReceiveOther
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.392156862745   # 100/255
+    - canonical: canonical.wifi.radio.1.noise
+      valueType: int
+      devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.1.Noise
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.5
+              offset: -110
+    # --- Radio 2 ---
+    - canonical: canonical.wifi.radio.2.channel
+      valueType: unsignedint
+      devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.2.CurrentOperatingClasses.1.Channel
+    - canonical: canonical.wifi.radio.2.utilization
+      valueType: unsignedint
+      devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.2.Utilization
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.392156862745   # 100/255
+    - canonical: canonical.wifi.radio.2.airtime.transmit
+      valueType: unsignedint
+      devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.2.Transmit
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.392156862745   # 100/255
+    - canonical: canonical.wifi.radio.2.airtime.receive_self
+      valueType: unsignedint
+      devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.2.ReceiveSelf
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.392156862745   # 100/255
+    - canonical: canonical.wifi.radio.2.airtime.receive_other
+      valueType: unsignedint
+      devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.2.ReceiveOther
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.392156862745   # 100/255
+    - canonical: canonical.wifi.radio.2.noise
+      valueType: int
+      devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.2.Noise
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.5
+              offset: -110
+    # --- Radio 3 ---
+    - canonical: canonical.wifi.radio.3.channel
+      valueType: unsignedint
+      devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.3.CurrentOperatingClasses.1.Channel
+    - canonical: canonical.wifi.radio.3.utilization
+      valueType: unsignedint
+      devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.3.Utilization
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.392156862745   # 100/255
+    - canonical: canonical.wifi.radio.3.airtime.transmit
+      valueType: unsignedint
+      devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.3.Transmit
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.392156862745   # 100/255
+    - canonical: canonical.wifi.radio.3.airtime.receive_self
+      valueType: unsignedint
+      devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.3.ReceiveSelf
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.392156862745   # 100/255
+    - canonical: canonical.wifi.radio.3.airtime.receive_other
+      valueType: unsignedint
+      devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.3.ReceiveOther
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.392156862745   # 100/255
+    - canonical: canonical.wifi.radio.3.noise
+      valueType: int
+      devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.3.Noise
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.5
+              offset: -110
+---
+# Data Elements RF, bound to any TR-181 CPE.
+#
+# Priority 20, above the TR-181 baseline's 10, because where a CPE
+# populates both trees the Data Elements one is the better answer: it is
+# the standardised measurement rather than a parameter each vendor
+# interprets, and it carries the airtime split that TR-181 proper cannot
+# express at all.
+#
+# Bound on `dataModel:device` rather than on a Data Elements-specific
+# label because there is no such label: the CWMP handler derives
+# dataModel from the path prefixes a CPE volunteers in its Inform, and
+# `Device.WiFi.DataElements.*` is inside `Device.*`. A CPE without the
+# tree therefore binds this profile and simply has no values under it,
+# which costs one negative-cache entry per path on the first session and
+# nothing afterwards. That is the right trade against making every
+# operator with an EasyMesh fleet write this file themselves.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingProfile
+metadata:
+  name: dataelements-wifi-rf
+spec:
+  priority: 20
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:device"
+        operator: Exists
+  parameterMappings:
+    - wifi-rf-dataelements

@@ -101,6 +101,14 @@ spec:
     - device-info-tr181
     - firmware-tr181
     - wifi-tr181
+    # The neighbour-scan vocabulary. Bound here as well as declared,
+    # because the `wifi_scan` action resolves canonical.wifi.scan.state
+    # through the DEVICE's profile: a table that is only declared is
+    # visible to the fleet-wide path lookup the RF graph reads with, and
+    # invisible to the per-device resolve the trigger needs.
+    - wifi-scan-tr181
+    - wifi-capability-tr181
+    - wifi-rf-tr181
 ---
 # CWMP-only half of the TR-181 baseline: the `canonical.mgmt.*` table.
 #
@@ -133,6 +141,9 @@ spec:
     - firmware-tr181
     - mgmt-tr181
     - wifi-tr181
+    - wifi-scan-tr181
+    - wifi-capability-tr181
+    - wifi-rf-tr181
 
 ---
 # Canonical WiFi mappings for TR-181 (Device.*) devices.
@@ -178,6 +189,33 @@ spec:
     - canonical: canonical.wifi.radio.2.band
       valueType: string
       devicePath: Device.WiFi.Radio.2.OperatingFrequencyBand
+    # A third radio, because 6 GHz is normally Radio.3 on a tri-band
+    # gateway and a band the platform cannot see is a band it will report
+    # as absent.
+    - canonical: canonical.wifi.radio.3.enable
+      valueType: boolean
+      devicePath: Device.WiFi.Radio.3.Enable
+    - canonical: canonical.wifi.radio.3.status
+      valueType: string
+      devicePath: Device.WiFi.Radio.3.Status
+    - canonical: canonical.wifi.radio.3.channel
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.3.Channel
+    - canonical: canonical.wifi.radio.3.band
+      valueType: string
+      devicePath: Device.WiFi.Radio.3.OperatingFrequencyBand
+    # The operating width. Without it every radio in a TR-181 fleet is
+    # drawn at the assumed 20 MHz and reported as a coverage gap, and no
+    # radio can be told apart from one running below what it supports.
+    - canonical: canonical.wifi.radio.1.bandwidth
+      valueType: string
+      devicePath: Device.WiFi.Radio.1.OperatingChannelBandwidth
+    - canonical: canonical.wifi.radio.2.bandwidth
+      valueType: string
+      devicePath: Device.WiFi.Radio.2.OperatingChannelBandwidth
+    - canonical: canonical.wifi.radio.3.bandwidth
+      valueType: string
+      devicePath: Device.WiFi.Radio.3.OperatingChannelBandwidth
     - canonical: canonical.wifi.ssid.1.enable
       valueType: boolean
       devicePath: Device.WiFi.SSID.1.Enable
@@ -303,3 +341,403 @@ spec:
     - canonical: canonical.firmware.image.available
       valueType: boolean
       devicePath: Device.DeviceInfo.FirmwareImage.1.Available
+
+---
+# Radio, access point and client CAPABILITY for TR-181 (Device.*) devices.
+#
+# The rest of the WiFi tables map what a CPE is DOING. This one maps what
+# it says it CAN do, which is what the Spectrum page's band and capability
+# posture compares the operating values against: a 6 GHz radio that is
+# off, a width below what the radio supports, WPA3 available and not
+# enabled, a client on 2.4 GHz whose 802.11 standard implies it has a
+# 5 GHz radio.
+#
+# INSTANCE RANGES ARE A DECLARATION, NOT A LIMIT.
+#
+# A canonical wildcard is expanded by walking the entries in this table,
+# not by scanning the device, so an instance only exists northbound if it
+# is written out here. The ranges below cover what residential gateways
+# expose: 3 radios (2.4, 5 and 6 GHz), 4 access points, 8 associated
+# clients per access point. Operators serving devices with more extend
+# this table at a higher-priority profile; nothing in Go caps the count,
+# and the Spectrum page reports clients beyond the mapped range as
+# coverage rather than counting them as absent.
+#
+# The client range is the one worth thinking about before changing it.
+# Every mapped instance is a raw path in the fleet-wide path lookup, which
+# is capped at 500 results, so a range of 64 clients per access point
+# would crowd out the rest of the vocabulary and under-count the page in a
+# way only the `truncated` coverage flag would reveal.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: wifi-capability-tr181
+spec:
+  mappings:
+    # Radio capability, against the operating values in wifi-tr181.
+    - canonical: canonical.wifi.radio.1.supported_bands
+      valueType: string
+      devicePath: Device.WiFi.Radio.1.SupportedFrequencyBands
+    - canonical: canonical.wifi.radio.1.possible_channels
+      valueType: string
+      devicePath: Device.WiFi.Radio.1.PossibleChannels
+    - canonical: canonical.wifi.radio.1.supported_standards
+      valueType: string
+      devicePath: Device.WiFi.Radio.1.SupportedStandards
+    - canonical: canonical.wifi.radio.1.operating_standards
+      valueType: string
+      devicePath: Device.WiFi.Radio.1.OperatingStandards
+    - canonical: canonical.wifi.radio.1.supported_bandwidths
+      valueType: string
+      devicePath: Device.WiFi.Radio.1.SupportedOperatingChannelBandwidths
+    - canonical: canonical.wifi.radio.2.supported_bands
+      valueType: string
+      devicePath: Device.WiFi.Radio.2.SupportedFrequencyBands
+    - canonical: canonical.wifi.radio.2.possible_channels
+      valueType: string
+      devicePath: Device.WiFi.Radio.2.PossibleChannels
+    - canonical: canonical.wifi.radio.2.supported_standards
+      valueType: string
+      devicePath: Device.WiFi.Radio.2.SupportedStandards
+    - canonical: canonical.wifi.radio.2.operating_standards
+      valueType: string
+      devicePath: Device.WiFi.Radio.2.OperatingStandards
+    - canonical: canonical.wifi.radio.2.supported_bandwidths
+      valueType: string
+      devicePath: Device.WiFi.Radio.2.SupportedOperatingChannelBandwidths
+    - canonical: canonical.wifi.radio.3.supported_bands
+      valueType: string
+      devicePath: Device.WiFi.Radio.3.SupportedFrequencyBands
+    - canonical: canonical.wifi.radio.3.possible_channels
+      valueType: string
+      devicePath: Device.WiFi.Radio.3.PossibleChannels
+    - canonical: canonical.wifi.radio.3.supported_standards
+      valueType: string
+      devicePath: Device.WiFi.Radio.3.SupportedStandards
+    - canonical: canonical.wifi.radio.3.operating_standards
+      valueType: string
+      devicePath: Device.WiFi.Radio.3.OperatingStandards
+    - canonical: canonical.wifi.radio.3.supported_bandwidths
+      valueType: string
+      devicePath: Device.WiFi.Radio.3.SupportedOperatingChannelBandwidths
+    # Security, supported against enabled. `security_mode` itself is in
+    # wifi-tr181; without the supported list next to it, an access point
+    # running WPA2 cannot be told apart from one that can do nothing else.
+    - canonical: canonical.wifi.ap.1.security_modes_supported
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.1.Security.ModesSupported
+    - canonical: canonical.wifi.ap.2.security_modes_supported
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.2.Security.ModesSupported
+    - canonical: canonical.wifi.ap.3.security_modes_supported
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.3.Security.ModesSupported
+    - canonical: canonical.wifi.ap.4.security_modes_supported
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.4.Security.ModesSupported
+    # The reference chain that says which radio an access point is on.
+    # TR-181 splits radio, SSID and access point into three objects, so a
+    # client's band is only knowable by following AccessPoint.SSIDReference
+    # to an SSID and that SSID's LowerLayers to a radio. Both are followed
+    # by VALUE: the mapper says which parameter holds the reference, and
+    # the CPE says what it points at.
+    - canonical: canonical.wifi.ap.1.ssid_ref
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.1.SSIDReference
+    - canonical: canonical.wifi.ap.2.ssid_ref
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.2.SSIDReference
+    - canonical: canonical.wifi.ap.3.ssid_ref
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.3.SSIDReference
+    - canonical: canonical.wifi.ap.4.ssid_ref
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.4.SSIDReference
+    - canonical: canonical.wifi.ssid.1.lower_layers
+      valueType: string
+      devicePath: Device.WiFi.SSID.1.LowerLayers
+    - canonical: canonical.wifi.ssid.2.lower_layers
+      valueType: string
+      devicePath: Device.WiFi.SSID.2.LowerLayers
+    - canonical: canonical.wifi.ssid.3.lower_layers
+      valueType: string
+      devicePath: Device.WiFi.SSID.3.LowerLayers
+    - canonical: canonical.wifi.ssid.4.lower_layers
+      valueType: string
+      devicePath: Device.WiFi.SSID.4.LowerLayers
+    # Per-client capability. OperatingStandard is the standard the client
+    # is using on the band it is currently on, which is why the sticky
+    # finding infers 5 GHz support from it rather than reading it; see
+    # `implies_5ghz` in api/app/services/spectrum_capability.py for the
+    # assumption and its failure case.
+    - canonical: canonical.wifi.ap.1.client.1.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.1.AssociatedDevice.1.OperatingStandard
+    - canonical: canonical.wifi.ap.1.client.1.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.1.AssociatedDevice.1.SignalStrength
+    - canonical: canonical.wifi.ap.1.client.2.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.1.AssociatedDevice.2.OperatingStandard
+    - canonical: canonical.wifi.ap.1.client.2.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.1.AssociatedDevice.2.SignalStrength
+    - canonical: canonical.wifi.ap.1.client.3.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.1.AssociatedDevice.3.OperatingStandard
+    - canonical: canonical.wifi.ap.1.client.3.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.1.AssociatedDevice.3.SignalStrength
+    - canonical: canonical.wifi.ap.1.client.4.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.1.AssociatedDevice.4.OperatingStandard
+    - canonical: canonical.wifi.ap.1.client.4.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.1.AssociatedDevice.4.SignalStrength
+    - canonical: canonical.wifi.ap.1.client.5.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.1.AssociatedDevice.5.OperatingStandard
+    - canonical: canonical.wifi.ap.1.client.5.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.1.AssociatedDevice.5.SignalStrength
+    - canonical: canonical.wifi.ap.1.client.6.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.1.AssociatedDevice.6.OperatingStandard
+    - canonical: canonical.wifi.ap.1.client.6.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.1.AssociatedDevice.6.SignalStrength
+    - canonical: canonical.wifi.ap.1.client.7.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.1.AssociatedDevice.7.OperatingStandard
+    - canonical: canonical.wifi.ap.1.client.7.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.1.AssociatedDevice.7.SignalStrength
+    - canonical: canonical.wifi.ap.1.client.8.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.1.AssociatedDevice.8.OperatingStandard
+    - canonical: canonical.wifi.ap.1.client.8.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.1.AssociatedDevice.8.SignalStrength
+    - canonical: canonical.wifi.ap.2.client.1.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.2.AssociatedDevice.1.OperatingStandard
+    - canonical: canonical.wifi.ap.2.client.1.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.2.AssociatedDevice.1.SignalStrength
+    - canonical: canonical.wifi.ap.2.client.2.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.2.AssociatedDevice.2.OperatingStandard
+    - canonical: canonical.wifi.ap.2.client.2.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.2.AssociatedDevice.2.SignalStrength
+    - canonical: canonical.wifi.ap.2.client.3.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.2.AssociatedDevice.3.OperatingStandard
+    - canonical: canonical.wifi.ap.2.client.3.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.2.AssociatedDevice.3.SignalStrength
+    - canonical: canonical.wifi.ap.2.client.4.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.2.AssociatedDevice.4.OperatingStandard
+    - canonical: canonical.wifi.ap.2.client.4.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.2.AssociatedDevice.4.SignalStrength
+    - canonical: canonical.wifi.ap.2.client.5.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.2.AssociatedDevice.5.OperatingStandard
+    - canonical: canonical.wifi.ap.2.client.5.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.2.AssociatedDevice.5.SignalStrength
+    - canonical: canonical.wifi.ap.2.client.6.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.2.AssociatedDevice.6.OperatingStandard
+    - canonical: canonical.wifi.ap.2.client.6.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.2.AssociatedDevice.6.SignalStrength
+    - canonical: canonical.wifi.ap.2.client.7.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.2.AssociatedDevice.7.OperatingStandard
+    - canonical: canonical.wifi.ap.2.client.7.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.2.AssociatedDevice.7.SignalStrength
+    - canonical: canonical.wifi.ap.2.client.8.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.2.AssociatedDevice.8.OperatingStandard
+    - canonical: canonical.wifi.ap.2.client.8.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.2.AssociatedDevice.8.SignalStrength
+    - canonical: canonical.wifi.ap.3.client.1.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.3.AssociatedDevice.1.OperatingStandard
+    - canonical: canonical.wifi.ap.3.client.1.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.3.AssociatedDevice.1.SignalStrength
+    - canonical: canonical.wifi.ap.3.client.2.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.3.AssociatedDevice.2.OperatingStandard
+    - canonical: canonical.wifi.ap.3.client.2.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.3.AssociatedDevice.2.SignalStrength
+    - canonical: canonical.wifi.ap.3.client.3.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.3.AssociatedDevice.3.OperatingStandard
+    - canonical: canonical.wifi.ap.3.client.3.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.3.AssociatedDevice.3.SignalStrength
+    - canonical: canonical.wifi.ap.3.client.4.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.3.AssociatedDevice.4.OperatingStandard
+    - canonical: canonical.wifi.ap.3.client.4.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.3.AssociatedDevice.4.SignalStrength
+    - canonical: canonical.wifi.ap.3.client.5.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.3.AssociatedDevice.5.OperatingStandard
+    - canonical: canonical.wifi.ap.3.client.5.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.3.AssociatedDevice.5.SignalStrength
+    - canonical: canonical.wifi.ap.3.client.6.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.3.AssociatedDevice.6.OperatingStandard
+    - canonical: canonical.wifi.ap.3.client.6.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.3.AssociatedDevice.6.SignalStrength
+    - canonical: canonical.wifi.ap.3.client.7.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.3.AssociatedDevice.7.OperatingStandard
+    - canonical: canonical.wifi.ap.3.client.7.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.3.AssociatedDevice.7.SignalStrength
+    - canonical: canonical.wifi.ap.3.client.8.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.3.AssociatedDevice.8.OperatingStandard
+    - canonical: canonical.wifi.ap.3.client.8.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.3.AssociatedDevice.8.SignalStrength
+    - canonical: canonical.wifi.ap.4.client.1.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.4.AssociatedDevice.1.OperatingStandard
+    - canonical: canonical.wifi.ap.4.client.1.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.4.AssociatedDevice.1.SignalStrength
+    - canonical: canonical.wifi.ap.4.client.2.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.4.AssociatedDevice.2.OperatingStandard
+    - canonical: canonical.wifi.ap.4.client.2.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.4.AssociatedDevice.2.SignalStrength
+    - canonical: canonical.wifi.ap.4.client.3.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.4.AssociatedDevice.3.OperatingStandard
+    - canonical: canonical.wifi.ap.4.client.3.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.4.AssociatedDevice.3.SignalStrength
+    - canonical: canonical.wifi.ap.4.client.4.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.4.AssociatedDevice.4.OperatingStandard
+    - canonical: canonical.wifi.ap.4.client.4.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.4.AssociatedDevice.4.SignalStrength
+    - canonical: canonical.wifi.ap.4.client.5.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.4.AssociatedDevice.5.OperatingStandard
+    - canonical: canonical.wifi.ap.4.client.5.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.4.AssociatedDevice.5.SignalStrength
+    - canonical: canonical.wifi.ap.4.client.6.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.4.AssociatedDevice.6.OperatingStandard
+    - canonical: canonical.wifi.ap.4.client.6.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.4.AssociatedDevice.6.SignalStrength
+    - canonical: canonical.wifi.ap.4.client.7.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.4.AssociatedDevice.7.OperatingStandard
+    - canonical: canonical.wifi.ap.4.client.7.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.4.AssociatedDevice.7.SignalStrength
+    - canonical: canonical.wifi.ap.4.client.8.operating_standard
+      valueType: string
+      devicePath: Device.WiFi.AccessPoint.4.AssociatedDevice.8.OperatingStandard
+    - canonical: canonical.wifi.ap.4.client.8.signal_strength
+      valueType: int
+      devicePath: Device.WiFi.AccessPoint.4.AssociatedDevice.8.SignalStrength
+---
+# Canonical RF measurements for TR-181 (Device.*) radios.
+#
+# Kept apart from wifi-tr181 because it is a different kind of thing.
+# That table maps CONFIGURATION: what channel a radio is set to, what its
+# SSID is called. This one maps MEASUREMENT: how busy the air actually
+# was, how noisy, how many frames had to be retried. The Spectrum page
+# reads the first as posture and the second as a time series, and an
+# operator who wants one without the other should be able to unbind the
+# table rather than edit entries out of it.
+#
+# The ranges cover what residential gateways expose (2 radios, matching
+# wifi-tr181). Operators serving tri-band gateways extend this table at a
+# higher-priority profile; nothing in Go caps the count.
+#
+# ON ChannelUtilization AND ITS SCALE.
+#
+# TR-181 defines this as a percentage, and CPE in the wild do not all
+# agree. Some report the IEEE 802.11 BSS Load channel-utilisation byte
+# directly, which is 0-255, and some report a duty cycle accumulated
+# since boot rather than an instantaneous read. The percentage is what
+# the canonical means, so a vendor that reports something else declares
+# the conversion HERE, on its own higher-priority profile, and never in
+# the reader:
+#
+#     - canonical: canonical.wifi.radio.1.utilization
+#       valueType: unsignedint
+#       devicePath: Device.WiFi.Radio.1.ChannelUtilization
+#       transform:
+#         pipeline:
+#           - type: unit
+#             spec:
+#               multiplier: 0.392156862745   # 100/255
+#
+# The Spectrum page clamps anything still outside 0-100 and reports the
+# radios it clamped, rather than rescaling on a guess. A chart that
+# quietly divided by 2.55 would look right and hide the missing profile.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: wifi-rf-tr181
+spec:
+  mappings:
+    - canonical: canonical.wifi.radio.1.utilization
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.1.ChannelUtilization
+    - canonical: canonical.wifi.radio.1.noise
+      valueType: int
+      devicePath: Device.WiFi.Radio.1.Stats.Noise
+    - canonical: canonical.wifi.radio.1.stats.retry_count
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.1.Stats.RetryCount
+    - canonical: canonical.wifi.radio.1.stats.fcs_errors
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.1.Stats.FCSErrorCount
+    - canonical: canonical.wifi.radio.1.stats.bytes_sent
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.1.Stats.BytesSent
+    - canonical: canonical.wifi.radio.1.stats.bytes_received
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.1.Stats.BytesReceived
+    - canonical: canonical.wifi.radio.2.utilization
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.2.ChannelUtilization
+    - canonical: canonical.wifi.radio.2.noise
+      valueType: int
+      devicePath: Device.WiFi.Radio.2.Stats.Noise
+    - canonical: canonical.wifi.radio.2.stats.retry_count
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.2.Stats.RetryCount
+    - canonical: canonical.wifi.radio.2.stats.fcs_errors
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.2.Stats.FCSErrorCount
+    - canonical: canonical.wifi.radio.2.stats.bytes_sent
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.2.Stats.BytesSent
+    - canonical: canonical.wifi.radio.2.stats.bytes_received
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.2.Stats.BytesReceived

@@ -1,0 +1,65 @@
+# Canonical neighbour-scan vocabulary for Wi-Fi Alliance Data Elements.
+#
+# `Device.WiFi.DataElements.*` (TR-181 Issue 2) is the only standardised
+# place where utilisation, noise floor, per-STA signal strength and scan
+# results exist as one coherent tree, and any EasyMesh-certified CPE has
+# it. For the RF neighbourhood graph it is strictly richer than the
+# TR-181 diagnostic: a NeighborBSS carries the observed AP's own channel
+# utilisation and station count, not just its signal.
+#
+# READ ONLY, AND THAT IS NOT AN OVERSIGHT.
+#
+# TR-181 2.20 defines no data-model command to start a Data Elements
+# channel scan. The tree is populated in response to a 1905 Channel Scan
+# Request from the Multi-AP controller, which is not a message an ACS
+# sends. So there is no `wifi_scan` ActionProfile for this data model:
+# where an operator runs an EasyMesh controller, these results appear on
+# the controller's own cadence and Herder reads them; where they do not,
+# the TR-181 diagnostic (baseline/tr181/wifi-scan.yaml) is the trigger.
+#
+# THE CHANNEL SITS ONE OBJECT ABOVE THE NEIGHBOUR.
+#
+# A neighbour is a `ChannelScan.{i}.NeighborBSS.{i}.` and the channel it
+# was heard on belongs to the `ChannelScan.{i}.` above it, shared by
+# every neighbour found on that channel. That is a different shape from
+# the TR-181 diagnostic, where every attribute of a result hangs off the
+# result. The graph detects the difference from these declared paths and
+# switches its pivot to a prefix join for it; a TR-181-only fleet never
+# pays the cost. Nothing needs configuring for that to happen, but the
+# shape is worth knowing before editing the right-hand sides.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: wifi-scan-dataelements
+spec:
+  mappings:
+    - canonical: canonical.wifi.scan.result.{i}.bssid
+      valueType: string
+      devicePath: Device.WiFi.DataElements.Network.Device.{i}.Radio.{i}.ScanResult.{i}.OpClassScan.{i}.ChannelScan.{i}.NeighborBSS.{i}.BSSID
+    # Reduced to a salted digest the moment it is read and never stored.
+    # See baseline/tr181/wifi-scan.yaml for why it is declared at all.
+    - canonical: canonical.wifi.scan.result.{i}.ssid
+      valueType: string
+      devicePath: Device.WiFi.DataElements.Network.Device.{i}.Radio.{i}.ScanResult.{i}.OpClassScan.{i}.ChannelScan.{i}.NeighborBSS.{i}.SSID
+    - canonical: canonical.wifi.scan.result.{i}.rssi
+      valueType: int
+      devicePath: Device.WiFi.DataElements.Network.Device.{i}.Radio.{i}.ScanResult.{i}.OpClassScan.{i}.ChannelScan.{i}.NeighborBSS.{i}.SignalStrength
+    - canonical: canonical.wifi.scan.result.{i}.bandwidth
+      valueType: string
+      devicePath: Device.WiFi.DataElements.Network.Device.{i}.Radio.{i}.ScanResult.{i}.OpClassScan.{i}.ChannelScan.{i}.NeighborBSS.{i}.ChannelBandwidth
+    # The ancestor. Every NeighborBSS beneath this ChannelScan was heard
+    # on this channel.
+    - canonical: canonical.wifi.scan.result.{i}.channel
+      valueType: unsignedint
+      devicePath: Device.WiFi.DataElements.Network.Device.{i}.Radio.{i}.ScanResult.{i}.OpClassScan.{i}.ChannelScan.{i}.Channel
+
+    # The fleet BSSID index, Data Elements side. A BSS is what the
+    # AccessPoint object is in TR-181, so this is the same canonical
+    # name pointed at the same physical thing in a different tree, which
+    # is the entire purpose of the canonical layer.
+    - canonical: canonical.wifi.ap.{i}.bssid
+      valueType: string
+      devicePath: Device.WiFi.DataElements.Network.Device.{i}.Radio.{i}.BSS.{i}.BSSID
+    - canonical: canonical.wifi.ssid.{i}.ssid
+      valueType: string
+      devicePath: Device.WiFi.DataElements.Network.Device.{i}.Radio.{i}.BSS.{i}.SSID

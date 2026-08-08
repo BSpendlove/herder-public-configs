@@ -212,6 +212,8 @@ spec:
     - mgmt-tr098
     - diagnostics-tr098
     - wifi-tr098
+    - wifi-bssid-tr098
+    - wifi-capability-tr098
 
 ---
 # Canonical WiFi mappings for TR-098 (InternetGatewayDevice.*) devices.
@@ -369,3 +371,35 @@ spec:
     - canonical: canonical.wifi.ap.4.client_count
       valueType: unsignedint
       devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.TotalAssociations
+
+---
+# Radio CAPABILITY for TR-098 (InternetGatewayDevice.*) devices.
+#
+# TR-098 predates every band-list parameter TR-181 has, so there is
+# exactly one capability signal in the standard: PossibleChannels. A radio
+# that lists channel 36 is a 5 GHz radio, and the Spectrum page reads the
+# channel numbers through the same IEEE plan it uses everywhere else.
+#
+# There is no standard TR-098 equivalent for supported widths, supported
+# security modes, or a client's operating standard. Those are absent here
+# rather than guessed, and the page reports the shortfall as coverage: a
+# TR-098 fleet shows its 5 GHz capability and reports its clients as
+# beyond what any profile can reach, which is the truth.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: wifi-capability-tr098
+spec:
+  mappings:
+    - canonical: canonical.wifi.radio.1.possible_channels
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.PossibleChannels
+    - canonical: canonical.wifi.radio.2.possible_channels
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.PossibleChannels
+    - canonical: canonical.wifi.radio.3.possible_channels
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.PossibleChannels
+    - canonical: canonical.wifi.radio.4.possible_channels
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.PossibleChannels

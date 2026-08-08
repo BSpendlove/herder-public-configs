@@ -1,0 +1,116 @@
+# Telemetry profile: TR-181 neighbouring-WiFi scan results.
+#
+# The RF neighbour graph. Each gateway reports the BSSIDs it can
+# physically hear, so co-channel and adjacent-channel contention is
+# derivable WITHOUT any geographic data: two homes that hear each
+# other are neighbours by definition, which is a stronger signal than
+# a street address anyway (it accounts for walls, floors and transmit
+# power that a map cannot see).
+#
+# READ THIS BEFORE ENABLING — this object is a DIAGNOSTIC, not
+# passive state.
+#
+# Device.WiFi.NeighboringWiFiDiagnostic populates Result.{i}.* only
+# after a controller sets DiagnosticsState to "Requested" and the CPE
+# completes the scan (TR-181 §Device.WiFi.NeighboringWiFiDiagnostic).
+# A profile that only READS the table, as this one does, returns
+# whatever the last scan left behind — stale results, or nothing at
+# all on a CPE that has never been asked. Collection and triggering
+# are deliberately separate concerns:
+#
+#   * THIS FILE collects results when they exist.
+#   * A provisioning rule or a scheduled job must set
+#     DiagnosticsState=Requested to make them exist.
+#
+# Shipping the trigger here would mean every CPE bound to this profile
+# runs an off-channel scan on every Inform. That is not free: the
+# radio stops serving clients for the duration of the scan (typically
+# 50-500ms per channel, so seconds across a full band), which is a
+# real customer-visible impact on a busy AP. Operators choose the
+# cadence; the sane default is hours or days, not minutes.
+#
+# CARDINALITY WARNING. One dense apartment block can return 40+
+# BSSIDs per radio per scan. Result rows are per-neighbour, so a
+# 100k-CPE fleet scanning twice a day writes on the order of 10^7
+# rows/day if every parameter below is collected. The set below is
+# curated down to what interference analysis actually needs; adding
+# the excluded parameters back multiplies that figure.
+#
+# Excluded deliberately:
+#   * SSID: a neighbour's network name is third-party personal data
+#     (the people broadcasting it are not the operator's subscribers),
+#     and a telemetry row is a retained, exportable time series. The
+#     graph's probable tier reads the CURRENT value the wifi_scan
+#     action collects into device_parameters and reduces it to a
+#     salted digest in the same statement; no history of the name is
+#     needed for that, so none is kept. An operator who accepts the
+#     privacy cost can add the path back in a higher-priority profile,
+#     which is the explicit opt-in the privacy posture requires.
+#   * SecurityModeEnabled / EncryptionMode — a neighbour's security
+#     posture is not the operator's concern and doubles row count.
+#   * SupportedStandards — high cardinality string, and the operating
+#     channel/bandwidth already carries what matters for contention.
+#   * BeaconPeriod / DTIMPeriod — no operational use at fleet scale.
+#
+# Noise IS collected: a channel that is quiet by BSSID count but
+# noisy in dBm is the case where "just move to channel 11" is wrong
+# advice, and it is the only non-WiFi interference signal the CPE
+# offers (microwaves, baby monitors, DECT).
+#
+# All params interval=0 (passive — one GPV per natural Inform session,
+# no Connection Request scheduling). The scan itself is triggered
+# out-of-band as described above.
+#
+# Scope: any TR-181-capable CPE (matched via dataModel:device label
+# written by the CWMP handler's detectDataModels helper — see #321).
+# Binds on the first qualifying Inform.
+#
+# Priority 10 — operator-shipped vendor profiles (typical priority 50+)
+# override on conflicting paths.
+apiVersion: telemetry.herder.io/v1alpha1
+kind: TelemetryProfile
+metadata:
+  name: tr181-wifi-neighbors
+spec:
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:device"
+        operator: Exists
+  parameters:
+    # --- Scan state ---
+    # DiagnosticsState distinguishes "no neighbours" from "never
+    # scanned" from "scan failed". Without it every empty result set
+    # looks identical, and an operator cannot tell a quiet RF
+    # environment from a broken trigger.
+    - path: "Device.WiFi.NeighboringWiFiDiagnostic.DiagnosticsState"
+      interval: 0
+    - path: "Device.WiFi.NeighboringWiFiDiagnostic.ResultNumberOfEntries"
+      interval: 0
+    # --- Per-neighbour scan results ---
+    # Radio back-reference: which of the CPE's own radios heard this
+    # neighbour. Required to attribute contention to a band, since a
+    # 2.4GHz and a 5GHz radio scan different spectrum.
+    - path: "Device.WiFi.NeighboringWiFiDiagnostic.Result.{i}.Radio"
+      interval: 0
+    # No SSID entry here; see the exclusion list in the header.
+    # BSSID is the join key for the neighbour graph: matching a
+    # scanned BSSID against Device.WiFi.SSID.{i}.BSSID on another
+    # managed device is what turns two independent scans into an edge
+    # between two subscribers.
+    - path: "Device.WiFi.NeighboringWiFiDiagnostic.Result.{i}.BSSID"
+      interval: 0
+    - path: "Device.WiFi.NeighboringWiFiDiagnostic.Result.{i}.Channel"
+      interval: 0
+    - path: "Device.WiFi.NeighboringWiFiDiagnostic.Result.{i}.SignalStrength"
+      interval: 0
+    - path: "Device.WiFi.NeighboringWiFiDiagnostic.Result.{i}.OperatingFrequencyBand"
+      interval: 0
+    # Bandwidth decides whether two different channels actually
+    # overlap. A 160MHz neighbour on channel 36 contends with a
+    # 20MHz AP on channel 48; comparing channel numbers alone would
+    # score that pair as clean.
+    - path: "Device.WiFi.NeighboringWiFiDiagnostic.Result.{i}.OperatingChannelBandwidth"
+      interval: 0
+    - path: "Device.WiFi.NeighboringWiFiDiagnostic.Result.{i}.Noise"
+      interval: 0
