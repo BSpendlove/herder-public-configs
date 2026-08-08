@@ -1,0 +1,56 @@
+# Baseline experience score (#714).
+#
+# Computes the full score tree in one script: wifi + wan components,
+# the two dimension scores, and the overall composite. One rule owns
+# the whole tree because a rule only sees its own emits; splitting
+# dimensions across rules would leave nothing able to compute overall.
+#
+# Every threshold and weight is operator config below. The script is a
+# starting point, not a framework: fork it, add dimensions (mesh,
+# device_health), retune weights per market.
+#
+# Score rows land as labeled telemetry (metric experience.score) and
+# band tags (experience:<dimension>:<good|fair|poor>) land on the
+# device, so selectors can target e.g. tag:experience:wifi:poor.
+#
+# Gate posture: triggerPaths limits runs to informs that actually carry
+# WiFi/WAN state; the 5m coalesce bounds cost on chatty CPEs (#493).
+apiVersion: telemetry.herder.io/v1alpha1
+kind: EnrichmentRule
+metadata:
+  name: baseline-experience-score
+spec:
+  priority: 210
+  deviceSelector:
+    matchExpressions:
+      - key: oui
+        operator: Exists
+  triggerPaths:
+    - "Device.WiFi.AccessPoint.*"
+    - "Device.Ethernet.Interface.*"
+    - "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.*"
+    - "InternetGatewayDevice.WANDevice.*"
+  coalesceWindow: 5m
+  config:
+    # WiFi client_rssi component: linear 0-100 between floor and ceil dBm.
+    wifiRssiFloor: -85
+    wifiRssiCeil: -55
+    # WiFi phy_rate component: linear 0-100 between floor and ceil Mbps.
+    rateFloorMbps: 10
+    rateCeilMbps: 100
+    # WAN error_rate component: 100 at zero errors, 0 at this ratio.
+    wanErrorRateCeil: 0.01
+    # WAN stability component: 100 at this uptime (seconds), 0 at zero.
+    wanUptimeGoodSeconds: 86400
+    # Component weights inside each dimension.
+    weightWifiClientRssi: 0.7
+    weightWifiPhyRate: 0.3
+    weightWanErrors: 0.6
+    weightWanStability: 0.4
+    # Dimension weights inside overall.
+    weightOverallWifi: 0.5
+    weightOverallWan: 0.5
+    # Band thresholds for the experience:* tags.
+    bandPoorBelow: 60
+    bandFairBelow: 80
+  script: experience-score.ts
