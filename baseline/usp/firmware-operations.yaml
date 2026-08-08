@@ -1,0 +1,49 @@
+# USP firmware operation baseline profile.
+#
+# A firmware campaign over USP is an Operate on the device's mapped
+# Download() command. TR-369 delivers the outcome of an asynchronous
+# command only to Controllers holding a Subscription with NotifType
+# OperationComplete whose ReferenceList matches the command; nothing is
+# sent to the invoking Controller by default. Without this profile a
+# campaign would dispatch, the agent would flash, and the platform would
+# never hear the completion.
+#
+# Subscription set:
+#
+#   * OperationComplete on the FirmwareImage Download() and Activate()
+#     commands. This is what settles the campaign task: the notification
+#     carries the command_key the dispatcher set, which is the task id.
+#
+#   * Event on Device.LocalAgent.TransferComplete! and Device.Boot!.
+#     TR-181 puts the transfer result (URL, times, fault) in the
+#     TransferComplete! event rather than in the operation output, and
+#     Boot! carries FirmwareUpdated plus the command_key of the
+#     operation that caused the reboot. Both land in the event history,
+#     which is how an operator distinguishes "downloaded but never
+#     activated" from "activated and rebooted".
+#
+# Selector: TR-181 USP devices, same scoping as the wifi baseline.
+#
+# Priority 10: baseline tier. Vendor profiles at 50+ extend or narrow.
+
+apiVersion: telemetry.herder.io/v1alpha1
+kind: TelemetryProfile
+metadata:
+  name: usp-firmware-operations
+spec:
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "protocol:usp"
+        operator: Exists
+      - key: "dataModel:device"
+        operator: Exists
+  subscriptions:
+    - notifType: OperationComplete
+      referenceList:
+        - Device.DeviceInfo.FirmwareImage.{i}.Download()
+        - Device.DeviceInfo.FirmwareImage.{i}.Activate()
+    - notifType: Event
+      referenceList:
+        - Device.LocalAgent.TransferComplete!
+        - Device.Boot!
