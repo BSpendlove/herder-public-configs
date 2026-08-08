@@ -1,0 +1,74 @@
+# Telemetry profile: Wi-Fi Alliance Data Elements RF measurements.
+#
+# The collection half of the dataelements-wifi-rf mapping profile. A
+# mapping profile says where a canonical lives; nothing fetches it until
+# a telemetry profile asks for it, and the Spectrum page's time axis is
+# built from history rather than from current state.
+#
+# Wildcards rather than enumerated instances, unlike the mapping table
+# next to it: telemetry patterns are resolved against the device's actual
+# tree with one GPN per instance dimension, so `{i}` collects however
+# many radios and BSSs a CPE really has. The mapping table has to
+# enumerate because canonical wildcards expand over declared entries; the
+# two mechanisms are different and the difference is deliberate.
+#
+# Scope: any TR-181-capable CPE. A CPE with no Data Elements tree faults
+# 9005 on the first attempt and the paths are negative-cached per #605,
+# so the cost of shipping this on by default is one wasted GPV per device
+# per firmware version.
+#
+# All params interval=0 (passive, one GPV per natural Inform session).
+apiVersion: telemetry.herder.io/v1alpha1
+kind: TelemetryProfile
+metadata:
+  name: dataelements-wifi-rf
+spec:
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:device"
+        operator: Exists
+  parameters:
+    # Which AP in the mesh each Device.{i} is, so a reader can tell the
+    # gateway from its extenders. ControllerID names the gateway.
+    - path: "Device.WiFi.DataElements.Network.ControllerID"
+      interval: 0
+    - path: "Device.WiFi.DataElements.Network.Device.{i}.ID"
+      interval: 0
+    # --- Radio identity and operating state ---
+    - path: "Device.WiFi.DataElements.Network.Device.{i}.Radio.{i}.ID"
+      interval: 0
+    - path: "Device.WiFi.DataElements.Network.Device.{i}.Radio.{i}.CurrentOperatingClasses.{i}.Class"
+      interval: 0
+    - path: "Device.WiFi.DataElements.Network.Device.{i}.Radio.{i}.CurrentOperatingClasses.{i}.Channel"
+      interval: 0
+    # --- The RF measurement itself ---
+    # Utilization is the total; Transmit, ReceiveSelf and ReceiveOther
+    # decompose it into this radio's own activity and everyone else's.
+    # Collecting Utilization without the other three gives a busyness
+    # chart with no explanation, which is the state TR-181 proper leaves
+    # an operator in.
+    - path: "Device.WiFi.DataElements.Network.Device.{i}.Radio.{i}.Utilization"
+      interval: 0
+    - path: "Device.WiFi.DataElements.Network.Device.{i}.Radio.{i}.Transmit"
+      interval: 0
+    - path: "Device.WiFi.DataElements.Network.Device.{i}.Radio.{i}.ReceiveSelf"
+      interval: 0
+    - path: "Device.WiFi.DataElements.Network.Device.{i}.Radio.{i}.ReceiveOther"
+      interval: 0
+    # Noise floor, ANPI-encoded (dBm + 110). The mapping table carries
+    # the conversion.
+    - path: "Device.WiFi.DataElements.Network.Device.{i}.Radio.{i}.Noise"
+      interval: 0
+    # --- Per-BSS identity and counters ---
+    # BSSID is what a later spec resolves neighbour scans against; the
+    # counters are what separates a busy channel the home is causing from
+    # one it is not.
+    - path: "Device.WiFi.DataElements.Network.Device.{i}.Radio.{i}.BSS.{i}.BSSID"
+      interval: 0
+    - path: "Device.WiFi.DataElements.Network.Device.{i}.Radio.{i}.BSS.{i}.SSID"
+      interval: 0
+    - path: "Device.WiFi.DataElements.Network.Device.{i}.Radio.{i}.BSS.{i}.UnicastBytesSent"
+      interval: 0
+    - path: "Device.WiFi.DataElements.Network.Device.{i}.Radio.{i}.BSS.{i}.UnicastBytesReceived"
+      interval: 0
