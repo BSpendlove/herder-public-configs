@@ -37,6 +37,15 @@
 # the excluded parameters back multiplies that figure.
 #
 # Excluded deliberately:
+#   * SSID: a neighbour's network name is third-party personal data
+#     (the people broadcasting it are not the operator's subscribers),
+#     and a telemetry row is a retained, exportable time series. The
+#     graph's probable tier reads the CURRENT value the wifi_scan
+#     action collects into device_parameters and reduces it to a
+#     salted digest in the same statement; no history of the name is
+#     needed for that, so none is kept. An operator who accepts the
+#     privacy cost can add the path back in a higher-priority profile,
+#     which is the explicit opt-in the privacy posture requires.
 #   * SecurityModeEnabled / EncryptionMode — a neighbour's security
 #     posture is not the operator's concern and doubles row count.
 #   * SupportedStandards — high cardinality string, and the operating
@@ -84,8 +93,7 @@ spec:
     # 2.4GHz and a 5GHz radio scan different spectrum.
     - path: "Device.WiFi.NeighboringWiFiDiagnostic.Result.{i}.Radio"
       interval: 0
-    - path: "Device.WiFi.NeighboringWiFiDiagnostic.Result.{i}.SSID"
-      interval: 0
+    # No SSID entry here; see the exclusion list in the header.
     # BSSID is the join key for the neighbour graph: matching a
     # scanned BSSID against Device.WiFi.SSID.{i}.BSSID on another
     # managed device is what turns two independent scans into an edge
