@@ -55,6 +55,15 @@ metadata:
   name: wifi-rf-dataelements
 spec:
   mappings:
+    # Utilization, Transmit, ReceiveSelf and ReceiveOther are all the
+    # IEEE 802.11 BSS Load encoding the Data Elements spec inherits: a
+    # linear 0-255 scale where 255 is 100% of the measurement window.
+    # The canonical is a percentage, so every one of them carries the
+    # 100/255 conversion here, in the profile, never in a reader.
+    #
+    # The noise floor is ANPI-encoded (defined in the same units as
+    # RCPI): value = (dBm + 110) * 2, so 0 is -110 dBm and 220 is 0 dBm.
+    # The canonical is dBm, hence multiplier 0.5 and offset -110.
     # --- Radio 1 ---
     - canonical: canonical.wifi.radio.1.channel
       valueType: unsignedint
@@ -62,20 +71,35 @@ spec:
     - canonical: canonical.wifi.radio.1.utilization
       valueType: unsignedint
       devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.1.Utilization
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.392156862745   # 100/255
     - canonical: canonical.wifi.radio.1.airtime.transmit
       valueType: unsignedint
       devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.1.Transmit
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.392156862745   # 100/255
     - canonical: canonical.wifi.radio.1.airtime.receive_self
       valueType: unsignedint
       devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.1.ReceiveSelf
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.392156862745   # 100/255
     - canonical: canonical.wifi.radio.1.airtime.receive_other
       valueType: unsignedint
       devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.1.ReceiveOther
-    # Data Elements carries the noise floor in the IEEE 802.11 ANPI
-    # encoding: an unsigned byte holding dBm + 110, so 110 is -0 dBm and
-    # 20 is -90 dBm. The canonical is dBm, so the offset belongs here.
-    # This is exactly what a transform is for, and it is the reason the
-    # reader never learns a unit.
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.392156862745   # 100/255
     - canonical: canonical.wifi.radio.1.noise
       valueType: int
       devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.1.Noise
@@ -83,6 +107,7 @@ spec:
         pipeline:
           - type: unit
             spec:
+              multiplier: 0.5
               offset: -110
     # --- Radio 2 ---
     - canonical: canonical.wifi.radio.2.channel
@@ -91,15 +116,35 @@ spec:
     - canonical: canonical.wifi.radio.2.utilization
       valueType: unsignedint
       devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.2.Utilization
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.392156862745   # 100/255
     - canonical: canonical.wifi.radio.2.airtime.transmit
       valueType: unsignedint
       devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.2.Transmit
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.392156862745   # 100/255
     - canonical: canonical.wifi.radio.2.airtime.receive_self
       valueType: unsignedint
       devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.2.ReceiveSelf
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.392156862745   # 100/255
     - canonical: canonical.wifi.radio.2.airtime.receive_other
       valueType: unsignedint
       devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.2.ReceiveOther
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.392156862745   # 100/255
     - canonical: canonical.wifi.radio.2.noise
       valueType: int
       devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.2.Noise
@@ -107,6 +152,7 @@ spec:
         pipeline:
           - type: unit
             spec:
+              multiplier: 0.5
               offset: -110
     # --- Radio 3 ---
     - canonical: canonical.wifi.radio.3.channel
@@ -115,15 +161,35 @@ spec:
     - canonical: canonical.wifi.radio.3.utilization
       valueType: unsignedint
       devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.3.Utilization
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.392156862745   # 100/255
     - canonical: canonical.wifi.radio.3.airtime.transmit
       valueType: unsignedint
       devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.3.Transmit
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.392156862745   # 100/255
     - canonical: canonical.wifi.radio.3.airtime.receive_self
       valueType: unsignedint
       devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.3.ReceiveSelf
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.392156862745   # 100/255
     - canonical: canonical.wifi.radio.3.airtime.receive_other
       valueType: unsignedint
       devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.3.ReceiveOther
+      transform:
+        pipeline:
+          - type: unit
+            spec:
+              multiplier: 0.392156862745   # 100/255
     - canonical: canonical.wifi.radio.3.noise
       valueType: int
       devicePath: Device.WiFi.DataElements.Network.Device.1.Radio.3.Noise
@@ -131,6 +197,7 @@ spec:
         pipeline:
           - type: unit
             spec:
+              multiplier: 0.5
               offset: -110
 ---
 # Data Elements RF, bound to any TR-181 CPE.
