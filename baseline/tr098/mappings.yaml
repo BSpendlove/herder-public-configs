@@ -212,6 +212,7 @@ spec:
     - mgmt-tr098
     - diagnostics-tr098
     - wifi-tr098
+    - wifi-bssid-tr098
 
 ---
 # Canonical WiFi mappings for TR-098 (InternetGatewayDevice.*) devices.

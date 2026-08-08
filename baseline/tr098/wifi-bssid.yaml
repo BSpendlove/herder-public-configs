@@ -1,0 +1,35 @@
+# The fleet BSSID index for TR-098 (InternetGatewayDevice.*) devices.
+#
+# `wifi-tr098` already declares `canonical.wifi.ssid.{1..4}.bssid` and
+# the RF neighbourhood graph reads those, so this table is not what makes
+# a TR-098 fleet resolvable. What it adds is the tail.
+#
+# A gateway with a guest network, a backhaul SSID and an IoT SSID
+# routinely runs eight WLANConfiguration instances, and one dev fleet
+# reports BSSIDs on instances 1, 2, 5, 6, 7 and 8. Under an enumeration
+# that stops at four, half that gateway's radios are absent from the
+# index, and the effect is not a slightly weaker figure: a scan that
+# heard instance 6 resolves to nothing and the edge is filed as an
+# unmanaged neighbour. The graph then reports the operator's own
+# equipment as somebody else's interference, which is the exact number
+# the whole feature exists to get right.
+#
+# Wildcarded rather than enumerated further, because there is no number
+# to stop at that is right for every fleet. `{i}` is normalised to `*` by
+# the mapper and the graph reads it as the single-segment match the
+# resolver already defines. It is a fleet-wide lookup only: a per-device
+# resolve of a wildcarded raw path finds no rows, which is why the
+# enumerated entries in `wifi-tr098` remain the ones anything writing to
+# a specific radio uses.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: wifi-bssid-tr098
+spec:
+  mappings:
+    - canonical: canonical.wifi.ap.{i}.bssid
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.BSSID
+    - canonical: canonical.wifi.ssid.{i}.ssid
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.SSID

@@ -1,0 +1,106 @@
+# Canonical neighbour-scan vocabulary for TR-181 (Device.*) devices.
+#
+# WHAT THIS TABLE IS FOR.
+#
+# `Device.WiFi.NeighboringWiFiDiagnostic` is what turns a fleet of
+# gateways into a measured RF map: each CPE reports the BSSIDs it can
+# physically hear, and a BSSID that resolves to another managed CPE is a
+# measured adjacency between two homes. Herder's RF neighbourhood graph
+# reads these canonicals and nothing else, so a vendor exposing a
+# site-survey table under its own `X_` subtree joins the graph by copying
+# this file, changing the right-hand side and scoping a profile at it.
+#
+# WHY THE RESULT ENTRIES CARRY `{i}` AND THE RADIO ENTRIES DO NOT.
+#
+# The rest of the WiFi tables enumerate their instances (radio 1, radio 2,
+# SSID 1 through 4) because a canonical wildcard is expanded by walking
+# the DECLARED entries, so an instance only exists northbound if somebody
+# wrote it out. That is right for radios, whose count is a property of
+# the hardware and small.
+#
+# A scan result list is not that. Its length is whatever the air held: an
+# apartment block returns forty rows and a rural line returns two, and
+# writing out `Result.1` through `Result.40` would cap the fleet at
+# whatever number was guessed and burn 240 entries against the fleet-wide
+# path lookup's 500-result limit. `{i}` is normalised to `*` on both
+# sides by the mapper (see mapping.ParameterMapping.Normalize), and the
+# graph's pivot reads the wildcard as the single-segment match the
+# resolver already defines it to be.
+#
+# SCAN RESULTS ARE A DIAGNOSTIC, NOT PASSIVE STATE. This table says where
+# the results live. Making them exist is the `wifi_scan` action
+# capability (platform/actions/wifi-scan-tr181.yaml), and collecting them
+# on an Inform is the tr181-wifi-neighbors telemetry profile. The three
+# are deliberately separate: a CPE that scanned on every Inform would
+# stop serving its clients for seconds at a time, several times an hour.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: wifi-scan-tr181
+spec:
+  mappings:
+    # The trigger and the state, in one parameter. Writing "Requested"
+    # starts a sweep; the CPE moves it to a completion or an error value
+    # of its own spelling when the sweep ends.
+    - canonical: canonical.wifi.scan.state
+      valueType: string
+      devicePath: Device.WiFi.NeighboringWiFiDiagnostic.DiagnosticsState
+    # Load-bearing for the coverage model, not a convenience. An empty
+    # result table looks the same whether the CPE swept the air and heard
+    # nobody or has never been asked, and a reported count of zero is the
+    # only vendor-neutral evidence of the first. Without it a dense
+    # apartment block that has never scanned reads as clean air.
+    - canonical: canonical.wifi.scan.result_count
+      valueType: unsignedint
+      devicePath: Device.WiFi.NeighboringWiFiDiagnostic.ResultNumberOfEntries
+
+    # The join key. Matching this against the fleet BSSID index below is
+    # the ONLY thing that turns two independent scans into an edge
+    # between two subscribers, and an exact match is the only match
+    # Herder will make: BSSIDs are allocated off a base MAC with the low
+    # bits varying, so a near miss is a different home.
+    - canonical: canonical.wifi.scan.result.{i}.bssid
+      valueType: string
+      devicePath: Device.WiFi.NeighboringWiFiDiagnostic.Result.{i}.BSSID
+    # A neighbour's network name is third-party personal data. Herder
+    # never stores it: the graph reduces it to a salted digest inside the
+    # statement that reads it, purely so a managed CPE that renumbered
+    # its BSSIDs after a firmware update can still be recognised. It is
+    # declared here because that recognition is worth having and the
+    # value has to be readable to be hashed.
+    - canonical: canonical.wifi.scan.result.{i}.ssid
+      valueType: string
+      devicePath: Device.WiFi.NeighboringWiFiDiagnostic.Result.{i}.SSID
+    - canonical: canonical.wifi.scan.result.{i}.channel
+      valueType: unsignedint
+      devicePath: Device.WiFi.NeighboringWiFiDiagnostic.Result.{i}.Channel
+    # dBm, and negative. Firmware that reports a 0-100 quality percentage
+    # under this parameter is counted in coverage rather than guessed at:
+    # every energy share on the page is weighted by this number.
+    - canonical: canonical.wifi.scan.result.{i}.rssi
+      valueType: int
+      devicePath: Device.WiFi.NeighboringWiFiDiagnostic.Result.{i}.SignalStrength
+    # Only 6 GHz needs this: it reuses the low channel numbers, so 1-14
+    # is ambiguous without a hint. Everything else is derived from the
+    # channel number by the IEEE plan.
+    - canonical: canonical.wifi.scan.result.{i}.band
+      valueType: string
+      devicePath: Device.WiFi.NeighboringWiFiDiagnostic.Result.{i}.OperatingFrequencyBand
+    # Decides whether two different channels actually overlap. A 160 MHz
+    # neighbour on channel 36 contends with a 20 MHz AP on channel 48;
+    # comparing channel numbers would score that pair as clean.
+    - canonical: canonical.wifi.scan.result.{i}.bandwidth
+      valueType: string
+      devicePath: Device.WiFi.NeighboringWiFiDiagnostic.Result.{i}.OperatingChannelBandwidth
+
+    # The fleet BSSID index: what a scanned BSSID is matched against.
+    #
+    # `canonical.wifi.ssid.{i}.bssid` in wifi-tr181 points at the same
+    # parameter and the graph reads both, so an operator who has not
+    # adopted this table still gets managed edges. This entry exists
+    # because it is wildcarded rather than enumerated to four instances,
+    # which matters for a gateway broadcasting more: an SSID missing from
+    # the index does not weaken an edge, it removes one.
+    - canonical: canonical.wifi.ap.{i}.bssid
+      valueType: string
+      devicePath: Device.WiFi.SSID.{i}.BSSID

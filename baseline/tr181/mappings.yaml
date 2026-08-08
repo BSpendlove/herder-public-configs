@@ -101,6 +101,12 @@ spec:
     - device-info-tr181
     - firmware-tr181
     - wifi-tr181
+    # The neighbour-scan vocabulary. Bound here as well as declared,
+    # because the `wifi_scan` action resolves canonical.wifi.scan.state
+    # through the DEVICE's profile: a table that is only declared is
+    # visible to the fleet-wide path lookup the RF graph reads with, and
+    # invisible to the per-device resolve the trigger needs.
+    - wifi-scan-tr181
 ---
 # CWMP-only half of the TR-181 baseline: the `canonical.mgmt.*` table.
 #
@@ -133,6 +139,7 @@ spec:
     - firmware-tr181
     - mgmt-tr181
     - wifi-tr181
+    - wifi-scan-tr181
 
 ---
 # Canonical WiFi mappings for TR-181 (Device.*) devices.

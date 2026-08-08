@@ -1,0 +1,102 @@
+# Neighbour scan, TR-181 NeighboringWiFiDiagnostic.
+#
+# Provides the `wifi_scan` capability on any CPE exposing the standard
+# TR-181 neighbour diagnostic. This is what makes the RF neighbourhood
+# graph a measurement rather than an accident: until a controller asks,
+# `Device.WiFi.NeighboringWiFiDiagnostic.Result.{i}.*` holds whatever the
+# last scan left behind, which on most fleets is nothing at all.
+#
+# A SCAN IS NOT FREE, AND THAT IS WHY THIS IS AN ACTION.
+#
+# Sweeping the band means going off channel, and a radio that is off
+# channel is not serving its clients: typically 50-500 ms per channel, so
+# seconds across a band, during which a subscriber's video call stutters.
+# That cost is why the scan is a capability an operator invokes rather
+# than a telemetry parameter Herder polls, and why the shipped default is
+# opportunistic:
+#
+#   * on bootstrap, when the home has no clients to disturb yet,
+#   * after a channel change, when the old measurement is void anyway,
+#   * and otherwise on a slow operator-set cadence inside a maintenance
+#     window.
+#
+# The cadence itself is deliberately NOT in this file. It belongs with
+# the rest of the operator's RF policy (the `RFPolicy` kind the channel
+# planner introduces), because an operator with regional maintenance
+# windows needs it selector-scoped, and a scan cadence that could only be
+# set per action profile would force them to fork the profile to change a
+# number. Until that kind lands, a scan is invoked through
+# `POST /devices/{id}/actions/wifi_scan` or from a job that targets a
+# cohort, and the graph reports how stale each edge is either way.
+#
+# WHY THERE IS NO SEPARATE USP PROFILE HERE.
+#
+# The `set` step writes `canonical.wifi.scan.state`, and the mapper
+# resolves that to the same TR-181 parameter over CWMP or USP, so a USP
+# agent exposing the diagnostic as a writable parameter is covered by
+# this profile as written. An agent that exposes it as a USP command
+# (`Device.WiFi.NeighboringWiFiDiagnostic()`) is not: the action engine
+# issues SetParameterValues and has no operate step, which is an engine
+# gap rather than a profile one.
+#
+# WHY THERE IS NO DATA ELEMENTS PROFILE HERE.
+#
+# TR-181 2.20 defines no data-model command to start a Data Elements
+# channel scan. `...Radio.{i}.ScanResult.{i}.` is populated in response
+# to a 1905 Channel Scan Request from the Multi-AP controller, which is
+# not something an ACS sends. Data Elements scan results are therefore
+# read where they exist (baseline/tr181/wifi-scan-dataelements.yaml) and
+# triggered by the EasyMesh controller, not by this capability.
+apiVersion: actions.herder.io/v1alpha1
+kind: ActionProfile
+metadata:
+  name: wifi-scan-tr181
+spec:
+  capability: wifi_scan
+  priority: 10
+
+  # TR-181 devices, on either protocol. TR-098 has no standard
+  # equivalent of this diagnostic at all, so a TR-098 fleet needs a
+  # vendor profile pointed at the manufacturer's site-survey subtree,
+  # which is a copy of this file with a narrower selector and different
+  # raw paths.
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:device"
+        operator: Exists
+
+  # Bounds the whole run. A band sweep is seconds of radio time and the
+  # rest is waiting for the CPE to come back and say so, which on a
+  # connection-request fleet is a couple of poll intervals.
+  timeout: 6m
+
+  steps:
+    - name: scan
+      set:
+        # Canonical, so this one profile covers every data model that
+        # declares the vocabulary. Writing "Requested" is the trigger;
+        # the CPE clears the result table and repopulates it.
+        canonical.wifi.scan.state: Requested
+      awaitParam: canonical.wifi.scan.state
+      # Anything outside this set is terminal, including the several
+      # Error_* values TR-181 defines. Listing only the success value
+      # would leave a failed scan polling until it timed out instead of
+      # reporting why it failed, and "the CPE refused" is a useful
+      # answer.
+      awaitNotIn: [Requested, None]
+      # Each poll costs a connection request and a session. Ten seconds
+      # is roughly one band sweep, so a scan that finished is noticed on
+      # the first or second poll and a fleet-wide campaign does not turn
+      # into a connection-request storm.
+      pollInterval: 10s
+      timeout: 4m
+      collect:
+        # The whole diagnostic subtree, because the result list length is
+        # whatever the air held and naming instances would cap it. The
+        # collected values are published as telemetry by the CWMP handler
+        # and land in device_parameters at their raw paths, which is
+        # where the graph reads them from: this action does not write a
+        # derived form of anything (Architecture Principle 6).
+        - Device.WiFi.NeighboringWiFiDiagnostic.
+
+  normalize: platform/actions/wifi-scan-tr181.ts
