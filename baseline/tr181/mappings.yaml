@@ -108,6 +108,7 @@ spec:
     # invisible to the per-device resolve the trigger needs.
     - wifi-scan-tr181
     - wifi-capability-tr181
+    - wifi-rf-tr181
 ---
 # CWMP-only half of the TR-181 baseline: the `canonical.mgmt.*` table.
 #
@@ -142,6 +143,7 @@ spec:
     - wifi-tr181
     - wifi-scan-tr181
     - wifi-capability-tr181
+    - wifi-rf-tr181
 
 ---
 # Canonical WiFi mappings for TR-181 (Device.*) devices.
@@ -660,3 +662,82 @@ spec:
     - canonical: canonical.wifi.ap.4.client.8.signal_strength
       valueType: int
       devicePath: Device.WiFi.AccessPoint.4.AssociatedDevice.8.SignalStrength
+---
+# Canonical RF measurements for TR-181 (Device.*) radios.
+#
+# Kept apart from wifi-tr181 because it is a different kind of thing.
+# That table maps CONFIGURATION: what channel a radio is set to, what its
+# SSID is called. This one maps MEASUREMENT: how busy the air actually
+# was, how noisy, how many frames had to be retried. The Spectrum page
+# reads the first as posture and the second as a time series, and an
+# operator who wants one without the other should be able to unbind the
+# table rather than edit entries out of it.
+#
+# The ranges cover what residential gateways expose (2 radios, matching
+# wifi-tr181). Operators serving tri-band gateways extend this table at a
+# higher-priority profile; nothing in Go caps the count.
+#
+# ON ChannelUtilization AND ITS SCALE.
+#
+# TR-181 defines this as a percentage, and CPE in the wild do not all
+# agree. Some report the IEEE 802.11 BSS Load channel-utilisation byte
+# directly, which is 0-255, and some report a duty cycle accumulated
+# since boot rather than an instantaneous read. The percentage is what
+# the canonical means, so a vendor that reports something else declares
+# the conversion HERE, on its own higher-priority profile, and never in
+# the reader:
+#
+#     - canonical: canonical.wifi.radio.1.utilization
+#       valueType: unsignedint
+#       devicePath: Device.WiFi.Radio.1.ChannelUtilization
+#       transform:
+#         pipeline:
+#           - type: unit
+#             spec:
+#               multiplier: 0.392156862745   # 100/255
+#
+# The Spectrum page clamps anything still outside 0-100 and reports the
+# radios it clamped, rather than rescaling on a guess. A chart that
+# quietly divided by 2.55 would look right and hide the missing profile.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: wifi-rf-tr181
+spec:
+  mappings:
+    - canonical: canonical.wifi.radio.1.utilization
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.1.ChannelUtilization
+    - canonical: canonical.wifi.radio.1.noise
+      valueType: int
+      devicePath: Device.WiFi.Radio.1.Stats.Noise
+    - canonical: canonical.wifi.radio.1.stats.retry_count
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.1.Stats.RetryCount
+    - canonical: canonical.wifi.radio.1.stats.fcs_errors
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.1.Stats.FCSErrorCount
+    - canonical: canonical.wifi.radio.1.stats.bytes_sent
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.1.Stats.BytesSent
+    - canonical: canonical.wifi.radio.1.stats.bytes_received
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.1.Stats.BytesReceived
+    - canonical: canonical.wifi.radio.2.utilization
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.2.ChannelUtilization
+    - canonical: canonical.wifi.radio.2.noise
+      valueType: int
+      devicePath: Device.WiFi.Radio.2.Stats.Noise
+    - canonical: canonical.wifi.radio.2.stats.retry_count
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.2.Stats.RetryCount
+    - canonical: canonical.wifi.radio.2.stats.fcs_errors
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.2.Stats.FCSErrorCount
+    - canonical: canonical.wifi.radio.2.stats.bytes_sent
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.2.Stats.BytesSent
+    - canonical: canonical.wifi.radio.2.stats.bytes_received
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.2.Stats.BytesReceived

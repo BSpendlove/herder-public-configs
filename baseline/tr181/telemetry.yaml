@@ -384,3 +384,56 @@ spec:
       interval: 0
     - path: "Device.WiFi.DataElements.Network.Device.{i}.Manufacturer"
       interval: 0
+---
+# Telemetry profile: TR-181 radio RF measurements.
+#
+# The time-series half of the Spectrum page. tr181-wifi above collects
+# what a radio is CONFIGURED as; this collects what the air was actually
+# like, which is the only thing that distinguishes a home whose channel
+# looks crowded from a home whose Wi-Fi is bad.
+#
+# Separate from tr181-wifi so an operator can carry one without the
+# other. These paths are the ones most likely to be missing on older
+# firmware: ChannelUtilization and Stats.Noise are widely implemented and
+# not universally, and a CPE that faults 9005 on them has that path
+# negative-cached per #605 rather than re-fetched every session.
+#
+# Byte counters are already collected by tr181-wifi. They are not
+# repeated here: overlapping paths dedupe on the priority merge, and
+# listing them twice would only make the two profiles look like they
+# disagree.
+#
+# All params interval=0 (passive, one GPV per natural Inform session).
+# That is also the resolution of the resulting chart: a fleet on a
+# 24-hour inform interval gets 24-hour resolution, and the Spectrum page
+# reports the measured sample interval rather than drawing a smooth line
+# between two points.
+#
+# Scope: any TR-181-capable CPE (dataModel:device). Priority 10, so an
+# operator-shipped vendor profile overrides on conflicting paths.
+apiVersion: telemetry.herder.io/v1alpha1
+kind: TelemetryProfile
+metadata:
+  name: tr181-wifi-rf
+spec:
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:device"
+        operator: Exists
+  parameters:
+    # Percentage of time the primary channel was busy, from the radio's
+    # own measurement. The single most useful RF number a CPE reports.
+    - path: "Device.WiFi.Radio.{i}.ChannelUtilization"
+      interval: 0
+    # Noise floor in dBm. Separates "busy" from "the air here is dirty",
+    # which have different fixes: one is a channel change, the other is a
+    # site visit.
+    - path: "Device.WiFi.Radio.{i}.Stats.Noise"
+      interval: 0
+    # Monotonic counters, reset on reboot. Read as differences, and a
+    # negative step is a reboot rather than negative traffic.
+    - path: "Device.WiFi.Radio.{i}.Stats.RetryCount"
+      interval: 0
+    - path: "Device.WiFi.Radio.{i}.Stats.FCSErrorCount"
+      interval: 0
