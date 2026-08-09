@@ -204,6 +204,20 @@ spec:
     - canonical: canonical.wifi.radio.3.band
       valueType: string
       devicePath: Device.WiFi.Radio.3.OperatingFrequencyBand
+    # The auto-channel switch, one per radio. The channel planner writes
+    # it: a channel set against a radio still running auto-select is a
+    # set the CPE's own algorithm is free to revert, so a plan apply
+    # disables the switch in the same SetParameterValues and a rollback
+    # restores what the CPE reported before.
+    - canonical: canonical.wifi.radio.1.auto_channel_enable
+      valueType: boolean
+      devicePath: Device.WiFi.Radio.1.AutoChannelEnable
+    - canonical: canonical.wifi.radio.2.auto_channel_enable
+      valueType: boolean
+      devicePath: Device.WiFi.Radio.2.AutoChannelEnable
+    - canonical: canonical.wifi.radio.3.auto_channel_enable
+      valueType: boolean
+      devicePath: Device.WiFi.Radio.3.AutoChannelEnable
     # The operating width. Without it every radio in a TR-181 fleet is
     # drawn at the assumed 20 MHz and reported as a coverage gap, and no
     # radio can be told apart from one running below what it supports.
