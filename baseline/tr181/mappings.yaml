@@ -687,9 +687,17 @@ spec:
 # operator who wants one without the other should be able to unbind the
 # table rather than edit entries out of it.
 #
-# The ranges cover what residential gateways expose (2 radios, matching
-# wifi-tr181). Operators serving tri-band gateways extend this table at a
-# higher-priority profile; nothing in Go caps the count.
+# The ranges cover 3 radios, matching wifi-tr181: a tri-band gateway's
+# 6 GHz radio carries the same measurements as the other two. Operators
+# serving devices with more extend this table on a profile of their own;
+# nothing in Go caps the count.
+#
+# No retry counter. TR-181 defines the 802.11 retry counters on
+# Device.WiFi.SSID.{i}.Stats (per BSS), not on Radio.{i}.Stats, and the
+# per-radio path an earlier revision named here faulted on every
+# spec-compliant CPE. An operator who accepts per-BSS retries as a
+# per-radio approximation can declare that mapping deliberately on a
+# profile of their own; the baseline does not guess it for them.
 #
 # ON ChannelUtilization AND ITS SCALE.
 #
@@ -725,9 +733,6 @@ spec:
     - canonical: canonical.wifi.radio.1.noise
       valueType: int
       devicePath: Device.WiFi.Radio.1.Stats.Noise
-    - canonical: canonical.wifi.radio.1.stats.retry_count
-      valueType: unsignedint
-      devicePath: Device.WiFi.Radio.1.Stats.RetryCount
     - canonical: canonical.wifi.radio.1.stats.fcs_errors
       valueType: unsignedint
       devicePath: Device.WiFi.Radio.1.Stats.FCSErrorCount
@@ -743,9 +748,6 @@ spec:
     - canonical: canonical.wifi.radio.2.noise
       valueType: int
       devicePath: Device.WiFi.Radio.2.Stats.Noise
-    - canonical: canonical.wifi.radio.2.stats.retry_count
-      valueType: unsignedint
-      devicePath: Device.WiFi.Radio.2.Stats.RetryCount
     - canonical: canonical.wifi.radio.2.stats.fcs_errors
       valueType: unsignedint
       devicePath: Device.WiFi.Radio.2.Stats.FCSErrorCount
@@ -755,3 +757,18 @@ spec:
     - canonical: canonical.wifi.radio.2.stats.bytes_received
       valueType: unsignedint
       devicePath: Device.WiFi.Radio.2.Stats.BytesReceived
+    - canonical: canonical.wifi.radio.3.utilization
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.3.ChannelUtilization
+    - canonical: canonical.wifi.radio.3.noise
+      valueType: int
+      devicePath: Device.WiFi.Radio.3.Stats.Noise
+    - canonical: canonical.wifi.radio.3.stats.fcs_errors
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.3.Stats.FCSErrorCount
+    - canonical: canonical.wifi.radio.3.stats.bytes_sent
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.3.Stats.BytesSent
+    - canonical: canonical.wifi.radio.3.stats.bytes_received
+      valueType: unsignedint
+      devicePath: Device.WiFi.Radio.3.Stats.BytesReceived

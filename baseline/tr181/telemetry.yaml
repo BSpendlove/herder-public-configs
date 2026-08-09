@@ -127,6 +127,21 @@ spec:
       interval: 0
     - path: "Device.WiFi.Radio.{i}.OperatingChannelBandwidth"
       interval: 0
+    # --- Radio capability and the auto-select switch ---
+    # The inputs behind the capability grading (band6_idle,
+    # width_below_capability) and the channel planner's rollback record.
+    # Without them the findings ship with nothing to read: capability is
+    # graded from current parameter values, and a parameter nothing
+    # collects has no current value. Static per firmware, so the cost is
+    # one GPV per session.
+    - path: "Device.WiFi.Radio.{i}.SupportedFrequencyBands"
+      interval: 0
+    - path: "Device.WiFi.Radio.{i}.PossibleChannels"
+      interval: 0
+    - path: "Device.WiFi.Radio.{i}.SupportedOperatingChannelBandwidths"
+      interval: 0
+    - path: "Device.WiFi.Radio.{i}.AutoChannelEnable"
+      interval: 0
     # --- Radio byte counters ---
     - path: "Device.WiFi.Radio.{i}.Stats.BytesSent"
       interval: 0
@@ -156,6 +171,10 @@ spec:
       interval: 0
     - path: "Device.WiFi.AccessPoint.{i}.Security.ModeEnabled"
       interval: 0
+    # Supported next to enabled: the wpa3_absent finding is the gap
+    # between the two, and either alone cannot say it.
+    - path: "Device.WiFi.AccessPoint.{i}.Security.ModesSupported"
+      interval: 0
     - path: "Device.WiFi.AccessPoint.{i}.AssociatedDeviceNumberOfEntries"
       interval: 0
     # --- Associated clients (TR-181 spellings) ---
@@ -168,6 +187,10 @@ spec:
     - path: "Device.WiFi.AccessPoint.{i}.AssociatedDevice.{i}.LastDataUplinkRate"
       interval: 0
     - path: "Device.WiFi.AccessPoint.{i}.AssociatedDevice.{i}.SignalStrength"
+      interval: 0
+    # The client's 802.11 standard, which with the signal above is the
+    # whole sticky-client test.
+    - path: "Device.WiFi.AccessPoint.{i}.AssociatedDevice.{i}.OperatingStandard"
       interval: 0
     - path: "Device.WiFi.AccessPoint.{i}.AssociatedDevice.{i}.Active"
       interval: 0
@@ -432,8 +455,9 @@ spec:
     - path: "Device.WiFi.Radio.{i}.Stats.Noise"
       interval: 0
     # Monotonic counters, reset on reboot. Read as differences, and a
-    # negative step is a reboot rather than negative traffic.
-    - path: "Device.WiFi.Radio.{i}.Stats.RetryCount"
-      interval: 0
+    # negative step is a reboot rather than negative traffic. No retry
+    # counter here: TR-181 has no per-radio one (the 802.11 retry counters
+    # live on Device.WiFi.SSID.{i}.Stats, per BSS), and the path this
+    # profile used to name faulted 9005 on every spec-compliant CPE.
     - path: "Device.WiFi.Radio.{i}.Stats.FCSErrorCount"
       interval: 0

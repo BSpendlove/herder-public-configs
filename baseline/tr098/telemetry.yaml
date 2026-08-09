@@ -222,6 +222,13 @@ spec:
       interval: 0
     - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.BeaconType"
       interval: 0
+    # Channel capability and the auto-select switch: the inputs behind the
+    # Spectrum capability grading and the channel planner's rollback
+    # record. Static per firmware, so the cost is one GPV per session.
+    - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.PossibleChannels"
+      interval: 0
+    - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.AutoChannelEnable"
+      interval: 0
     # --- Security / auth posture ---
     - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.BasicAuthenticationMode"
       interval: 0
@@ -237,6 +244,13 @@ spec:
     - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.Stats.BytesSent"
       interval: 0
     - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.Stats.BytesReceived"
+      interval: 0
+    # The standard-position byte counters as well: the canonical byte
+    # counters map to TotalBytesSent/TotalBytesReceived (TR-098 keeps bytes
+    # on the object, not under Stats), so history has to hold them.
+    - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.TotalBytesSent"
+      interval: 0
+    - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.TotalBytesReceived"
       interval: 0
     # --- Association counts ---
     - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.TotalAssociations"

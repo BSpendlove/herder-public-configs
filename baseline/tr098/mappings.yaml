@@ -183,10 +183,17 @@ spec:
 ---
 # Baseline fallback mapping profile for any TR-098 device.
 #
-# Priority 10 (the same tier the baseline telemetry profiles use) with a
-# `dataModel:igd` Exists selector, so it binds to every device that ever
-# reported an `InternetGatewayDevice.*` path and loses to any
-# vendor-specific profile (those ship at priority 50+).
+# Priority 10 with a `dataModel:igd` Exists selector, so it binds to
+# every device that ever reported an `InternetGatewayDevice.*` path.
+# Mapping profile selection picks the LOWEST priority number (see
+# backend/internal/mapping/selector/resolve.go, ascending sort, first
+# wins; the opposite of telemetry, where matching profiles merge and
+# the highest number wins on conflicts). A vendor profile that should
+# outbind this baseline therefore ships at a priority BELOW 10, and it
+# must repeat the whole baseline vocabulary it still needs, because
+# binding is single-profile: a vendor profile that names only its own
+# tables strips the device of canonical.mgmt.connection_request_url
+# and makes it undispatchable.
 #
 # Why a fallback has to exist: canonical→raw resolution needs a bound
 # profile, and connection-request dispatch resolves the CPE's URL through
@@ -226,9 +233,13 @@ spec:
 # out below. That is why the ranges are enumerated rather than expressed as
 # a pattern.
 #
-# The ranges cover what residential gateways actually expose: 4 WLAN configurations.
-# Operators serving devices with more radios or SSIDs extend this table at a
-# higher-priority profile; nothing in Go caps the count.
+# The ranges cover 8 WLAN configurations, because the commonest residential
+# TR-098 layout splits them across the physical radios: instances 1 to 4 are
+# BSSes on the 2.4 GHz radio and 5 to 8 on the 5 GHz one. A table stopping at
+# 4 made every such gateway's 5 GHz half invisible, and a fleet of them read
+# as 2.4 GHz-only homes on the Spectrum page. Operators serving devices with
+# more extend this table on a profile of their own; nothing in Go caps the
+# count.
 apiVersion: mapping.herder.io/v1alpha1
 kind: MappingTable
 metadata:
@@ -287,6 +298,134 @@ spec:
     - canonical: canonical.wifi.radio.4.band
       valueType: string
       devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.Standard
+    - canonical: canonical.wifi.radio.5.enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.Enable
+    - canonical: canonical.wifi.radio.5.status
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.Status
+    - canonical: canonical.wifi.radio.5.channel
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.Channel
+    - canonical: canonical.wifi.radio.5.band
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.Standard
+    - canonical: canonical.wifi.radio.6.enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.6.Enable
+    - canonical: canonical.wifi.radio.6.status
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.6.Status
+    - canonical: canonical.wifi.radio.6.channel
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.6.Channel
+    - canonical: canonical.wifi.radio.6.band
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.6.Standard
+    - canonical: canonical.wifi.radio.7.enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.7.Enable
+    - canonical: canonical.wifi.radio.7.status
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.7.Status
+    - canonical: canonical.wifi.radio.7.channel
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.7.Channel
+    - canonical: canonical.wifi.radio.7.band
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.7.Standard
+    - canonical: canonical.wifi.radio.8.enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.8.Enable
+    - canonical: canonical.wifi.radio.8.status
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.8.Status
+    - canonical: canonical.wifi.radio.8.channel
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.8.Channel
+    - canonical: canonical.wifi.radio.8.band
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.8.Standard
+  # Auto-channel, for the channel planner: a plan that sets a channel on
+  # a radio still running auto-select is undone by the CPE's own
+  # algorithm, so the apply disables the switch where a profile declares
+  # it and rollback restores what the CPE reported before.
+    - canonical: canonical.wifi.radio.1.auto_channel_enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.AutoChannelEnable
+    - canonical: canonical.wifi.radio.2.auto_channel_enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.AutoChannelEnable
+    - canonical: canonical.wifi.radio.3.auto_channel_enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.AutoChannelEnable
+    - canonical: canonical.wifi.radio.4.auto_channel_enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.AutoChannelEnable
+    - canonical: canonical.wifi.radio.5.auto_channel_enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.AutoChannelEnable
+    - canonical: canonical.wifi.radio.6.auto_channel_enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.6.AutoChannelEnable
+    - canonical: canonical.wifi.radio.7.auto_channel_enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.7.AutoChannelEnable
+    - canonical: canonical.wifi.radio.8.auto_channel_enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.8.AutoChannelEnable
+  # Byte counters, for the airtime page's counter movement and the
+  # timeline's reboot marks. TotalBytesSent/TotalBytesReceived live on
+  # WLANConfiguration itself; TR-098's Stats object carries packet and
+  # error counters, not bytes.
+    - canonical: canonical.wifi.radio.1.stats.bytes_sent
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.TotalBytesSent
+    - canonical: canonical.wifi.radio.1.stats.bytes_received
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.TotalBytesReceived
+    - canonical: canonical.wifi.radio.2.stats.bytes_sent
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.TotalBytesSent
+    - canonical: canonical.wifi.radio.2.stats.bytes_received
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.TotalBytesReceived
+    - canonical: canonical.wifi.radio.3.stats.bytes_sent
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.TotalBytesSent
+    - canonical: canonical.wifi.radio.3.stats.bytes_received
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.3.TotalBytesReceived
+    - canonical: canonical.wifi.radio.4.stats.bytes_sent
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.TotalBytesSent
+    - canonical: canonical.wifi.radio.4.stats.bytes_received
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.TotalBytesReceived
+    - canonical: canonical.wifi.radio.5.stats.bytes_sent
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.TotalBytesSent
+    - canonical: canonical.wifi.radio.5.stats.bytes_received
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.TotalBytesReceived
+    - canonical: canonical.wifi.radio.6.stats.bytes_sent
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.6.TotalBytesSent
+    - canonical: canonical.wifi.radio.6.stats.bytes_received
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.6.TotalBytesReceived
+    - canonical: canonical.wifi.radio.7.stats.bytes_sent
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.7.TotalBytesSent
+    - canonical: canonical.wifi.radio.7.stats.bytes_received
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.7.TotalBytesReceived
+    - canonical: canonical.wifi.radio.8.stats.bytes_sent
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.8.TotalBytesSent
+    - canonical: canonical.wifi.radio.8.stats.bytes_received
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.8.TotalBytesReceived
     - canonical: canonical.wifi.ssid.1.enable
       valueType: boolean
       devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.Enable
@@ -335,6 +474,54 @@ spec:
     - canonical: canonical.wifi.ssid.4.bssid
       valueType: string
       devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.BSSID
+    - canonical: canonical.wifi.ssid.5.enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.Enable
+    - canonical: canonical.wifi.ssid.5.status
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.Status
+    - canonical: canonical.wifi.ssid.5.ssid
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.SSID
+    - canonical: canonical.wifi.ssid.5.bssid
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.BSSID
+    - canonical: canonical.wifi.ssid.6.enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.6.Enable
+    - canonical: canonical.wifi.ssid.6.status
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.6.Status
+    - canonical: canonical.wifi.ssid.6.ssid
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.6.SSID
+    - canonical: canonical.wifi.ssid.6.bssid
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.6.BSSID
+    - canonical: canonical.wifi.ssid.7.enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.7.Enable
+    - canonical: canonical.wifi.ssid.7.status
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.7.Status
+    - canonical: canonical.wifi.ssid.7.ssid
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.7.SSID
+    - canonical: canonical.wifi.ssid.7.bssid
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.7.BSSID
+    - canonical: canonical.wifi.ssid.8.enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.8.Enable
+    - canonical: canonical.wifi.ssid.8.status
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.8.Status
+    - canonical: canonical.wifi.ssid.8.ssid
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.8.SSID
+    - canonical: canonical.wifi.ssid.8.bssid
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.8.BSSID
     - canonical: canonical.wifi.ap.1.enable
       valueType: boolean
       devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.Enable
@@ -371,6 +558,42 @@ spec:
     - canonical: canonical.wifi.ap.4.client_count
       valueType: unsignedint
       devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.TotalAssociations
+    - canonical: canonical.wifi.ap.5.enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.Enable
+    - canonical: canonical.wifi.ap.5.security_mode
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.BeaconType
+    - canonical: canonical.wifi.ap.5.client_count
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.TotalAssociations
+    - canonical: canonical.wifi.ap.6.enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.6.Enable
+    - canonical: canonical.wifi.ap.6.security_mode
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.6.BeaconType
+    - canonical: canonical.wifi.ap.6.client_count
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.6.TotalAssociations
+    - canonical: canonical.wifi.ap.7.enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.7.Enable
+    - canonical: canonical.wifi.ap.7.security_mode
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.7.BeaconType
+    - canonical: canonical.wifi.ap.7.client_count
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.7.TotalAssociations
+    - canonical: canonical.wifi.ap.8.enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.8.Enable
+    - canonical: canonical.wifi.ap.8.security_mode
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.8.BeaconType
+    - canonical: canonical.wifi.ap.8.client_count
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.8.TotalAssociations
 
 ---
 # Radio CAPABILITY for TR-098 (InternetGatewayDevice.*) devices.
@@ -403,3 +626,15 @@ spec:
     - canonical: canonical.wifi.radio.4.possible_channels
       valueType: string
       devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.4.PossibleChannels
+    - canonical: canonical.wifi.radio.5.possible_channels
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.5.PossibleChannels
+    - canonical: canonical.wifi.radio.6.possible_channels
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.6.PossibleChannels
+    - canonical: canonical.wifi.radio.7.possible_channels
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.7.PossibleChannels
+    - canonical: canonical.wifi.radio.8.possible_channels
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.8.PossibleChannels
