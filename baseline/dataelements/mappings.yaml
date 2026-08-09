@@ -200,13 +200,20 @@ spec:
               multiplier: 0.5
               offset: -110
 ---
-# Data Elements RF, bound to any TR-181 CPE.
+# Data Elements RF: declares the table, and deliberately never wins a
+# binding.
 #
-# Priority 20, above the TR-181 baseline's 10, because where a CPE
-# populates both trees the Data Elements one is the better answer: it is
-# the standardised measurement rather than a parameter each vendor
-# interprets, and it carries the airtime split that TR-181 proper cannot
-# express at all.
+# Mapping profile selection picks the LOWEST priority number and binds
+# exactly ONE profile (backend/internal/mapping/selector/resolve.go),
+# so at priority 20 this profile always loses to the TR-181 baseline's
+# 10, and that is the correct outcome twice over. Binding is
+# single-profile, so if this profile ever won, the device would carry
+# ONLY the Data Elements table and lose
+# canonical.mgmt.connection_request_url, which makes it
+# undispatchable. And the fleet-scale readers that consume these
+# canonicals (rpc.mapping.paths, behind the airtime and RF pages) walk
+# every DECLARED table regardless of which profile a device is bound
+# to, so declaring the table is all this profile has to do.
 #
 # Bound on `dataModel:device` rather than on a Data Elements-specific
 # label because there is no such label: the CWMP handler derives

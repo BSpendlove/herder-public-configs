@@ -1,0 +1,46 @@
+# Telemetry profile: Wi-Fi Alliance Data Elements channel-scan results.
+#
+# The collection half of baseline/tr181/wifi-scan-dataelements.yaml. A
+# mapping table says where the scan vocabulary lives; nothing reaches
+# `device_parameters` until a telemetry profile asks for it, and the RF
+# neighbour graph reads current parameter values. Shipping the table
+# without this file made the whole Data Elements scan vocabulary inert:
+# declared, resolvable fleet-wide, and never populated.
+#
+# No trigger, and none is possible here: TR-181 defines no data-model
+# command to start a Data Elements channel scan. The tree fills in
+# response to a 1905 Channel Scan Request from the Multi-AP controller,
+# on the controller's own cadence, and this profile collects whatever
+# the last scan left behind. See the mapping table's header for the full
+# reasoning.
+#
+# SSID is deliberately not collected, matching
+# baseline/tr181/wifi-neighbors-telemetry.yaml: a neighbour's network
+# name is third-party personal data, and the probable-tier digest is an
+# opt-in an operator makes by collecting it on a profile of their own.
+#
+# CARDINALITY: same warning as the TR-181 neighbour profile. NeighborBSS
+# rows are per heard AP per channel; a dense block returns dozens per
+# radio. The set below is the four attributes the graph reads and
+# nothing else.
+#
+# All params interval=0 (passive, one GPV per natural Inform session).
+apiVersion: telemetry.herder.io/v1alpha1
+kind: TelemetryProfile
+metadata:
+  name: dataelements-wifi-scan
+spec:
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:device"
+        operator: Exists
+  parameters:
+    - path: "Device.WiFi.DataElements.Network.Device.{i}.Radio.{i}.ScanResult.{i}.OpClassScan.{i}.ChannelScan.{i}.Channel"
+      interval: 0
+    - path: "Device.WiFi.DataElements.Network.Device.{i}.Radio.{i}.ScanResult.{i}.OpClassScan.{i}.ChannelScan.{i}.NeighborBSS.{i}.BSSID"
+      interval: 0
+    - path: "Device.WiFi.DataElements.Network.Device.{i}.Radio.{i}.ScanResult.{i}.OpClassScan.{i}.ChannelScan.{i}.NeighborBSS.{i}.SignalStrength"
+      interval: 0
+    - path: "Device.WiFi.DataElements.Network.Device.{i}.Radio.{i}.ScanResult.{i}.OpClassScan.{i}.ChannelScan.{i}.NeighborBSS.{i}.ChannelBandwidth"
+      interval: 0
