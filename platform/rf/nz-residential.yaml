@@ -1,0 +1,59 @@
+# Reference RF policy: the operator's channel stance, as config.
+#
+# This is the document the channel planner plans under. No channel
+# list, width preference, DFS stance, RSSI floor or cadence lives in
+# Herder's code; a fleet spanning two regulatory domains ships two of
+# these, selector-scoped, and the highest priority policy that matches
+# a device is the one that binds it (mapping/telemetry semantics).
+#
+# The allowed channels here are a POLICY, not a capability claim: the
+# planner intersects them with the channels each radio itself reports,
+# and never assigns outside either. The regulatory domain belongs to
+# the CPE.
+#
+# dfs: avoid is the only defensible default until the DFS eviction
+# ledger (/v1/spectrum/dfs/evictions) has shown which radar channels
+# are actually clean in this market; allow opts in per band, forbid
+# also evacuates radios already sitting on one.
+apiVersion: rf.herder.io/v1alpha1
+kind: RFPolicy
+metadata:
+  name: nz-residential
+  labels:
+    region: nz
+spec:
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:device"
+        operator: Exists
+  bands:
+    "2.4 GHz":
+      # The orthogonal set. Anything else overlaps both of its
+      # neighbours on a band where the channels are 5 MHz apart and
+      # the signals 20 MHz wide.
+      allowedChannels: [1, 6, 11]
+      allowedWidths: [20]
+    "5 GHz":
+      # UNII-1 and UNII-3: the non-DFS ranges common to NZ residential
+      # deployments. The DFS range (52-144) stays available to a
+      # policy that sets dfs: allow after reading the eviction ledger.
+      allowedChannels: [36, 40, 44, 48, 149, 153, 157, 161]
+      allowedWidths: [80, 40]
+      dfs: avoid
+    "6 GHz":
+      # Empty means every channel the radio reports supporting.
+      allowedChannels: []
+      allowedWidths: [160, 80]
+  scan:
+    # Neighbour scans are disruptive (an off-channel sweep stops the
+    # radio serving clients), so the cadence is slow and the window is
+    # when the household is asleep. The window is UTC.
+    cadence: 24h
+    window: "02:00-05:00"
+  planning:
+    # Managed edges quieter than the floor are audible, not worth a
+    # channel change. One plan proposes at most maxChangesPerRun
+    # moves; what the cap leaves out is reported on the plan.
+    rssiFloor: -82
+    maxChangesPerRun: 500
