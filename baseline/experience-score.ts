@@ -76,6 +76,35 @@ interface ClientSample { rssi: number | null; rate: number | null; mac: string |
 
 const clients: ClientSample[] = [];
 
+
+// Vendor-extension fallback for client signal. TR-069 vendor leaves
+// follow X_<OUI>_<Name>; plenty of firmware reports client RSSI only
+// under that convention (X_0000C5_RSSI, X_00005E_RSSI, ...), and a
+// score that reads only the standard spelling silently drops its
+// heaviest-weighted component for those fleets. The scan is the
+// naming convention, not a vendor table: dBm-style RSSI is preferred,
+// the percent-style SignalStrength variant is used only as a last
+// resort and never mistaken for dBm (values above 0 are ignored for
+// the rssi component).
+function clientSignalDbm(c: Record<string, unknown>): number | null {
+  const std = toNum(c.SignalStrength);
+  if (std !== null && std <= 0) return std;
+  const keys = Object.keys(c);
+  for (let i = 0; i < keys.length; i++) {
+    if (/^X_[0-9A-Fa-f]{6}_RSSI$/.test(keys[i])) {
+      const v = toNum(c[keys[i]]);
+      if (v !== null && v <= 0) return v;
+    }
+  }
+  for (let i = 0; i < keys.length; i++) {
+    if (/^X_[0-9A-Fa-f]{6}_SignalStrength$/.test(keys[i])) {
+      const v = toNum(c[keys[i]]);
+      if (v !== null && v <= 0) return v;
+    }
+  }
+  return std;
+}
+
 const tr181Clients = batch.matches("Device.WiFi.AccessPoint.*.AssociatedDevice.*");
 for (let i = 0; i < tr181Clients.length; i++) {
   const c = tr181Clients[i];
@@ -91,7 +120,7 @@ const tr098Clients = batch.matches(
 for (let i = 0; i < tr098Clients.length; i++) {
   const c = tr098Clients[i];
   clients.push({
-    rssi: toNum(c.SignalStrength),
+    rssi: clientSignalDbm(c),
     rate: toNum(c.LastDataTransmitRate),
     mac:
       typeof c.AssociatedDeviceMACAddress === "string"

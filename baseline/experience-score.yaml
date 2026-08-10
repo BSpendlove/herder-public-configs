@@ -30,7 +30,7 @@ spec:
     - "Device.Ethernet.Interface.*"
     - "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.*"
     - "InternetGatewayDevice.WANDevice.*"
-  coalesceWindow: 5m
+  coalesceWindow: 45s
   config:
     # WiFi client_rssi component: linear 0-100 between floor and ceil dBm.
     wifiRssiFloor: -85
