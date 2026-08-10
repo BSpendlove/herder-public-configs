@@ -39,13 +39,17 @@ spec:
       interval: 0
     - path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.{i}.Stats.ErrorsReceived"
       interval: 0
-    - path: "InternetGatewayDevice.WANDevice.1.WANEthernetInterfaceConfig.Stats.EthernetErrorsSent"
-      interval: 0
-    - path: "InternetGatewayDevice.WANDevice.1.WANEthernetInterfaceConfig.Stats.EthernetErrorsReceived"
-      interval: 0
     - path: "InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.Stats.EthernetErrorsSent"
       interval: 0
     - path: "InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.Stats.EthernetErrorsReceived"
+      interval: 0
+    # The denominator for the error rate, and the uptime the stability
+    # component reads. This family carries its WAN counters on the
+    # per-connection Stats table only; there is no
+    # WANEthernetInterfaceConfig object on the box.
+    - path: "InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.Stats.EthernetPacketsReceived"
+      interval: 0
+    - path: "InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.Uptime"
       interval: 0
     - path: "InternetGatewayDevice.DeviceInfo.UpTime"
       interval: 0

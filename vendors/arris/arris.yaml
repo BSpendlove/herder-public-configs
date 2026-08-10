@@ -201,3 +201,27 @@ spec:
         operator: In
         values: [Arris, ARRIS]
   script: arris-client-rssi-labels.ts
+---
+# WAN posture for the experience score's wan dimension: the error rate
+# reads the per-connection Ethernet counters, stability reads the
+# connection uptime with device uptime as fallback.
+apiVersion: telemetry.herder.io/v1alpha1
+kind: TelemetryProfile
+metadata:
+  name: arris-wan-tr098
+spec:
+  priority: 50
+  deviceSelector:
+    matchExpressions:
+      - key: manufacturer
+        operator: In
+        values: [Arris, ARRIS]
+  parameters:
+    - path: "InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.Stats.EthernetErrorsReceived"
+      interval: 0
+    - path: "InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.Stats.EthernetPacketsReceived"
+      interval: 0
+    - path: "InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.Uptime"
+      interval: 0
+    - path: "InternetGatewayDevice.DeviceInfo.UpTime"
+      interval: 0

@@ -220,6 +220,23 @@ for (let i = 0; i < tr098Wans.length; i++) {
     worstErrIface = "wandevice." + s.$indexes.WANDevice;
   }
 }
+// TR-098 gateways commonly carry their WAN counters on the per-connection
+// Stats table (WANIPConnection.{i}.Stats.Ethernet*) rather than the
+// interface-level one read above. Both spellings feed the same component.
+const tr098ConnStats = batch.matches(
+  "InternetGatewayDevice.WANDevice.*.WANConnectionDevice.*.WANIPConnection.*",
+);
+for (let i = 0; i < tr098ConnStats.length; i++) {
+  const s = tr098ConnStats[i];
+  const errors = toNum(s["Stats.EthernetErrorsReceived"]);
+  const packets = toNum(s["Stats.EthernetPacketsReceived"]);
+  if (errors === null || packets === null || packets === 0) continue;
+  const rate = errors / packets;
+  if (worstErrRate === null || rate > worstErrRate) {
+    worstErrRate = rate;
+    worstErrIface = "wanipconnection." + s.$indexes.WANIPConnection;
+  }
+}
 if (worstErrRate !== null) {
   wanErrorScore = linScore(WAN_ERR_CEIL - worstErrRate, 0, WAN_ERR_CEIL);
   score.set("wan", wanErrorScore, {
@@ -239,9 +256,17 @@ for (let i = 0; i < tr098Conns.length; i++) {
   if (u === null) continue;
   if (bestUptime === null || u > bestUptime) bestUptime = u;
 }
+// Device uptime is the fallback when no per-connection uptime came in
+// the batch. Weaker evidence (the box being up is not the WAN being
+// up), but a link that bounces usually reboots nothing, so connection
+// uptime wins whenever both are present.
 const tr181Up = toNum(batch.params["Device.DeviceInfo.UpTime"]);
+const tr098Up = toNum(batch.params["InternetGatewayDevice.DeviceInfo.UpTime"]);
 if (bestUptime === null && tr181Up !== null) {
   bestUptime = tr181Up;
+}
+if (bestUptime === null && tr098Up !== null) {
+  bestUptime = tr098Up;
 }
 if (bestUptime !== null) {
   wanStabilityScore = linScore(bestUptime, 0, WAN_UPTIME_GOOD);

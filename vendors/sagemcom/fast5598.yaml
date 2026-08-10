@@ -14,3 +14,25 @@ spec:
   parameters:
     - path: "Device.PPP.Interface.{i}.Username"
       interval: 0
+---
+# WAN posture for the experience score's wan dimension, TR-181 form:
+# interface error counters for the error rate, device uptime for
+# stability.
+apiVersion: telemetry.herder.io/v1alpha1
+kind: TelemetryProfile
+metadata:
+  name: sagemcom-fast5598-wan
+spec:
+  priority: 50
+  deviceSelector:
+    matchExpressions:
+      - key: productClass
+        operator: In
+        values: [FAST5598]
+  parameters:
+    - path: "Device.Ethernet.Interface.{i}.Stats.ErrorsReceived"
+      interval: 0
+    - path: "Device.Ethernet.Interface.{i}.Stats.PacketsReceived"
+      interval: 0
+    - path: "Device.DeviceInfo.UpTime"
+      interval: 0
