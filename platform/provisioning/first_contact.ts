@@ -4,11 +4,11 @@
 // Uses canonical paths — the mapping profile translates to the correct
 // device-native paths (TR-098/TR-181/vendor) automatically.
 
-// Fetch device info for parameter database population.
-device.fetch("canonical.device.*");
-
-// Fetch management server config.
-device.fetch("canonical.mgmt.*");
+// No fetches. Parameter discovery is the telemetry phase's job, and
+// every set below is unconditional, so a fetch here only added device
+// round-trips to the eval on the busiest session the fleet has. At
+// 100k a boot storm's evals went from milliseconds to seconds on
+// exactly those round-trips, and the queue died of old age.
 
 // Set up connection request credentials (deterministic per device).
 const crUsername = device.oui + "-" + (device.serialNumber || "");
