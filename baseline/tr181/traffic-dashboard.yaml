@@ -1,0 +1,128 @@
+# Traffic utilisation for TR-181 devices, from the raw interface byte
+# counters (`agg: rate` turns each monotonic counter into bytes/second,
+# clamping counter resets to zero). Pinned by the baseline device UI
+# profile's Monitoring section; also pinnable on its own.
+#
+# refIds are constrained to [A-Z]{1,4}, so direction and instance are
+# encoded there: TX/RX for the WAN pair, RA/RB for radios 1 and 2,
+# SA/SB for SSIDs 1 and 2.
+apiVersion: dashboards.herder.io/v1alpha1
+kind: Dashboard
+metadata:
+  name: tr181-traffic
+spec:
+  title: Traffic
+  description: Interface throughput from the device's byte counters
+  deviceSelector:
+    matchExpressions:
+      - {key: "dataModel:device", operator: Exists}
+  defaultTimeRange:
+    from: {kind: relative, expr: "now-6h"}
+    to: {kind: relative, expr: "now"}
+  defaultRefreshIntervalMs: 60000
+  panels:
+    - id: panel-wan-throughput
+      kind: line
+      title: WAN throughput
+      description: TX is upstream from the home, RX is downstream to it
+      layout: {x: 0, y: 0, w: 6, h: 8}
+      queries:
+        - refId: TX
+          version: 1
+          datasource: telemetry_history
+          query:
+            agg: rate
+            filters: {path: "Device.Ethernet.Interface.1.Stats.BytesSent"}
+        - refId: RX
+          version: 1
+          datasource: telemetry_history
+          query:
+            agg: rate
+            filters: {path: "Device.Ethernet.Interface.1.Stats.BytesReceived"}
+      config:
+        showPoints: false
+        interpolation: monotone
+        yAxis: {kind: auto}
+        unit: " B/s"
+        legend:
+          displayMode: list
+          placement: bottom
+          calcs: [last, mean, max]
+    - id: panel-radio-throughput
+      kind: line
+      title: WiFi radio throughput
+      description: RA is radio 1 (2.4 GHz), RB is radio 2 (5 GHz)
+      layout: {x: 6, y: 0, w: 6, h: 8}
+      queries:
+        - refId: RATX
+          version: 1
+          datasource: telemetry_history
+          query:
+            agg: rate
+            filters: {path: "Device.WiFi.Radio.1.Stats.BytesSent"}
+        - refId: RARX
+          version: 1
+          datasource: telemetry_history
+          query:
+            agg: rate
+            filters: {path: "Device.WiFi.Radio.1.Stats.BytesReceived"}
+        - refId: RBTX
+          version: 1
+          datasource: telemetry_history
+          query:
+            agg: rate
+            filters: {path: "Device.WiFi.Radio.2.Stats.BytesSent"}
+        - refId: RBRX
+          version: 1
+          datasource: telemetry_history
+          query:
+            agg: rate
+            filters: {path: "Device.WiFi.Radio.2.Stats.BytesReceived"}
+      config:
+        showPoints: false
+        interpolation: monotone
+        yAxis: {kind: auto}
+        unit: " B/s"
+        legend:
+          displayMode: list
+          placement: bottom
+          calcs: [last, mean, max]
+    - id: panel-ssid-throughput
+      kind: line
+      title: SSID throughput
+      description: SA is SSID 1, SB is SSID 2
+      layout: {x: 0, y: 8, w: 12, h: 8}
+      queries:
+        - refId: SATX
+          version: 1
+          datasource: telemetry_history
+          query:
+            agg: rate
+            filters: {path: "Device.WiFi.SSID.1.Stats.BytesSent"}
+        - refId: SARX
+          version: 1
+          datasource: telemetry_history
+          query:
+            agg: rate
+            filters: {path: "Device.WiFi.SSID.1.Stats.BytesReceived"}
+        - refId: SBTX
+          version: 1
+          datasource: telemetry_history
+          query:
+            agg: rate
+            filters: {path: "Device.WiFi.SSID.2.Stats.BytesSent"}
+        - refId: SBRX
+          version: 1
+          datasource: telemetry_history
+          query:
+            agg: rate
+            filters: {path: "Device.WiFi.SSID.2.Stats.BytesReceived"}
+      config:
+        showPoints: false
+        interpolation: monotone
+        yAxis: {kind: auto}
+        unit: " B/s"
+        legend:
+          displayMode: table
+          placement: bottom
+          calcs: [last, mean, max]

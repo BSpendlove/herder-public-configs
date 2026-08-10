@@ -1,0 +1,152 @@
+# Traffic utilisation for TR-098 devices, from the raw interface byte
+# counters (`agg: rate` turns each monotonic counter into bytes/second,
+# clamping counter resets to zero). Pinned by the baseline device UI
+# profile's Monitoring section; also pinnable on its own.
+#
+# refIds are constrained to [A-Z]{1,4}, so direction and instance are
+# encoded there: TX/RX for the WAN pair, A-D for LAN ports 1-4, WA/WB
+# for WLANConfiguration 1 and 2.
+apiVersion: dashboards.herder.io/v1alpha1
+kind: Dashboard
+metadata:
+  name: tr098-traffic
+spec:
+  title: Traffic
+  description: Interface throughput from the device's byte counters
+  deviceSelector:
+    matchExpressions:
+      - {key: "dataModel:igd", operator: Exists}
+  defaultTimeRange:
+    from: {kind: relative, expr: "now-6h"}
+    to: {kind: relative, expr: "now"}
+  defaultRefreshIntervalMs: 60000
+  panels:
+    - id: panel-wan-throughput
+      kind: line
+      title: WAN throughput
+      description: TX is upstream from the home, RX is downstream to it
+      layout: {x: 0, y: 0, w: 6, h: 8}
+      queries:
+        - refId: TX
+          version: 1
+          datasource: telemetry_history
+          query:
+            agg: rate
+            filters: {path: "InternetGatewayDevice.WANDevice.1.WANCommonInterfaceConfig.TotalBytesSent"}
+        - refId: RX
+          version: 1
+          datasource: telemetry_history
+          query:
+            agg: rate
+            filters: {path: "InternetGatewayDevice.WANDevice.1.WANCommonInterfaceConfig.TotalBytesReceived"}
+      config:
+        showPoints: false
+        interpolation: monotone
+        yAxis: {kind: auto}
+        unit: " B/s"
+        legend:
+          displayMode: list
+          placement: bottom
+          calcs: [last, mean, max]
+    - id: panel-wifi-throughput
+      kind: line
+      title: WiFi throughput
+      description: WA is WLAN 1 (2.4 GHz), WB is WLAN 2 (5 GHz)
+      layout: {x: 6, y: 0, w: 6, h: 8}
+      queries:
+        - refId: WATX
+          version: 1
+          datasource: telemetry_history
+          query:
+            agg: rate
+            filters: {path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.Stats.BytesSent"}
+        - refId: WARX
+          version: 1
+          datasource: telemetry_history
+          query:
+            agg: rate
+            filters: {path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.Stats.BytesReceived"}
+        - refId: WBTX
+          version: 1
+          datasource: telemetry_history
+          query:
+            agg: rate
+            filters: {path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.Stats.BytesSent"}
+        - refId: WBRX
+          version: 1
+          datasource: telemetry_history
+          query:
+            agg: rate
+            filters: {path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.Stats.BytesReceived"}
+      config:
+        showPoints: false
+        interpolation: monotone
+        yAxis: {kind: auto}
+        unit: " B/s"
+        legend:
+          displayMode: list
+          placement: bottom
+          calcs: [last, mean, max]
+    - id: panel-lan-throughput
+      kind: line
+      title: LAN port throughput
+      description: One TX/RX pair per switch port, A-D are ports 1-4
+      layout: {x: 0, y: 8, w: 12, h: 8}
+      queries:
+        - refId: ATX
+          version: 1
+          datasource: telemetry_history
+          query:
+            agg: rate
+            filters: {path: "InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.1.Stats.BytesSent"}
+        - refId: ARX
+          version: 1
+          datasource: telemetry_history
+          query:
+            agg: rate
+            filters: {path: "InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.1.Stats.BytesReceived"}
+        - refId: BTX
+          version: 1
+          datasource: telemetry_history
+          query:
+            agg: rate
+            filters: {path: "InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.2.Stats.BytesSent"}
+        - refId: BRX
+          version: 1
+          datasource: telemetry_history
+          query:
+            agg: rate
+            filters: {path: "InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.2.Stats.BytesReceived"}
+        - refId: CTX
+          version: 1
+          datasource: telemetry_history
+          query:
+            agg: rate
+            filters: {path: "InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.3.Stats.BytesSent"}
+        - refId: CRX
+          version: 1
+          datasource: telemetry_history
+          query:
+            agg: rate
+            filters: {path: "InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.3.Stats.BytesReceived"}
+        - refId: DTX
+          version: 1
+          datasource: telemetry_history
+          query:
+            agg: rate
+            filters: {path: "InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.4.Stats.BytesSent"}
+        - refId: DRX
+          version: 1
+          datasource: telemetry_history
+          query:
+            agg: rate
+            filters: {path: "InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.4.Stats.BytesReceived"}
+      config:
+        showPoints: false
+        interpolation: monotone
+        yAxis: {kind: auto}
+        unit: " B/s"
+        legend:
+          displayMode: table
+          placement: bottom
+          calcs: [last, mean, max]

@@ -21,6 +21,10 @@ spec:
     - device-info-tr098
     - mgmt-tr098
     - diagnostics-tr098
+    - wifi-tr098
+    - wifi-bssid-tr098
+    - wifi-capability-tr098
+    - interfaces-tr098
 ---
 # Profile for the cpe-labs TR-181 simulator
 # (github.com/herder-labs/cpe-labs, profile example-tr181-gateway).
@@ -42,6 +46,10 @@ spec:
   parameterMappings:
     - device-info-tr181
     - mgmt-tr181
+    - firmware-tr181
+    - wifi-tr181
+    - wifi-rf-tr181
+    - interfaces-tr181
 ---
 # Telemetry add-ons for the cpe-labs TR-098 simulator
 # (github.com/herder-labs/cpe-labs, profile example-tr098-gateway).

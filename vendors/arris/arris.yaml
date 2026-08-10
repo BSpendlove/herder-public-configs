@@ -25,6 +25,10 @@ spec:
     - device-info-tr098
     - mgmt-tr098
     - diagnostics-tr098
+    - wifi-tr098
+    - wifi-bssid-tr098
+    - wifi-capability-tr098
+    - interfaces-tr098
 ---
 # Telemetry profile: Arris TR-098 WiFi + mesh extensions.
 #

@@ -1,0 +1,68 @@
+# Canonical interface mappings for TR-098 (InternetGatewayDevice.*)
+# devices.
+#
+# Same canonical.interface.* names as interfaces-tr181, mapped to the
+# IGD tree: the WAN side lives under WANDevice and the LAN switch ports
+# under LANDevice.1.LANEthernetInterfaceConfig. A profile written
+# against these canonicals renders identically over either data model,
+# which is the whole point of the namespace.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: interfaces-tr098
+spec:
+  mappings:
+    - canonical: canonical.interface.wan.status
+      valueType: string
+      devicePath: InternetGatewayDevice.WANDevice.1.WANCommonInterfaceConfig.PhysicalLinkStatus
+    - canonical: canonical.interface.wan.type
+      valueType: string
+      devicePath: InternetGatewayDevice.WANDevice.1.WANCommonInterfaceConfig.WANAccessType
+    - canonical: canonical.interface.wan.bytes_sent
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.WANDevice.1.WANCommonInterfaceConfig.TotalBytesSent
+    - canonical: canonical.interface.wan.bytes_received
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.WANDevice.1.WANCommonInterfaceConfig.TotalBytesReceived
+    - canonical: canonical.interface.wan.ip_address
+      valueType: string
+      devicePath: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.ExternalIPAddress
+    - canonical: canonical.interface.wan.uptime
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.Uptime
+    - canonical: canonical.interface.lan.1.status
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.1.Status
+    - canonical: canonical.interface.lan.1.enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.1.Enable
+    - canonical: canonical.interface.lan.1.mac
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.1.MACAddress
+    - canonical: canonical.interface.lan.2.status
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.2.Status
+    - canonical: canonical.interface.lan.2.enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.2.Enable
+    - canonical: canonical.interface.lan.2.mac
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.2.MACAddress
+    - canonical: canonical.interface.lan.3.status
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.3.Status
+    - canonical: canonical.interface.lan.3.enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.3.Enable
+    - canonical: canonical.interface.lan.3.mac
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.3.MACAddress
+    - canonical: canonical.interface.lan.4.status
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.4.Status
+    - canonical: canonical.interface.lan.4.enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.4.Enable
+    - canonical: canonical.interface.lan.4.mac
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.4.MACAddress
