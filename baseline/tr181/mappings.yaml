@@ -129,7 +129,13 @@ kind: MappingProfile
 metadata:
   name: baseline-tr181-cwmp
 spec:
-  priority: 10
+  # Higher than baseline-tr181 deliberately: both match a CWMP TR-181
+  # device, and at equal priority the tie-break bound the mgmt-less
+  # profile, which made every canonical.mgmt.* write fail translation
+  # on exactly the devices this profile exists for. Measured on the
+  # demo fleet as 52k failed SetParameterValues and a cohort stuck in
+  # bootstrap. More specific selector, higher priority.
+  priority: 20
   deviceSelector:
     matchExpressions:
       - key: "dataModel:device"

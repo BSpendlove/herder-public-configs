@@ -1,0 +1,16 @@
+# Subscriber identity from the CPE-reported PPPoE username, the single
+# most common source an ISP actually has. The realm is stripped so the
+# key reads as the account, and both data models' spellings are listed
+# because the same fact lives at different paths on different trees.
+apiVersion: subscriber.herder.io/v1alpha1
+kind: SubscriberSource
+metadata:
+  name: pppoe-username
+spec:
+  priority: 100
+  from:
+    - param:
+        - "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANPPPConnection.{i}.Username"
+        - "Device.PPP.Interface.{i}.Username"
+  normalize:
+    extract: "^([^@]+)"

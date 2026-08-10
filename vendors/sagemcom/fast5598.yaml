@@ -1,0 +1,16 @@
+# Sagemcom FAST5598 (TR-181): the PPP account identity, so subscriber
+# resolution covers this family the way the TR-098 trees already are.
+apiVersion: telemetry.herder.io/v1alpha1
+kind: TelemetryProfile
+metadata:
+  name: sagemcom-fast5598-identity
+spec:
+  priority: 50
+  deviceSelector:
+    matchExpressions:
+      - key: productClass
+        operator: In
+        values: [FAST5598]
+  parameters:
+    - path: "Device.PPP.Interface.{i}.Username"
+      interval: 0
