@@ -203,17 +203,21 @@ spec:
 # Data Elements RF: declares the table, and deliberately never wins a
 # binding.
 #
-# Mapping profile selection picks the LOWEST priority number and binds
+# Mapping profile selection picks the HIGHEST priority and binds
 # exactly ONE profile (backend/internal/mapping/selector/resolve.go),
-# so at priority 20 this profile always loses to the TR-181 baseline's
+# so at priority 1 this profile always loses to the TR-181 baseline's
 # 10, and that is the correct outcome twice over. Binding is
 # single-profile, so if this profile ever won, the device would carry
 # ONLY the Data Elements table and lose
 # canonical.mgmt.connection_request_url, which makes it
-# undispatchable. And the fleet-scale readers that consume these
-# canonicals (rpc.mapping.paths, behind the airtime and RF pages) walk
-# every DECLARED table regardless of which profile a device is bound
-# to, so declaring the table is all this profile has to do.
+# undispatchable. That is not hypothetical: this file originally said
+# priority 20 against the resolver's original lowest-wins sort, and
+# when the sort was corrected to highest-wins the 20 silently started
+# WINNING, stripping every TR-181 device down to the RF table alone.
+# And the fleet-scale readers that consume these canonicals
+# (rpc.mapping.paths, behind the airtime and RF pages) walk every
+# DECLARED table regardless of which profile a device is bound to, so
+# declaring the table is all this profile has to do.
 #
 # Bound on `dataModel:device` rather than on a Data Elements-specific
 # label because there is no such label: the CWMP handler derives
@@ -228,7 +232,7 @@ kind: MappingProfile
 metadata:
   name: dataelements-wifi-rf
 spec:
-  priority: 20
+  priority: 1
   deviceSelector:
     matchExpressions:
       - key: "dataModel:device"
