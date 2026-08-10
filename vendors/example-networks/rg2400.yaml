@@ -1,0 +1,51 @@
+# Example Networks RG2400 (TR-098): the reference simulated gateway
+# family used by demo and scale fleets. WiFi client signal, radio
+# posture and error counters, so experience scoring and per-client
+# troubleshooting have real inputs for this family. The X_00005E_*
+# extensions mirror the documentation-OUI vendor prefix the family
+# reports.
+apiVersion: telemetry.herder.io/v1alpha1
+kind: TelemetryProfile
+metadata:
+  name: example-networks-rg2400-wifi
+spec:
+  priority: 50
+  deviceSelector:
+    matchExpressions:
+      - key: productClass
+        operator: In
+        values: [RG2400]
+  parameters:
+    # Radio posture: channel, auto-channel and tx power are what the
+    # overlapping-channel and hot-radio investigations read.
+    - path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.{i}.Channel"
+      interval: 0
+    - path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.{i}.AutoChannelEnable"
+      interval: 0
+    - path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.{i}.TransmitPower"
+      interval: 0
+    - path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.{i}.SSID"
+      interval: 0
+    # Per-client signal: MAC anchors the client, RSSI is dBm, the
+    # SignalStrength companion is the percent-style spelling.
+    - path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.{i}.AssociatedDevice.{i}.AssociatedDeviceMACAddress"
+      interval: 0
+    - path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.{i}.AssociatedDevice.{i}.X_00005E_RSSI"
+      interval: 0
+    - path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.{i}.AssociatedDevice.{i}.LastDataTransmitRate"
+      interval: 0
+    # Error counters: the wifi and WAN halves of the packet-loss story.
+    - path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.{i}.Stats.ErrorsSent"
+      interval: 0
+    - path: "InternetGatewayDevice.LANDevice.1.WLANConfiguration.{i}.Stats.ErrorsReceived"
+      interval: 0
+    - path: "InternetGatewayDevice.WANDevice.1.WANEthernetInterfaceConfig.Stats.EthernetErrorsSent"
+      interval: 0
+    - path: "InternetGatewayDevice.WANDevice.1.WANEthernetInterfaceConfig.Stats.EthernetErrorsReceived"
+      interval: 0
+    - path: "InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.Stats.EthernetErrorsSent"
+      interval: 0
+    - path: "InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.Stats.EthernetErrorsReceived"
+      interval: 0
+    - path: "InternetGatewayDevice.DeviceInfo.UpTime"
+      interval: 0
