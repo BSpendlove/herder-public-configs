@@ -40,7 +40,12 @@ spec:
     # WAN error_rate component: 100 at zero errors, 0 at this ratio.
     wanErrorRateCeil: 0.01
     # WAN stability component: 100 at this uptime (seconds), 0 at zero.
-    wanUptimeGoodSeconds: 86400
+    # Four hours, not a day: a connection that has held for an
+    # afternoon is stable for scoring purposes, and a day-long ramp
+    # keeps a whole fleet amber for 24 hours after any power event,
+    # which reads as an outage that is not happening. A line that
+    # actually bounces still scores low because its uptime resets.
+    wanUptimeGoodSeconds: 14400
     # Component weights inside each dimension.
     weightWifiClientRssi: 0.7
     weightWifiPhyRate: 0.3
