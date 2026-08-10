@@ -49,3 +49,22 @@ spec:
       interval: 0
     - path: "InternetGatewayDevice.DeviceInfo.UpTime"
       interval: 0
+---
+# Per-client labels for the same family: the experience score's wifi
+# dimension consumes wifi.client.rssi, and the generic labels script
+# deliberately walks only standard spellings, so the vendor spellings
+# get their own rule here, same shape as the arris one.
+apiVersion: telemetry.herder.io/v1alpha1
+kind: EnrichmentRule
+metadata:
+  name: example-networks-rg2400-client-wifi
+spec:
+  priority: 50
+  deviceSelector:
+    matchExpressions:
+      - key: productClass
+        operator: In
+        values: [RG2400]
+  triggerPaths:
+    - "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.*"
+  script: rg2400-client-rssi-labels.ts

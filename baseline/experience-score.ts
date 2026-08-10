@@ -173,7 +173,15 @@ const wifiScore = weightedMean([
 ]);
 if (wifiScore !== null) {
   score.set("wifi", wifiScore);
-  applyBandTags("wifi", wifiScore);
+  // Tags only when the score is grounded in client signal. A batch
+  // carrying rates but no RSSI renormalises to the rate-only
+  // component and reads 100; letting that re-tag a home "good"
+  // seconds after a signal-bearing batch tagged it "poor" makes the
+  // tags thrash with the batch mix. Score rows always land; the
+  // sticky band moves only on signal evidence.
+  if (wifiRssiScore !== null) {
+    applyBandTags("wifi", wifiScore);
+  }
 }
 
 // --- WAN components -----------------------------------------------------
