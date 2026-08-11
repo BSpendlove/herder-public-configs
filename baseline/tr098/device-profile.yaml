@@ -54,20 +54,9 @@ spec:
           - {id: lan4, label: "4", kind: ethernet, entity: canonical.interface.lan.4}
           - {id: wifi24, label: 2.4 GHz, kind: wifi, entity: canonical.wifi.radio.1}
           - {id: wifi5, label: 5 GHz, kind: wifi, entity: canonical.wifi.radio.2}
-    - key: wifi-networks
-      title: WiFi networks
+    - key: wifi
+      title: WiFi
       icon: wifi
-      component: table
-      config:
-        entity: canonical.wifi.ssid
-        columns:
-          - {label: SSID, field: ssid}
-          - {label: Status, field: status}
-          - {label: Enabled, field: enable}
-          - {label: BSSID, field: bssid}
-    - key: wifi-settings
-      title: WiFi settings
-      icon: settings
       component: module
       config:
         module: wifi
