@@ -22,7 +22,14 @@ device.set("canonical.mgmt.connection_request_password", crUsername);
 // moment, and without a phase offset the whole fleet would re-inform in
 // synchronized waves forever (#649). Deterministic-from-serial matters:
 // re-running first_contact must not re-randomize the phase.
-var informInterval = 300;
+// 900, not 300. The interval is the fleet's steady-state load: at 100k
+// CPEs a 300s interval is 333 sessions per second forever, which on the
+// reference rig is the whole database write budget, so the steady
+// state starves the very bootstraps a recovering fleet needs admitted.
+// 900s is 111 per second, comfortably inside capacity, and still far
+// fresher than the 24h window the console's "not informing" measures
+// against. Real deployments at this scale run 900s or slower.
+var informInterval = 900;
 var phase = 0;
 var serial = device.serialNumber || "";
 for (var i = 0; i < serial.length; i++) {
