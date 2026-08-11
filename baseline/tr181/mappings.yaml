@@ -101,6 +101,7 @@ spec:
     - device-info-tr181
     - firmware-tr181
     - wifi-tr181
+    - interfaces-tr181
     # The neighbour-scan vocabulary. Bound here as well as declared,
     # because the `wifi_scan` action resolves canonical.wifi.scan.state
     # through the DEVICE's profile: a table that is only declared is
@@ -147,6 +148,7 @@ spec:
     - firmware-tr181
     - mgmt-tr181
     - wifi-tr181
+    - interfaces-tr181
     - wifi-scan-tr181
     - wifi-capability-tr181
     - wifi-rf-tr181

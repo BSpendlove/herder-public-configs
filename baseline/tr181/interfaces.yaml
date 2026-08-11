@@ -1,0 +1,70 @@
+# Canonical interface mappings for TR-181 (Device.*) devices.
+#
+# The canonical.interface.* namespace is what the device page's ports
+# view and the interface tables resolve, so a device only shows ports
+# northbound if they are written out here (same declared-instances rule
+# as the WiFi tables; see the note in mappings.yaml).
+#
+# The WAN/LAN split below is the common residential layout: the first
+# ethernet interface is the uplink and the rest are switch ports.
+# TR-181 encodes the real answer in Device.Ethernet.Interface.{i}.Upstream,
+# which a static table cannot branch on; a vendor whose port ordering
+# differs overrides this table at a higher-priority profile, which is
+# the intended shape for all vendor knowledge.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: interfaces-tr181
+spec:
+  mappings:
+    - canonical: canonical.interface.wan.status
+      valueType: string
+      devicePath: Device.Ethernet.Interface.1.Status
+    - canonical: canonical.interface.wan.mac
+      valueType: string
+      devicePath: Device.Ethernet.Interface.1.MACAddress
+    - canonical: canonical.interface.wan.bytes_sent
+      valueType: unsignedint
+      devicePath: Device.Ethernet.Interface.1.Stats.BytesSent
+    - canonical: canonical.interface.wan.bytes_received
+      valueType: unsignedint
+      devicePath: Device.Ethernet.Interface.1.Stats.BytesReceived
+    - canonical: canonical.interface.wan.ip_address
+      valueType: string
+      devicePath: Device.IP.Interface.1.IPv4Address.1.IPAddress
+    - canonical: canonical.interface.lan.1.status
+      valueType: string
+      devicePath: Device.Ethernet.Interface.2.Status
+    - canonical: canonical.interface.lan.1.enable
+      valueType: boolean
+      devicePath: Device.Ethernet.Interface.2.Enable
+    - canonical: canonical.interface.lan.1.mac
+      valueType: string
+      devicePath: Device.Ethernet.Interface.2.MACAddress
+    - canonical: canonical.interface.lan.2.status
+      valueType: string
+      devicePath: Device.Ethernet.Interface.3.Status
+    - canonical: canonical.interface.lan.2.enable
+      valueType: boolean
+      devicePath: Device.Ethernet.Interface.3.Enable
+    - canonical: canonical.interface.lan.2.mac
+      valueType: string
+      devicePath: Device.Ethernet.Interface.3.MACAddress
+    - canonical: canonical.interface.lan.3.status
+      valueType: string
+      devicePath: Device.Ethernet.Interface.4.Status
+    - canonical: canonical.interface.lan.3.enable
+      valueType: boolean
+      devicePath: Device.Ethernet.Interface.4.Enable
+    - canonical: canonical.interface.lan.3.mac
+      valueType: string
+      devicePath: Device.Ethernet.Interface.4.MACAddress
+    - canonical: canonical.interface.lan.4.status
+      valueType: string
+      devicePath: Device.Ethernet.Interface.5.Status
+    - canonical: canonical.interface.lan.4.enable
+      valueType: boolean
+      devicePath: Device.Ethernet.Interface.5.Enable
+    - canonical: canonical.interface.lan.4.mac
+      valueType: string
+      devicePath: Device.Ethernet.Interface.5.MACAddress
