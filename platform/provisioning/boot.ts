@@ -12,7 +12,7 @@ device.set("canonical.mgmt.connection_request_password", crUsername);
 
 // Enforce periodic inform config.
 device.set("canonical.mgmt.periodic_inform_enable", true);
-device.set("canonical.mgmt.periodic_inform_interval", 300);
+device.set("canonical.mgmt.periodic_inform_interval", 900);
 
 // Tag device as recently booted (operators can track reboots).
 device.addTag("boot-seen");
