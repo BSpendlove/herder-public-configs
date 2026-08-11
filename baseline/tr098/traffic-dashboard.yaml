@@ -3,8 +3,9 @@
 # clamping counter resets to zero). Pinned by the baseline device UI
 # profile's Monitoring section; also pinnable on its own.
 #
-# refIds are constrained to [A-Z]{1,4}; the legends read from each
-# panel's seriesLabels instead.
+# refIds are constrained to [A-Z]{1,4}; new consoles read the legends
+# from each panel's seriesLabels, and the panel descriptions keep the
+# refId decoding for consoles that predate seriesLabels.
 apiVersion: dashboards.herder.io/v1alpha1
 kind: Dashboard
 metadata:
@@ -23,6 +24,7 @@ spec:
     - id: panel-wan-throughput
       kind: line
       title: WAN throughput
+      description: TX is upstream from the home, RX is downstream to it
       layout: {x: 0, y: 0, w: 6, h: 8}
       queries:
         - refId: TX
@@ -50,6 +52,7 @@ spec:
     - id: panel-wifi-throughput
       kind: line
       title: WiFi throughput
+      description: WA is WLAN 1 (2.4 GHz), WB is WLAN 2 (5 GHz)
       layout: {x: 6, y: 0, w: 6, h: 8}
       queries:
         - refId: WATX
@@ -93,6 +96,7 @@ spec:
     - id: panel-lan-throughput
       kind: line
       title: LAN port throughput
+      description: One TX/RX pair per switch port, A-D are ports 1-4
       layout: {x: 0, y: 8, w: 12, h: 8}
       queries:
         - refId: ATX
