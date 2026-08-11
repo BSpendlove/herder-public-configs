@@ -3,9 +3,8 @@
 # clamping counter resets to zero). Pinned by the baseline device UI
 # profile's Monitoring section; also pinnable on its own.
 #
-# refIds are constrained to [A-Z]{1,4}, so direction and instance are
-# encoded there: TX/RX for the WAN pair, RA/RB for radios 1 and 2,
-# SA/SB for SSIDs 1 and 2.
+# refIds are constrained to [A-Z]{1,4}; the legends read from each
+# panel's seriesLabels instead.
 apiVersion: dashboards.herder.io/v1alpha1
 kind: Dashboard
 metadata:
@@ -24,7 +23,6 @@ spec:
     - id: panel-wan-throughput
       kind: line
       title: WAN throughput
-      description: TX is upstream from the home, RX is downstream to it
       layout: {x: 0, y: 0, w: 6, h: 8}
       queries:
         - refId: TX
@@ -44,6 +42,7 @@ spec:
         interpolation: monotone
         yAxis: {kind: auto}
         unit: " B/s"
+        seriesLabels: {TX: Up, RX: Down}
         legend:
           displayMode: list
           placement: bottom
@@ -51,7 +50,6 @@ spec:
     - id: panel-radio-throughput
       kind: line
       title: WiFi radio throughput
-      description: RA is radio 1 (2.4 GHz), RB is radio 2 (5 GHz)
       layout: {x: 6, y: 0, w: 6, h: 8}
       queries:
         - refId: RATX
@@ -83,6 +81,11 @@ spec:
         interpolation: monotone
         yAxis: {kind: auto}
         unit: " B/s"
+        seriesLabels:
+          RATX: 2.4 GHz up
+          RARX: 2.4 GHz down
+          RBTX: 5 GHz up
+          RBRX: 5 GHz down
         legend:
           displayMode: list
           placement: bottom
@@ -90,7 +93,6 @@ spec:
     - id: panel-ssid-throughput
       kind: line
       title: SSID throughput
-      description: SA is SSID 1, SB is SSID 2
       layout: {x: 0, y: 8, w: 12, h: 8}
       queries:
         - refId: SATX
@@ -122,6 +124,11 @@ spec:
         interpolation: monotone
         yAxis: {kind: auto}
         unit: " B/s"
+        seriesLabels:
+          SATX: SSID 1 up
+          SARX: SSID 1 down
+          SBTX: SSID 2 up
+          SBRX: SSID 2 down
         legend:
           displayMode: table
           placement: bottom
