@@ -1,0 +1,46 @@
+# Canonical voice mappings for TR-098 gateways (TR-104 under
+# InternetGatewayDevice.Services). Two lines enumerated, the same
+# declared-instances rule as the WiFi tables; gateways with more lines
+# extend this at a higher-priority profile.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: voice-tr104
+spec:
+  mappings:
+    - canonical: canonical.voice.line.1.status
+      valueType: string
+      devicePath: InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.Status
+    - canonical: canonical.voice.line.1.enable
+      valueType: string
+      devicePath: InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.Enable
+    - canonical: canonical.voice.line.1.number
+      valueType: string
+      devicePath: InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.DirectoryNumber
+    - canonical: canonical.voice.line.1.sip.username
+      valueType: string
+      devicePath: InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.SIP.AuthUserName
+    - canonical: canonical.voice.line.1.sip.password
+      valueType: string
+      devicePath: InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.SIP.AuthPassword
+    - canonical: canonical.voice.line.2.status
+      valueType: string
+      devicePath: InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.2.Status
+    - canonical: canonical.voice.line.2.enable
+      valueType: string
+      devicePath: InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.2.Enable
+    - canonical: canonical.voice.line.2.number
+      valueType: string
+      devicePath: InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.2.DirectoryNumber
+    - canonical: canonical.voice.line.2.sip.username
+      valueType: string
+      devicePath: InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.2.SIP.AuthUserName
+    - canonical: canonical.voice.line.2.sip.password
+      valueType: string
+      devicePath: InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.2.SIP.AuthPassword
+    - canonical: canonical.voice.sip.registrar
+      valueType: string
+      devicePath: InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.SIP.RegistrarServer
+    - canonical: canonical.voice.sip.proxy
+      valueType: string
+      devicePath: InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.SIP.ProxyServer

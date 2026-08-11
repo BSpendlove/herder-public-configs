@@ -1,0 +1,58 @@
+# Voice service module: SIP line state and credentials, normalised
+# across TR-104 (TR-098 gateways) and TR-104i2 (TR-181 gateways)
+# through the canonical.voice.* namespace declared in
+# baseline/tr098/voice.yaml and baseline/tr181/voice.yaml.
+#
+# The SIP password is `secret: true`: write-only, sealed into
+# task_secrets for the one SetParameterValues that carries it, never
+# readable back and never collected by telemetry. Line enablement is
+# READ-ONLY here: TR-104 issue 1 spells it as the enum
+# Disabled/Quiescent/Enabled while issue 2 makes it a boolean, so a
+# single writable vocabulary would fault on one data model or the
+# other. Toggling a line is a provisioning-script concern until the
+# mapper grows a value transform for it.
+apiVersion: modules.herder.io/v1alpha1
+kind: ServiceModule
+metadata:
+  name: voice
+spec:
+  description: >-
+    SIP voice lines: registration state, directory numbers and the
+    credentials the CPE registers with.
+  fields:
+    - name: line_status
+      canonical: canonical.voice.line.{i}.status
+      type: string
+      description: Registration status of the line.
+    - name: line_enabled
+      canonical: canonical.voice.line.{i}.enable
+      type: string
+      description: >-
+        Administrative state of the line, in the data model's own
+        vocabulary (enum on TR-104, boolean on TR-104 issue 2).
+    - name: directory_number
+      canonical: canonical.voice.line.{i}.number
+      type: string
+      writable: true
+      description: The directory number assigned to the line.
+    - name: sip_username
+      canonical: canonical.voice.line.{i}.sip.username
+      type: string
+      writable: true
+      description: SIP authentication user name for the line.
+    - name: sip_password
+      canonical: canonical.voice.line.{i}.sip.password
+      type: string
+      writable: true
+      secret: true
+      description: SIP authentication password. Write-only.
+    - name: sip_registrar
+      canonical: canonical.voice.sip.registrar
+      type: string
+      writable: true
+      description: Registrar server the CPE registers against.
+    - name: sip_proxy
+      canonical: canonical.voice.sip.proxy
+      type: string
+      writable: true
+      description: Outbound SIP proxy.

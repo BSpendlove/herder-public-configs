@@ -29,6 +29,7 @@ spec:
     - wifi-bssid-tr098
     - wifi-capability-tr098
     - interfaces-tr098
+    - voice-tr104
 ---
 # Telemetry profile: Arris TR-098 WiFi + mesh extensions.
 #
