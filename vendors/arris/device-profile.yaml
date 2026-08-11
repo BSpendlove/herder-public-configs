@@ -102,10 +102,10 @@ spec:
       title: Dashboard
       icon: layout-grid
       component: dashboard
-    - key: diagnostics
-      title: Diagnostics
-      icon: stethoscope
-      component: diagnostics
+    - key: actions
+      title: Actions
+      icon: zap
+      component: actions
     - key: action-log
       title: Action log
       icon: history

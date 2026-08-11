@@ -70,10 +70,10 @@ spec:
       component: dashboard
       config:
         dashboard: tr098-traffic
-    - key: diagnostics
-      title: Diagnostics
-      icon: stethoscope
-      component: diagnostics
+    - key: actions
+      title: Actions
+      icon: zap
+      component: actions
     - key: action-log
       title: Action log
       icon: history
@@ -152,10 +152,10 @@ spec:
       component: dashboard
       config:
         dashboard: tr181-traffic
-    - key: diagnostics
-      title: Diagnostics
-      icon: stethoscope
-      component: diagnostics
+    - key: actions
+      title: Actions
+      icon: zap
+      component: actions
     - key: action-log
       title: Action log
       icon: history
@@ -234,6 +234,10 @@ spec:
       component: dashboard
       config:
         dashboard: tr181-traffic
+    - key: actions
+      title: Actions
+      icon: zap
+      component: actions
     - key: action-log
       title: Action log
       icon: history
