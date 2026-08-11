@@ -1,0 +1,24 @@
+apiVersion: provisioning.herder.io/v1alpha1
+kind: ProvisioningRule
+metadata:
+  name: seed-usp-first-contact
+spec:
+  triggers:
+    - first_contact
+  # The USP counterpart to seed-first-contact, and deliberately not the
+  # same script. A TR-369 agent runs TR-181 but has no
+  # `Device.ManagementServer`: its controller relationship lives under
+  # `Device.LocalAgent.*` and its transport under `Device.MQTT.*`, so
+  # the CWMP seed's connection-request credentials and PeriodicInform
+  # pair have nothing to write to. Everything here targets objects a USP
+  # agent genuinely implements.
+  deviceSelector:
+    matchExpressions:
+      - key: "protocol:usp"
+        operator: Exists
+      - key: "dataModel:device"
+        operator: Exists
+  desired:
+    script: "usp_first_contact.ts"
+  priority: 50
+  enabled: true
