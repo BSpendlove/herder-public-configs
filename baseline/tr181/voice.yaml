@@ -1,0 +1,47 @@
+# Canonical voice mappings for TR-181 gateways (TR-104 issue 2 under
+# Device.Services). Same canonical names as voice-tr104, so the voice
+# module renders identically over either data model: lines live under
+# CallControl, SIP credentials under SIP.Client, servers under
+# SIP.Network.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: voice-tr104i2
+spec:
+  mappings:
+    - canonical: canonical.voice.line.1.status
+      valueType: string
+      devicePath: Device.Services.VoiceService.1.CallControl.Line.1.Status
+    - canonical: canonical.voice.line.1.enable
+      valueType: string
+      devicePath: Device.Services.VoiceService.1.CallControl.Line.1.Enable
+    - canonical: canonical.voice.line.1.number
+      valueType: string
+      devicePath: Device.Services.VoiceService.1.CallControl.Line.1.DirectoryNumber
+    - canonical: canonical.voice.line.1.sip.username
+      valueType: string
+      devicePath: Device.Services.VoiceService.1.SIP.Client.1.AuthUserName
+    - canonical: canonical.voice.line.1.sip.password
+      valueType: string
+      devicePath: Device.Services.VoiceService.1.SIP.Client.1.AuthPassword
+    - canonical: canonical.voice.line.2.status
+      valueType: string
+      devicePath: Device.Services.VoiceService.1.CallControl.Line.2.Status
+    - canonical: canonical.voice.line.2.enable
+      valueType: string
+      devicePath: Device.Services.VoiceService.1.CallControl.Line.2.Enable
+    - canonical: canonical.voice.line.2.number
+      valueType: string
+      devicePath: Device.Services.VoiceService.1.CallControl.Line.2.DirectoryNumber
+    - canonical: canonical.voice.line.2.sip.username
+      valueType: string
+      devicePath: Device.Services.VoiceService.1.SIP.Client.2.AuthUserName
+    - canonical: canonical.voice.line.2.sip.password
+      valueType: string
+      devicePath: Device.Services.VoiceService.1.SIP.Client.2.AuthPassword
+    - canonical: canonical.voice.sip.registrar
+      valueType: string
+      devicePath: Device.Services.VoiceService.1.SIP.Network.1.RegistrarServer
+    - canonical: canonical.voice.sip.proxy
+      valueType: string
+      devicePath: Device.Services.VoiceService.1.SIP.Network.1.ProxyServer

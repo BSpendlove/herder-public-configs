@@ -222,6 +222,7 @@ spec:
     - wifi-bssid-tr098
     - wifi-capability-tr098
     - interfaces-tr098
+    - voice-tr104
 
 ---
 # Canonical WiFi mappings for TR-098 (InternetGatewayDevice.*) devices.
