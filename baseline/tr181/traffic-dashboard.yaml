@@ -3,9 +3,9 @@
 # clamping counter resets to zero). Pinned by the baseline device UI
 # profile's Monitoring section; also pinnable on its own.
 #
-# refIds are constrained to [A-Z]{1,4}, so direction and instance are
-# encoded there: TX/RX for the WAN pair, RA/RB for radios 1 and 2,
-# SA/SB for SSIDs 1 and 2.
+# refIds are constrained to [A-Z]{1,4}; new consoles read the legends
+# from each panel's seriesLabels, and the panel descriptions keep the
+# refId decoding for consoles that predate seriesLabels.
 apiVersion: dashboards.herder.io/v1alpha1
 kind: Dashboard
 metadata:
@@ -44,6 +44,7 @@ spec:
         interpolation: monotone
         yAxis: {kind: auto}
         unit: " B/s"
+        seriesLabels: {TX: Up, RX: Down}
         legend:
           displayMode: list
           placement: bottom
@@ -83,6 +84,11 @@ spec:
         interpolation: monotone
         yAxis: {kind: auto}
         unit: " B/s"
+        seriesLabels:
+          RATX: 2.4 GHz up
+          RARX: 2.4 GHz down
+          RBTX: 5 GHz up
+          RBRX: 5 GHz down
         legend:
           displayMode: list
           placement: bottom
@@ -122,6 +128,11 @@ spec:
         interpolation: monotone
         yAxis: {kind: auto}
         unit: " B/s"
+        seriesLabels:
+          SATX: SSID 1 up
+          SARX: SSID 1 down
+          SBTX: SSID 2 up
+          SBRX: SSID 2 down
         legend:
           displayMode: table
           placement: bottom

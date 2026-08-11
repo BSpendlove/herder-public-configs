@@ -1,0 +1,252 @@
+# Device UI profiles for the cpe-labs simulators, so the demo instance
+# and the dev stack show the full section vocabulary on every simulated
+# device. The GenericIGD/GenericGateway tuples are the cpe-sim
+# alternates (see cpe-sim.yaml); the CpeLabs manufacturer match covers
+# the USP fleet sims (SimSub, SimOps, SimUSP), which run TR-181 over
+# USP and have no CWMP management surface, so their profile skips the
+# canonical.mgmt.* fields.
+apiVersion: deviceprofiles.herder.io/v1alpha1
+kind: DeviceProfile
+metadata:
+  name: cpe-sim-tr098-ui
+spec:
+  priority: 100
+  deviceSelector:
+    matchLabels:
+      productClass: "GenericIGD"
+  sections:
+    - key: overview
+      title: Overview
+      icon: gauge
+      component: overview
+    - key: status
+      title: Device status
+      icon: info
+      component: form
+      config:
+        groups:
+          - title: Identity
+            fields:
+              - {label: Manufacturer, canonical: canonical.device.manufacturer}
+              - {label: Model, canonical: canonical.device.model_name}
+              - {label: Serial number, canonical: canonical.device.serial_number}
+              - {label: Firmware, canonical: canonical.device.software_version}
+              - {label: Uptime, canonical: canonical.device.uptime, format: duration}
+          - title: WAN
+            fields:
+              - {label: Link status, canonical: canonical.interface.wan.status}
+              - {label: WAN IP address, canonical: canonical.interface.wan.ip_address}
+    - key: interfaces
+      title: Interfaces
+      icon: ethernet-port
+      component: ports
+      config:
+        ports:
+          - {id: wan, label: WAN, kind: wan, entity: canonical.interface.wan}
+          - {id: lan1, label: "1", kind: ethernet, entity: canonical.interface.lan.1}
+          - {id: lan2, label: "2", kind: ethernet, entity: canonical.interface.lan.2}
+          - {id: lan3, label: "3", kind: ethernet, entity: canonical.interface.lan.3}
+          - {id: lan4, label: "4", kind: ethernet, entity: canonical.interface.lan.4}
+          - {id: wifi24, label: 2.4 GHz, kind: wifi, entity: canonical.wifi.radio.1}
+          - {id: wifi5, label: 5 GHz, kind: wifi, entity: canonical.wifi.radio.2}
+    - key: wifi-networks
+      title: WiFi networks
+      icon: wifi
+      component: table
+      config:
+        entity: canonical.wifi.ssid
+        columns:
+          - {label: SSID, field: ssid}
+          - {label: Status, field: status}
+          - {label: Enabled, field: enable}
+          - {label: BSSID, field: bssid}
+    - key: network-map
+      title: Network map
+      icon: network
+      component: topology
+    - key: monitoring
+      title: Monitoring
+      icon: chart-line
+      component: dashboard
+      config:
+        dashboard: tr098-traffic
+    - key: actions
+      title: Actions
+      icon: zap
+      component: actions
+    - key: action-log
+      title: Action log
+      icon: history
+      component: tasks
+    - key: events
+      title: Events
+      icon: scroll-text
+      component: events
+    - key: maintenance
+      title: Maintenance
+      icon: wrench
+      component: maintenance
+---
+apiVersion: deviceprofiles.herder.io/v1alpha1
+kind: DeviceProfile
+metadata:
+  name: cpe-sim-tr181-ui
+spec:
+  priority: 100
+  deviceSelector:
+    matchLabels:
+      productClass: "GenericGateway"
+  sections:
+    - key: overview
+      title: Overview
+      icon: gauge
+      component: overview
+    - key: status
+      title: Device status
+      icon: info
+      component: form
+      config:
+        groups:
+          - title: Identity
+            fields:
+              - {label: Manufacturer, canonical: canonical.device.manufacturer}
+              - {label: Model, canonical: canonical.device.model_name}
+              - {label: Serial number, canonical: canonical.device.serial_number}
+              - {label: Firmware, canonical: canonical.device.software_version}
+              - {label: Uptime, canonical: canonical.device.uptime, format: duration}
+          - title: WAN
+            fields:
+              - {label: Link status, canonical: canonical.interface.wan.status}
+              - {label: WAN IP address, canonical: canonical.interface.wan.ip_address}
+    - key: interfaces
+      title: Interfaces
+      icon: ethernet-port
+      component: ports
+      config:
+        ports:
+          - {id: wan, label: WAN, kind: wan, entity: canonical.interface.wan}
+          - {id: lan1, label: "1", kind: ethernet, entity: canonical.interface.lan.1}
+          - {id: lan2, label: "2", kind: ethernet, entity: canonical.interface.lan.2}
+          - {id: lan3, label: "3", kind: ethernet, entity: canonical.interface.lan.3}
+          - {id: lan4, label: "4", kind: ethernet, entity: canonical.interface.lan.4}
+          - {id: wifi24, label: 2.4 GHz, kind: wifi, entity: canonical.wifi.radio.1}
+          - {id: wifi5, label: 5 GHz, kind: wifi, entity: canonical.wifi.radio.2}
+    - key: wifi-networks
+      title: WiFi networks
+      icon: wifi
+      component: table
+      config:
+        entity: canonical.wifi.ssid
+        columns:
+          - {label: SSID, field: ssid}
+          - {label: Status, field: status}
+          - {label: Enabled, field: enable}
+          - {label: BSSID, field: bssid}
+    - key: network-map
+      title: Network map
+      icon: network
+      component: topology
+    - key: monitoring
+      title: Monitoring
+      icon: chart-line
+      component: dashboard
+      config:
+        dashboard: tr181-traffic
+    - key: actions
+      title: Actions
+      icon: zap
+      component: actions
+    - key: action-log
+      title: Action log
+      icon: history
+      component: tasks
+    - key: events
+      title: Events
+      icon: scroll-text
+      component: events
+    - key: maintenance
+      title: Maintenance
+      icon: wrench
+      component: maintenance
+---
+# The USP fleet sims: TR-181 over USP, no ManagementServer, so no
+# Management form group; everything else is the standard showcase.
+apiVersion: deviceprofiles.herder.io/v1alpha1
+kind: DeviceProfile
+metadata:
+  name: cpe-sim-fleet-ui
+spec:
+  priority: 60
+  deviceSelector:
+    matchExpressions:
+      - key: manufacturer
+        operator: In
+        values: [CpeLabs]
+      - key: "protocol:usp"
+        operator: Exists
+  sections:
+    - key: overview
+      title: Overview
+      icon: gauge
+      component: overview
+    - key: status
+      title: Device status
+      icon: info
+      component: form
+      config:
+        groups:
+          - title: Identity
+            fields:
+              - {label: Manufacturer, canonical: canonical.device.manufacturer}
+              - {label: Model, canonical: canonical.device.model_name}
+              - {label: Serial number, canonical: canonical.device.serial_number}
+              - {label: Firmware, canonical: canonical.device.software_version}
+              - {label: Uptime, canonical: canonical.device.uptime, format: duration}
+    - key: interfaces
+      title: Interfaces
+      icon: ethernet-port
+      component: ports
+      config:
+        ports:
+          - {id: wan, label: WAN, kind: wan, entity: canonical.interface.wan}
+          - {id: lan1, label: "1", kind: ethernet, entity: canonical.interface.lan.1}
+          - {id: lan2, label: "2", kind: ethernet, entity: canonical.interface.lan.2}
+          - {id: wifi24, label: 2.4 GHz, kind: wifi, entity: canonical.wifi.radio.1}
+          - {id: wifi5, label: 5 GHz, kind: wifi, entity: canonical.wifi.radio.2}
+    - key: wifi-networks
+      title: WiFi networks
+      icon: wifi
+      component: table
+      config:
+        entity: canonical.wifi.ssid
+        columns:
+          - {label: SSID, field: ssid}
+          - {label: Status, field: status}
+          - {label: Enabled, field: enable}
+          - {label: BSSID, field: bssid}
+    - key: network-map
+      title: Network map
+      icon: network
+      component: topology
+    - key: monitoring
+      title: Monitoring
+      icon: chart-line
+      component: dashboard
+      config:
+        dashboard: tr181-traffic
+    - key: actions
+      title: Actions
+      icon: zap
+      component: actions
+    - key: action-log
+      title: Action log
+      icon: history
+      component: tasks
+    - key: events
+      title: Events
+      icon: scroll-text
+      component: events
+    - key: maintenance
+      title: Maintenance
+      icon: wrench
+      component: maintenance

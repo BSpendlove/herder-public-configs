@@ -1,16 +1,28 @@
-# Baseline device UI profile for TR-098 (InternetGatewayDevice.*)
-# devices. Same sections as baseline-tr181-ui, resolved through the IGD
-# mapping tables; see that file for the extension story.
+# Device UI profile for Arris NVG gateways: the full showcase of the
+# section vocabulary on TR-098 hardware. Same tuple as the
+# arris-nvg-tr098 mapping profile, and everything here resolves through
+# the tables that profile binds. This is also what the demo instance's
+# TR-098 simulator renders, so it deliberately exercises every
+# component kind: builtins, forms, instance tables, the ports
+# faceplate, a pinned dashboard and the auto-resolving one.
 apiVersion: deviceprofiles.herder.io/v1alpha1
 kind: DeviceProfile
 metadata:
-  name: baseline-tr098-ui
+  name: arris-nvg-ui
 spec:
-  priority: 10
+  priority: 50
   deviceSelector:
+    matchLabels:
+      oui: "0000C5"
     matchExpressions:
-      - key: "dataModel:igd"
-        operator: Exists
+      - key: productClass
+        operator: In
+        values:
+          - "NVG578LX"
+          - "NVG448BQ"
+          - "NVG468MQ"
+          - "NVG589"
+          - "NVG599"
   sections:
     - key: overview
       title: Overview
@@ -65,6 +77,17 @@ spec:
           - {label: Status, field: status}
           - {label: Enabled, field: enable}
           - {label: BSSID, field: bssid}
+    - key: radios
+      title: Radios
+      icon: antenna
+      component: table
+      config:
+        entity: canonical.wifi.radio
+        columns:
+          - {label: Status, field: status}
+          - {label: Enabled, field: enable}
+          - {label: Channel, field: channel}
+          - {label: Band, field: band}
     - key: network-map
       title: Network map
       icon: network
@@ -75,6 +98,10 @@ spec:
       component: dashboard
       config:
         dashboard: tr098-traffic
+    - key: dashboard
+      title: Dashboard
+      icon: layout-grid
+      component: dashboard
     - key: actions
       title: Actions
       icon: zap

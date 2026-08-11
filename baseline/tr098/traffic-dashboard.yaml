@@ -3,9 +3,9 @@
 # clamping counter resets to zero). Pinned by the baseline device UI
 # profile's Monitoring section; also pinnable on its own.
 #
-# refIds are constrained to [A-Z]{1,4}, so direction and instance are
-# encoded there: TX/RX for the WAN pair, A-D for LAN ports 1-4, WA/WB
-# for WLANConfiguration 1 and 2.
+# refIds are constrained to [A-Z]{1,4}; new consoles read the legends
+# from each panel's seriesLabels, and the panel descriptions keep the
+# refId decoding for consoles that predate seriesLabels.
 apiVersion: dashboards.herder.io/v1alpha1
 kind: Dashboard
 metadata:
@@ -44,6 +44,7 @@ spec:
         interpolation: monotone
         yAxis: {kind: auto}
         unit: " B/s"
+        seriesLabels: {TX: Up, RX: Down}
         legend:
           displayMode: list
           placement: bottom
@@ -83,6 +84,11 @@ spec:
         interpolation: monotone
         yAxis: {kind: auto}
         unit: " B/s"
+        seriesLabels:
+          WATX: 2.4 GHz up
+          WARX: 2.4 GHz down
+          WBTX: 5 GHz up
+          WBRX: 5 GHz down
         legend:
           displayMode: list
           placement: bottom
@@ -146,6 +152,15 @@ spec:
         interpolation: monotone
         yAxis: {kind: auto}
         unit: " B/s"
+        seriesLabels:
+          ATX: Port 1 up
+          ARX: Port 1 down
+          BTX: Port 2 up
+          BRX: Port 2 down
+          CTX: Port 3 up
+          CRX: Port 3 down
+          DTX: Port 4 up
+          DRX: Port 4 down
         legend:
           displayMode: table
           placement: bottom

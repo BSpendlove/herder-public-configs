@@ -1,16 +1,18 @@
-# Baseline device UI profile for TR-098 (InternetGatewayDevice.*)
-# devices. Same sections as baseline-tr181-ui, resolved through the IGD
-# mapping tables; see that file for the extension story.
+# Device UI profile for the Sagemcom FAST5598 (TR-181): the full
+# section showcase on Device.* hardware, including an access-point
+# table the TR-098 profiles cannot offer. Rendered by the demo
+# instance's TR-181 simulator.
 apiVersion: deviceprofiles.herder.io/v1alpha1
 kind: DeviceProfile
 metadata:
-  name: baseline-tr098-ui
+  name: sagemcom-fast5598-ui
 spec:
-  priority: 10
+  priority: 50
   deviceSelector:
     matchExpressions:
-      - key: "dataModel:igd"
-        operator: Exists
+      - key: productClass
+        operator: In
+        values: [FAST5598]
   sections:
     - key: overview
       title: Overview
@@ -28,15 +30,13 @@ spec:
               - {label: Model, canonical: canonical.device.model_name}
               - {label: Product class, canonical: canonical.device.product_class}
               - {label: Serial number, canonical: canonical.device.serial_number}
-              - {label: Hardware version, canonical: canonical.device.hardware_version}
               - {label: Firmware, canonical: canonical.device.software_version}
               - {label: Uptime, canonical: canonical.device.uptime, format: duration}
           - title: WAN
             fields:
               - {label: Link status, canonical: canonical.interface.wan.status}
-              - {label: Access type, canonical: canonical.interface.wan.type}
               - {label: WAN IP address, canonical: canonical.interface.wan.ip_address}
-              - {label: Connection uptime, canonical: canonical.interface.wan.uptime, format: duration}
+              - {label: WAN MAC, canonical: canonical.interface.wan.mac}
           - title: Management
             fields:
               - {label: Connection request URL, canonical: canonical.mgmt.connection_request_url}
@@ -65,6 +65,17 @@ spec:
           - {label: Status, field: status}
           - {label: Enabled, field: enable}
           - {label: BSSID, field: bssid}
+    - key: access-points
+      title: Access points
+      icon: antenna
+      component: table
+      config:
+        entity: canonical.wifi.ap
+        columns:
+          - {label: Enabled, field: enable}
+          - {label: Security, field: security_mode}
+          - {label: Clients, field: client_count}
+          - {label: SSID ref, field: ssid_ref}
     - key: network-map
       title: Network map
       icon: network
@@ -74,7 +85,11 @@ spec:
       icon: chart-line
       component: dashboard
       config:
-        dashboard: tr098-traffic
+        dashboard: tr181-traffic
+    - key: dashboard
+      title: Dashboard
+      icon: layout-grid
+      component: dashboard
     - key: actions
       title: Actions
       icon: zap
