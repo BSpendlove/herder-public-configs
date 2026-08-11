@@ -13,7 +13,7 @@ spec:
       valueType: string
       devicePath: Device.Services.VoiceService.1.CallControl.Line.1.Status
     - canonical: canonical.voice.line.1.enable
-      valueType: string
+      valueType: boolean
       devicePath: Device.Services.VoiceService.1.CallControl.Line.1.Enable
     - canonical: canonical.voice.line.1.number
       valueType: string
@@ -28,7 +28,7 @@ spec:
       valueType: string
       devicePath: Device.Services.VoiceService.1.CallControl.Line.2.Status
     - canonical: canonical.voice.line.2.enable
-      valueType: string
+      valueType: boolean
       devicePath: Device.Services.VoiceService.1.CallControl.Line.2.Enable
     - canonical: canonical.voice.line.2.number
       valueType: string
