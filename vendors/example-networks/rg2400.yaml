@@ -1,5 +1,9 @@
-# Example Networks RG2400 (TR-098): the reference simulated gateway
-# family used by demo and scale fleets. WiFi client signal, radio
+# Simulated TR-098 gateways (Example Networks RG2400, Technicolor
+# CGM4331COM): the reference TR-098 families used by demo and scale
+# fleets. They are grouped because they report the same
+# documentation-OUI vendor extensions (X_00005E_*), not because the
+# hardware is related, so the selector lists product classes rather
+# than matching a vendor. WiFi client signal, radio
 # posture and error counters, so experience scoring and per-client
 # troubleshooting have real inputs for this family. The X_00005E_*
 # extensions mirror the documentation-OUI vendor prefix the family
@@ -14,7 +18,7 @@ spec:
     matchExpressions:
       - key: productClass
         operator: In
-        values: [RG2400]
+        values: [RG2400, CGM4331COM]
   parameters:
     # Radio posture: channel, auto-channel and tx power are what the
     # overlapping-channel and hot-radio investigations read.
@@ -68,7 +72,7 @@ spec:
     matchExpressions:
       - key: productClass
         operator: In
-        values: [RG2400]
+        values: [RG2400, CGM4331COM]
   triggerPaths:
     - "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.*"
   script: rg2400-client-rssi-labels.ts

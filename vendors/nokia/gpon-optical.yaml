@@ -1,0 +1,48 @@
+# Nokia integrated GPON gateways: optical line telemetry.
+#
+# An integrated PON gateway terminates the fibre inside the box, so the
+# optical receive level is the number an operator actually looks at
+# when a line degrades. Nothing else in a residential fleet exposes it,
+# and without this profile the signal is reported by the device and
+# then dropped on the floor.
+#
+# Selected by product class rather than by manufacturer: Nokia ships
+# both integrated PON gateways and Ethernet mesh routers, and only the
+# former has an optical interface. A vendor-wide selector would ask a
+# Beacon for parameters it does not implement and collect a fault per
+# session instead of a reading.
+apiVersion: telemetry.herder.io/v1alpha1
+kind: TelemetryProfile
+metadata:
+  name: nokia-gpon-optical
+spec:
+  priority: 50
+  deviceSelector:
+    matchExpressions:
+      - key: productClass
+        operator: In
+        values: [G-2426G-A]
+  parameters:
+    # Receive power, in units of 0.1 dBm per TR-181, so -2410 is
+    # -24.1 dBm. A healthy ONT sits around -15 to -25 dBm and an
+    # operator investigates past roughly -27, which is why this is the
+    # one optical parameter worth a short interval: a fibre bend or a
+    # dirty connector shows here before the subscriber calls.
+    - path: "Device.Optical.Interface.{i}.CurrentDownstreamRxPower"
+      interval: 300
+    - path: "Device.Optical.Interface.{i}.OpticalSignalLevel"
+      interval: 300
+    # Transmit power distinguishes a fault in the home from a fault
+    # upstream: a normal Tx with a collapsed Rx points at the drop or
+    # the splitter, not at the gateway.
+    - path: "Device.Optical.Interface.{i}.CurrentUpstreamTxPower"
+      interval: 300
+    # Transceiver temperature and supply voltage change slowly and are
+    # only read on session, not polled: they matter when diagnosing a
+    # module that is failing rather than a line that is dirty.
+    - path: "Device.Optical.Interface.{i}.TransceiverTemperature"
+      interval: 0
+    - path: "Device.Optical.Interface.{i}.SupplyVoltage"
+      interval: 0
+    - path: "Device.Optical.Interface.{i}.Status"
+      interval: 0
