@@ -1,0 +1,42 @@
+# NAT port forwards for Arris NVG gateways.
+#
+# The NVG series carries its routed connection on WANIPConnection.2
+# (instance 1 is the transport underneath), so the baseline nat-tr098
+# table's WANIPConnection.1 paths resolve to a table the gateway never
+# populates. Same vocabulary, instance pinned. The arris-nvg-tr098
+# profile binds this table INSTEAD of nat-tr098; profiles bind
+# single-winner, so listing both would leave which table answers to
+# undefined order.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: nat-arris
+spec:
+  mappings:
+    - canonical: canonical.nat.port_forward
+      valueType: string
+      devicePath: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.2.PortMapping
+    - canonical: canonical.nat.port_forward.{i}.enabled
+      valueType: boolean
+      devicePath: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.2.PortMapping.{i}.PortMappingEnabled
+    - canonical: canonical.nat.port_forward.{i}.description
+      valueType: string
+      devicePath: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.2.PortMapping.{i}.PortMappingDescription
+    - canonical: canonical.nat.port_forward.{i}.protocol
+      valueType: string
+      devicePath: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.2.PortMapping.{i}.PortMappingProtocol
+    - canonical: canonical.nat.port_forward.{i}.external_port
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.2.PortMapping.{i}.ExternalPort
+    - canonical: canonical.nat.port_forward.{i}.internal_port
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.2.PortMapping.{i}.InternalPort
+    - canonical: canonical.nat.port_forward.{i}.internal_client
+      valueType: string
+      devicePath: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.2.PortMapping.{i}.InternalClient
+    - canonical: canonical.nat.port_forward.{i}.remote_host
+      valueType: string
+      devicePath: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.2.PortMapping.{i}.RemoteHost
+    - canonical: canonical.nat.port_forward.{i}.lease_duration
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.2.PortMapping.{i}.PortMappingLeaseDuration

@@ -1,0 +1,48 @@
+# Canonical NAT port-forward mappings for TR-181 (Device.*) devices.
+#
+# The canonical.nat.port_forward.* namespace backs the port-forwards
+# service module: one vocabulary over Device.NAT.PortMapping on TR-181
+# and the WANIPConnection PortMapping table on TR-098, so listing,
+# creating and deleting a forward is the same API call on either.
+#
+# The first entry maps the TABLE itself, not a leaf. Object creates and
+# deletes (AddObject/DeleteObject with a canonical obj_path) resolve the
+# table through it, and the adapters then translate each initial value
+# through the {i} leaf entries below. It is inert on the read path: no
+# device reports a parameter at exactly this path.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: nat-tr181
+spec:
+  mappings:
+    - canonical: canonical.nat.port_forward
+      valueType: string
+      devicePath: Device.NAT.PortMapping
+    - canonical: canonical.nat.port_forward.{i}.enabled
+      valueType: boolean
+      devicePath: Device.NAT.PortMapping.{i}.Enable
+    - canonical: canonical.nat.port_forward.{i}.status
+      valueType: string
+      devicePath: Device.NAT.PortMapping.{i}.Status
+    - canonical: canonical.nat.port_forward.{i}.description
+      valueType: string
+      devicePath: Device.NAT.PortMapping.{i}.Description
+    - canonical: canonical.nat.port_forward.{i}.protocol
+      valueType: string
+      devicePath: Device.NAT.PortMapping.{i}.Protocol
+    - canonical: canonical.nat.port_forward.{i}.external_port
+      valueType: unsignedint
+      devicePath: Device.NAT.PortMapping.{i}.ExternalPort
+    - canonical: canonical.nat.port_forward.{i}.internal_port
+      valueType: unsignedint
+      devicePath: Device.NAT.PortMapping.{i}.InternalPort
+    - canonical: canonical.nat.port_forward.{i}.internal_client
+      valueType: string
+      devicePath: Device.NAT.PortMapping.{i}.InternalClient
+    - canonical: canonical.nat.port_forward.{i}.remote_host
+      valueType: string
+      devicePath: Device.NAT.PortMapping.{i}.RemoteHost
+    - canonical: canonical.nat.port_forward.{i}.lease_duration
+      valueType: unsignedint
+      devicePath: Device.NAT.PortMapping.{i}.LeaseDuration

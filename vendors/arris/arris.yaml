@@ -38,6 +38,9 @@ spec:
     - netdiag-tr098
     - remote-access-tr098
     - remote-access-arris
+    # Port forwards with the NVG's routed connection (WANIPConnection.2)
+    # pinned; binds instead of the baseline nat-tr098, see nat.yaml.
+    - nat-arris
 ---
 # Telemetry profile: Arris TR-098 WiFi + mesh extensions.
 #

@@ -1,0 +1,44 @@
+# Canonical NAT port-forward mappings for TR-098
+# (InternetGatewayDevice.*) devices. TR-181 counterpart in
+# baseline/tr181/nat.yaml, which also explains the table-level first
+# entry.
+#
+# TR-098 hangs the PortMapping table under a WAN connection instance,
+# and WANDevice.1.WANConnectionDevice.1.WANIPConnection.1 is the
+# commonest single-WAN layout. Gateways that put the routed connection
+# elsewhere need a vendor table repeating these entries with their
+# instance pinned; vendors/arris/nat.yaml does exactly that for the NVG
+# series, whose routed connection is WANIPConnection.2.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: nat-tr098
+spec:
+  mappings:
+    - canonical: canonical.nat.port_forward
+      valueType: string
+      devicePath: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.PortMapping
+    - canonical: canonical.nat.port_forward.{i}.enabled
+      valueType: boolean
+      devicePath: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.PortMapping.{i}.PortMappingEnabled
+    - canonical: canonical.nat.port_forward.{i}.description
+      valueType: string
+      devicePath: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.PortMapping.{i}.PortMappingDescription
+    - canonical: canonical.nat.port_forward.{i}.protocol
+      valueType: string
+      devicePath: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.PortMapping.{i}.PortMappingProtocol
+    - canonical: canonical.nat.port_forward.{i}.external_port
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.PortMapping.{i}.ExternalPort
+    - canonical: canonical.nat.port_forward.{i}.internal_port
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.PortMapping.{i}.InternalPort
+    - canonical: canonical.nat.port_forward.{i}.internal_client
+      valueType: string
+      devicePath: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.PortMapping.{i}.InternalClient
+    - canonical: canonical.nat.port_forward.{i}.remote_host
+      valueType: string
+      devicePath: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.PortMapping.{i}.RemoteHost
+    - canonical: canonical.nat.port_forward.{i}.lease_duration
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.PortMapping.{i}.PortMappingLeaseDuration
