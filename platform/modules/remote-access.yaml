@@ -20,15 +20,22 @@ spec:
     protocol, and the vendor's access controls where the hardware has
     them.
   fields:
+    # Types mirror the data model's own declarations (Enable and the
+    # ARRIS status are xsd:boolean in the XML, the ports unsignedInt),
+    # because the console renders by this field: a boolean that claims
+    # to be a string renders as the text "1".
     - name: enabled
       canonical: canonical.mgmt.remote_access.enable
-      type: string
+      type: bool
       writable: true
       description: Whether the UI answers from the WAN at all.
     - name: port
       canonical: canonical.mgmt.remote_access.port
-      type: string
+      type: int
       writable: true
+      constraints:
+        min: 1
+        max: 65535
       description: TCP port the remote UI listens on.
     - name: protocol
       canonical: canonical.mgmt.remote_access.protocol
@@ -41,7 +48,7 @@ spec:
       description: What the firmware can serve.
     - name: status
       canonical: canonical.mgmt.remote_access.status
-      type: string
+      type: bool
       description: The vendor's own live state, where reported.
     - name: allowed_addresses
       canonical: canonical.mgmt.remote_access.acl
@@ -51,6 +58,9 @@ spec:
         Source addresses allowed in, where the vendor supports an ACL.
     - name: idle_timeout
       canonical: canonical.mgmt.remote_access.idle_timeout
-      type: string
+      type: int
       writable: true
-      description: Seconds of inactivity before a session ends.
+      constraints:
+        min: 1
+        max: 1440
+      description: Minutes of inactivity before a session ends.
