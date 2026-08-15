@@ -15,20 +15,25 @@ kind: ServiceModule
 metadata:
   name: remote-access
 spec:
-  description: >-
-    WAN access to the gateway's own management UI: state, port,
-    protocol, and the vendor's access controls where the hardware has
-    them.
+  # A noun phrase, and short. This renders as the panel subtitle, which
+  # is read a thousand times by someone on their way to a number, and
+  # the fields it used to enumerate are listed directly underneath it.
+  description: WAN access to the management UI
   fields:
     # Types mirror the data model's own declarations (Enable and the
     # ARRIS status are xsd:boolean in the XML, the ports unsignedInt),
     # because the console renders by this field: a boolean that claims
     # to be a string renders as the text "1".
+    #
+    # Most of these fields carried a description that said the label
+    # again in a longer form ("Port" / "TCP port the remote UI listens
+    # on"). Helper text under a control is read every time the panel is;
+    # earning that space means saying something the label cannot. The
+    # three left are the three that do.
     - name: enabled
       canonical: canonical.mgmt.remote_access.enable
       type: bool
       writable: true
-      description: Whether the UI answers from the WAN at all.
     - name: port
       canonical: canonical.mgmt.remote_access.port
       type: int
@@ -36,26 +41,28 @@ spec:
       constraints:
         min: 1
         max: 65535
-      description: TCP port the remote UI listens on.
     - name: protocol
       canonical: canonical.mgmt.remote_access.protocol
       type: string
       writable: true
-      description: Protocol in use, from the supported list.
     - name: supported_protocols
       canonical: canonical.mgmt.remote_access.supported_protocols
       type: string
-      description: What the firmware can serve.
     - name: status
       canonical: canonical.mgmt.remote_access.status
       type: bool
-      description: The vendor's own live state, where reported.
+      # Worth saying: this is what the box is doing, where `enabled` is
+      # what it was told to do, and they can disagree.
+      description: Live state, not the configured setting.
     - name: allowed_addresses
       canonical: canonical.mgmt.remote_access.acl
       type: string
       writable: true
-      description: >-
-        Source addresses allowed in, where the vendor supports an ACL.
+      # Verified on ARRIS NVG578LX firmware 9.5.0h4d131: empty is allow,
+      # not deny, and a listed source is enforced at the transport layer.
+      # Nobody can guess that, and guessing it the wrong way leaves a
+      # gateway open while its ACL field looks configured.
+      description: Empty allows any source. Accepts an address, a list, or CIDR.
     - name: idle_timeout
       canonical: canonical.mgmt.remote_access.idle_timeout
       type: int
@@ -63,4 +70,5 @@ spec:
       constraints:
         min: 1
         max: 1440
-      description: Minutes of inactivity before a session ends.
+      # The unit is the whole content.
+      description: Minutes.
