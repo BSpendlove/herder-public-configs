@@ -27,11 +27,38 @@ spec:
       - key: "dataModel:device"
         operator: Exists
   parameters:
+    # Identity, and it is NOT redundant with the devices row. A CPE
+    # announces itself in the Inform's DeviceID struct, which Herder
+    # persists as the device record, and the device page's status form
+    # reads canonical.device.* instead, which resolves through
+    # device_parameters. Without these the form renders a blank
+    # Manufacturer, Model, Product class and Serial number on hardware
+    # that has been telling us all four every session.
+    - path: "Device.DeviceInfo.Manufacturer"
+      interval: 0
+    - path: "Device.DeviceInfo.ManufacturerOUI"
+      interval: 0
+    - path: "Device.DeviceInfo.ModelName"
+      interval: 0
+    - path: "Device.DeviceInfo.ProductClass"
+      interval: 0
+    - path: "Device.DeviceInfo.SerialNumber"
+      interval: 0
+    - path: "Device.DeviceInfo.Description"
+      interval: 0
     - path: "Device.DeviceInfo.HardwareVersion"
       interval: 0
     - path: "Device.DeviceInfo.SoftwareVersion"
       interval: 0
     - path: "Device.DeviceInfo.UpTime"
+      interval: 0
+    # The inform schedule the CPE is actually running, which is the one
+    # number that says whether a quiet device is broken or simply on a
+    # long interval. Credentials in this subtree are deliberately absent:
+    # a collected password is a password in telemetry history.
+    - path: "Device.ManagementServer.PeriodicInformEnable"
+      interval: 0
+    - path: "Device.ManagementServer.PeriodicInformInterval"
       interval: 0
     # --- MemoryStatus (TR-181 §DeviceInfo.MemoryStatus) ---
     # Total/Free in KB. Memory-usage dashboards compute
