@@ -115,6 +115,7 @@ spec:
     # wifi-scan-tr181 above. The actions set and await these canonicals
     # through the device's bound profile.
     - netdiag-tr181
+    - remote-access-tr181
 ---
 # CWMP-only half of the TR-181 baseline: the `canonical.mgmt.*` table.
 #
@@ -159,6 +160,7 @@ spec:
     - wifi-capability-tr181
     - wifi-rf-tr181
     - netdiag-tr181
+    - remote-access-tr181
 
 ---
 # Canonical WiFi mappings for TR-181 (Device.*) devices.
@@ -787,3 +789,27 @@ spec:
     - canonical: canonical.wifi.radio.3.stats.bytes_received
       valueType: unsignedint
       devicePath: Device.WiFi.Radio.3.Stats.BytesReceived
+---
+# Remote access to the gateway's own web UI. The rare namespace both
+# data models spell identically: UserInterface.RemoteAccess carries the
+# same four leaves in TR-098 and TR-181, so this table is the whole
+# generic story and vendors only add extras (the ARRIS ACL and
+# timeouts live in remote-access-arris).
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: remote-access-tr181
+spec:
+  mappings:
+    - canonical: canonical.mgmt.remote_access.enable
+      valueType: boolean
+      devicePath: Device.UserInterface.RemoteAccess.Enable
+    - canonical: canonical.mgmt.remote_access.port
+      valueType: unsignedint
+      devicePath: Device.UserInterface.RemoteAccess.Port
+    - canonical: canonical.mgmt.remote_access.protocol
+      valueType: string
+      devicePath: Device.UserInterface.RemoteAccess.Protocol
+    - canonical: canonical.mgmt.remote_access.supported_protocols
+      valueType: string
+      devicePath: Device.UserInterface.RemoteAccess.SupportedProtocols

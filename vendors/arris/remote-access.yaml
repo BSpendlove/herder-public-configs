@@ -1,0 +1,41 @@
+# The ARRIS half of remote access: the parts worth having that the
+# standard object never grew. The ACL is the lock-down-to-an-address a
+# support call actually asks for, and the live status distinguishes
+# "enabled" from "answering".
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: remote-access-arris
+spec:
+  mappings:
+    - canonical: canonical.mgmt.remote_access.status
+      valueType: string
+      devicePath: InternetGatewayDevice.UserInterface.RemoteAccess.X_0000C5_Status
+    - canonical: canonical.mgmt.remote_access.acl
+      valueType: string
+      devicePath: InternetGatewayDevice.UserInterface.RemoteAccess.X_0000C5_ACL
+    - canonical: canonical.mgmt.remote_access.idle_timeout
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.UserInterface.RemoteAccess.X_0000C5_IdleTimeout
+---
+# Collect the vendor's remote-access extras alongside the standard
+# leaves the baseline system profiles gather.
+apiVersion: telemetry.herder.io/v1alpha1
+kind: TelemetryProfile
+metadata:
+  name: arris-remote-access
+spec:
+  priority: 50
+  deviceSelector:
+    matchLabels:
+      oui: "0000C5"
+    matchExpressions:
+      - key: "dataModel:igd"
+        operator: Exists
+  parameters:
+    - path: "InternetGatewayDevice.UserInterface.RemoteAccess.X_0000C5_Status"
+      interval: 0
+    - path: "InternetGatewayDevice.UserInterface.RemoteAccess.X_0000C5_ACL"
+      interval: 0
+    - path: "InternetGatewayDevice.UserInterface.RemoteAccess.X_0000C5_IdleTimeout"
+      interval: 0

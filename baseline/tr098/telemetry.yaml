@@ -58,6 +58,19 @@ spec:
       interval: 0
     - path: "InternetGatewayDevice.ManagementServer.PeriodicInformInterval"
       interval: 0
+    # Remote-access posture. Collected with identity because the fleet
+    # question ("how many gateways answer management from the WAN") is
+    # a posture question, and the support question needs current state
+    # before it can be changed. Bisect and the availability cache keep
+    # a firmware without the object from poisoning the batch.
+    - path: "InternetGatewayDevice.UserInterface.RemoteAccess.Enable"
+      interval: 0
+    - path: "InternetGatewayDevice.UserInterface.RemoteAccess.Port"
+      interval: 0
+    - path: "InternetGatewayDevice.UserInterface.RemoteAccess.Protocol"
+      interval: 0
+    - path: "InternetGatewayDevice.UserInterface.RemoteAccess.SupportedProtocols"
+      interval: 0
     # --- MemoryStatus (TR-098 §DeviceInfo.MemoryStatus) ---
     # Total/Free in KB. Memory-usage dashboards compute
     # (Total - Free) / Total * 100 with NULLIF on the denominator to

@@ -22,6 +22,7 @@ spec:
     - mgmt-tr098
     - diagnostics-tr098
     - netdiag-tr098
+    - remote-access-tr098
     - wifi-tr098
     - wifi-bssid-tr098
     - wifi-capability-tr098
@@ -49,6 +50,7 @@ spec:
     - mgmt-tr181
     - firmware-tr181
     - netdiag-tr181
+    - remote-access-tr181
     - wifi-tr181
     - wifi-rf-tr181
     - interfaces-tr181

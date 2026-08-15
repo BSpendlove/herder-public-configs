@@ -219,6 +219,7 @@ spec:
     - mgmt-tr098
     - diagnostics-tr098
     - netdiag-tr098
+    - remote-access-tr098
     - wifi-tr098
     - wifi-bssid-tr098
     - wifi-capability-tr098
@@ -641,3 +642,27 @@ spec:
     - canonical: canonical.wifi.radio.8.possible_channels
       valueType: string
       devicePath: InternetGatewayDevice.LANDevice.1.WLANConfiguration.8.PossibleChannels
+---
+# Remote access to the gateway's own web UI. The rare namespace both
+# data models spell identically: UserInterface.RemoteAccess carries the
+# same four leaves in TR-098 and TR-181, so this table is the whole
+# generic story and vendors only add extras (the ARRIS ACL and
+# timeouts live in remote-access-arris).
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: remote-access-tr098
+spec:
+  mappings:
+    - canonical: canonical.mgmt.remote_access.enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.UserInterface.RemoteAccess.Enable
+    - canonical: canonical.mgmt.remote_access.port
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.UserInterface.RemoteAccess.Port
+    - canonical: canonical.mgmt.remote_access.protocol
+      valueType: string
+      devicePath: InternetGatewayDevice.UserInterface.RemoteAccess.Protocol
+    - canonical: canonical.mgmt.remote_access.supported_protocols
+      valueType: string
+      devicePath: InternetGatewayDevice.UserInterface.RemoteAccess.SupportedProtocols

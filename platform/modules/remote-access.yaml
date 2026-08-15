@@ -1,0 +1,56 @@
+# Remote access to the CPE's own web UI: whether the subscriber's
+# gateway answers management HTTP from the WAN, on which port, over
+# which protocol. The support call it exists for is "turn my remote
+# access on and lock it down", and the fleet posture question is "how
+# many gateways have it open at all".
+#
+# The generic half is identical across TR-098 and TR-181, which almost
+# never happens: UserInterface.RemoteAccess carries the same four
+# leaves in both. Vendor reality adds the parts worth having: the ARRIS
+# exposes an ACL (the lock-down-to-an-address the support call asks
+# for), session timeouts and a live status, mapped in the vendor table
+# and rendered here as fields that simply do not resolve elsewhere.
+apiVersion: modules.herder.io/v1alpha1
+kind: ServiceModule
+metadata:
+  name: remote-access
+spec:
+  description: >-
+    WAN access to the gateway's own management UI: state, port,
+    protocol, and the vendor's access controls where the hardware has
+    them.
+  fields:
+    - name: enabled
+      canonical: canonical.mgmt.remote_access.enable
+      type: string
+      writable: true
+      description: Whether the UI answers from the WAN at all.
+    - name: port
+      canonical: canonical.mgmt.remote_access.port
+      type: string
+      writable: true
+      description: TCP port the remote UI listens on.
+    - name: protocol
+      canonical: canonical.mgmt.remote_access.protocol
+      type: string
+      writable: true
+      description: Protocol in use, from the supported list.
+    - name: supported_protocols
+      canonical: canonical.mgmt.remote_access.supported_protocols
+      type: string
+      description: What the firmware can serve.
+    - name: status
+      canonical: canonical.mgmt.remote_access.status
+      type: string
+      description: The vendor's own live state, where reported.
+    - name: allowed_addresses
+      canonical: canonical.mgmt.remote_access.acl
+      type: string
+      writable: true
+      description: >-
+        Source addresses allowed in, where the vendor supports an ACL.
+    - name: idle_timeout
+      canonical: canonical.mgmt.remote_access.idle_timeout
+      type: string
+      writable: true
+      description: Seconds of inactivity before a session ends.

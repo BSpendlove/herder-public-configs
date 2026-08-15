@@ -36,6 +36,8 @@ spec:
     # resolves to nothing on a TR-098 device.
     - wifi-scan-arris
     - netdiag-tr098
+    - remote-access-tr098
+    - remote-access-arris
 ---
 # Telemetry profile: Arris TR-098 WiFi + mesh extensions.
 #

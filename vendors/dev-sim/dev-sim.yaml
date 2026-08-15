@@ -16,3 +16,4 @@ spec:
     - mgmt-tr098
     - diagnostics-tr098
     - netdiag-tr098
+    - remote-access-tr098
