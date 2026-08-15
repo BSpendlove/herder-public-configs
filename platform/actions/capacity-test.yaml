@@ -1,0 +1,39 @@
+# IP-layer capacity (TR-471 / UDPST): the modern replacement for HTTP
+# speedtests, accurate where TR-143 goes CPU-bound. Needs a UDPST
+# server; the deployment's is config, so regions override per group
+# exactly as the TR-143 test server does.
+apiVersion: actions.herder.io/v1alpha1
+kind: ActionProfile
+metadata:
+  name: capacity-test-tr181
+spec:
+  capability: capacity_test
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:device"
+        operator: Exists
+  timeout: 10m
+  inputs:
+    - name: direction
+      description: Which way to measure
+      enum: [Downstream, Upstream]
+      default: Downstream
+  config:
+    # The UDPST server. No default on purpose: a capacity test against
+    # a server that is not there reads as a broken line.
+    server: ""
+  steps:
+    - name: measure
+      set:
+        Device.IP.Diagnostics.IPLayerCapacityMetrics.Host: "{{ .config.server }}"
+        Device.IP.Diagnostics.IPLayerCapacityMetrics.Role: Receiver
+        Device.IP.Diagnostics.IPLayerCapacityMetrics.TestType: "{{ .input.direction }}"
+        Device.IP.Diagnostics.IPLayerCapacityMetrics.DiagnosticsState: Requested
+      awaitParam: Device.IP.Diagnostics.IPLayerCapacityMetrics.DiagnosticsState
+      awaitNotIn: [Requested, None]
+      pollInterval: 10s
+      timeout: 8m
+      collect:
+        - Device.IP.Diagnostics.IPLayerCapacityMetrics.
+  normalize: platform/actions/capacity-test.ts

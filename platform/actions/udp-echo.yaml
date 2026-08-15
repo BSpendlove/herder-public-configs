@@ -1,0 +1,55 @@
+# UDP echo: latency, jitter and per-packet loss from inside the home,
+# the numbers a TR-143 throughput test cannot give and the ones a VoIP
+# complaint turns on. TR-181 only.
+#
+# Per-packet results are enabled so the normalizer can compute jitter:
+# the aggregate min/avg/max alone cannot say whether 40 ms average is a
+# steady 40 or 10 with spikes, and the spikes are the complaint.
+#
+# The echo target is any RFC 862 UDP echo responder the operator
+# runs; nothing else is required server-side.
+apiVersion: actions.herder.io/v1alpha1
+kind: ActionProfile
+metadata:
+  name: udp-echo-tr181
+spec:
+  capability: udp_echo
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:device"
+        operator: Exists
+  timeout: 5m
+  inputs:
+    - name: host
+      description: UDP echo server to bounce packets off
+      required: true
+    - name: protocol
+      description: Address family
+      enum: [Any, IPv4, IPv6]
+      default: Any
+  config:
+    port: "7"
+    repetitions: "20"
+    timeout_ms: "1000"
+    inter_transmission_ms: "100"
+    data_block_size: "64"
+  steps:
+    - name: echo
+      set:
+        Device.IP.Diagnostics.UDPEchoDiagnostics.Host: "{{ .input.host }}"
+        Device.IP.Diagnostics.UDPEchoDiagnostics.Port: "{{ .config.port }}"
+        Device.IP.Diagnostics.UDPEchoDiagnostics.ProtocolVersion: "{{ .input.protocol }}"
+        Device.IP.Diagnostics.UDPEchoDiagnostics.NumberOfRepetitions: "{{ .config.repetitions }}"
+        Device.IP.Diagnostics.UDPEchoDiagnostics.Timeout: "{{ .config.timeout_ms }}"
+        Device.IP.Diagnostics.UDPEchoDiagnostics.InterTransmissionTime: "{{ .config.inter_transmission_ms }}"
+        Device.IP.Diagnostics.UDPEchoDiagnostics.DataBlockSize: "{{ .config.data_block_size }}"
+        Device.IP.Diagnostics.UDPEchoDiagnostics.EnableIndividualPacketResults: "true"
+        Device.IP.Diagnostics.UDPEchoDiagnostics.DiagnosticsState: Requested
+      awaitParam: Device.IP.Diagnostics.UDPEchoDiagnostics.DiagnosticsState
+      awaitNotIn: [Requested, None]
+      pollInterval: 5s
+      timeout: 4m
+      collect:
+        - Device.IP.Diagnostics.UDPEchoDiagnostics.
+  normalize: platform/actions/udp-echo.ts

@@ -1,0 +1,51 @@
+# Self test: the CPE's own hardware check, both families. Two
+# parameters and a vendor-defined Results string, which is exactly why
+# the normalizer passes the text through rather than parsing it: the
+# spec deliberately does not say what a self test tests.
+apiVersion: actions.herder.io/v1alpha1
+kind: ActionProfile
+metadata:
+  name: self-test-tr181
+spec:
+  capability: self_test
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:device"
+        operator: Exists
+  timeout: 5m
+  steps:
+    - name: self-test
+      set:
+        Device.SelfTestDiagnostics.DiagnosticsState: Requested
+      awaitParam: Device.SelfTestDiagnostics.DiagnosticsState
+      awaitNotIn: [Requested, None]
+      pollInterval: 10s
+      timeout: 4m
+      collect:
+        - Device.SelfTestDiagnostics.
+  normalize: platform/actions/self-test.ts
+---
+apiVersion: actions.herder.io/v1alpha1
+kind: ActionProfile
+metadata:
+  name: self-test-tr098
+spec:
+  capability: self_test
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:igd"
+        operator: Exists
+  timeout: 5m
+  steps:
+    - name: self-test
+      set:
+        InternetGatewayDevice.SelfTestDiagnostics.DiagnosticsState: Requested
+      awaitParam: InternetGatewayDevice.SelfTestDiagnostics.DiagnosticsState
+      awaitNotIn: [Requested, None]
+      pollInterval: 10s
+      timeout: 4m
+      collect:
+        - InternetGatewayDevice.SelfTestDiagnostics.
+  normalize: platform/actions/self-test.ts

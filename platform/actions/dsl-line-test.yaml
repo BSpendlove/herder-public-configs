@@ -1,0 +1,60 @@
+# DSL line test: the loop diagnostic that turns "slow DSL" into a
+# physics answer. Meaningless on an Ethernet or fibre estate, essential
+# the day a DSL fleet appears, and the reason it ships at priority 5:
+# it selects on the data model family because nothing better exists to
+# select on until capability discovery lands, and a run on a line-less
+# device fails with the CPE's own error rather than pretending.
+#
+# The two families disagree about more than the root here: TR-098 runs
+# it per WANDevice with a state parameter spelled LoopDiagnosticsState,
+# TR-181 runs it under DSL.Diagnostics.ADSLLineTest with the standard
+# DiagnosticsState. Both return the per-subcarrier arrays; the
+# normalizer keeps the scalars and the array lengths rather than
+# shipping kilobytes of HLOG values into every run row.
+apiVersion: actions.herder.io/v1alpha1
+kind: ActionProfile
+metadata:
+  name: dsl-line-test-tr181
+spec:
+  capability: dsl_line_test
+  priority: 5
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:device"
+        operator: Exists
+  timeout: 10m
+  steps:
+    - name: line-test
+      set:
+        Device.DSL.Diagnostics.ADSLLineTest.DiagnosticsState: Requested
+      awaitParam: Device.DSL.Diagnostics.ADSLLineTest.DiagnosticsState
+      awaitNotIn: [Requested, None]
+      pollInterval: 15s
+      timeout: 8m
+      collect:
+        - Device.DSL.Diagnostics.ADSLLineTest.
+  normalize: platform/actions/dsl-line-test.ts
+---
+apiVersion: actions.herder.io/v1alpha1
+kind: ActionProfile
+metadata:
+  name: dsl-line-test-tr098
+spec:
+  capability: dsl_line_test
+  priority: 5
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:igd"
+        operator: Exists
+  timeout: 10m
+  steps:
+    - name: line-test
+      set:
+        InternetGatewayDevice.WANDevice.1.WANDSLDiagnostics.LoopDiagnosticsState: Requested
+      awaitParam: InternetGatewayDevice.WANDevice.1.WANDSLDiagnostics.LoopDiagnosticsState
+      awaitNotIn: [Requested, None]
+      pollInterval: 15s
+      timeout: 8m
+      collect:
+        - InternetGatewayDevice.WANDevice.1.WANDSLDiagnostics.
+  normalize: platform/actions/dsl-line-test.ts

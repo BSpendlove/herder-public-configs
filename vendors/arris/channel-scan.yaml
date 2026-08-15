@@ -1,0 +1,37 @@
+# Channel scan on the ARRIS NVG: the radio's own per-channel verdict.
+#
+# The capability is generic and the contract is the normalized result
+# (channels with an AP count and a score); this vendor tree is simply
+# the first implementation, exactly as wifi_scan began. There is no
+# TR-181 baseline profile because TR-181 has no channel-scoring object:
+# a device without an implementation does not offer the capability,
+# which is the honest answer.
+#
+# The neighbour scan asks "who is on the air"; this asks the chipset
+# "which channel would you rate best", which is the question channel
+# planning actually acts on.
+apiVersion: actions.herder.io/v1alpha1
+kind: ActionProfile
+metadata:
+  name: channel-scan-arris
+spec:
+  capability: channel_scan
+  priority: 50
+  deviceSelector:
+    matchLabels:
+      oui: "0000C5"
+    matchExpressions:
+      - key: "dataModel:igd"
+        operator: Exists
+  timeout: 6m
+  steps:
+    - name: scan
+      set:
+        InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.ChannelDiagnostics.DiagnosticsState: Requested
+      awaitParam: InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.ChannelDiagnostics.DiagnosticsState
+      awaitNotIn: [Requested, None]
+      pollInterval: 10s
+      timeout: 4m
+      collect:
+        - InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.ChannelDiagnostics.
+  normalize: platform/actions/channel-scan.ts

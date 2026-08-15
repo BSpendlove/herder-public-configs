@@ -1,0 +1,45 @@
+# Server selection: the CPE races a host list and names the fastest,
+# which is how a speedtest picks its regional server per subscriber
+# instead of per fleet. TR-181 only; TR-098 has no such object.
+#
+# The host list is an input with a config default: an operator wires
+# the regional candidates once, and a support session can still ask
+# about an arbitrary set.
+apiVersion: actions.herder.io/v1alpha1
+kind: ActionProfile
+metadata:
+  name: server-selection-tr181
+spec:
+  capability: server_selection
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:device"
+        operator: Exists
+  timeout: 5m
+  inputs:
+    - name: hosts
+      description: Comma-separated hosts to race
+      required: true
+    - name: protocol
+      description: Address family
+      enum: [Any, IPv4, IPv6]
+      default: Any
+  config:
+    repetitions: "3"
+    timeout_ms: "1000"
+  steps:
+    - name: select
+      set:
+        Device.IP.Diagnostics.ServerSelectionDiagnostics.HostList: "{{ .input.hosts }}"
+        Device.IP.Diagnostics.ServerSelectionDiagnostics.ProtocolVersion: "{{ .input.protocol }}"
+        Device.IP.Diagnostics.ServerSelectionDiagnostics.NumberOfRepetitions: "{{ .config.repetitions }}"
+        Device.IP.Diagnostics.ServerSelectionDiagnostics.Timeout: "{{ .config.timeout_ms }}"
+        Device.IP.Diagnostics.ServerSelectionDiagnostics.DiagnosticsState: Requested
+      awaitParam: Device.IP.Diagnostics.ServerSelectionDiagnostics.DiagnosticsState
+      awaitNotIn: [Requested, None]
+      pollInterval: 5s
+      timeout: 4m
+      collect:
+        - Device.IP.Diagnostics.ServerSelectionDiagnostics.
+  normalize: platform/actions/server-selection.ts
