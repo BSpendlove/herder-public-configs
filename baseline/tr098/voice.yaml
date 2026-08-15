@@ -49,10 +49,10 @@ spec:
 #
 # Same reasoning as tr181-voice next door: the mapping table says where
 # the lines are, and nothing asks for them until a telemetry profile
-# does. Every path is templated so a gateway without a VoiceService
-# tree expands to nothing rather than faulting 9005 and taking the rest
-# of the collection batch with it, and the SIP password is absent
-# because the module declares it write-only.
+# does. Every path is templated, so a gateway without a VoiceService
+# tree costs one failed subtree fetch under its own prefix rather than
+# a fault on a request carrying anything else, and the SIP password is
+# absent because the module declares it write-only.
 apiVersion: telemetry.herder.io/v1alpha1
 kind: TelemetryProfile
 metadata:

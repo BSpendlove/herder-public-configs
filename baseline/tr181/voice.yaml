@@ -57,12 +57,13 @@ spec:
 # EVERY PATH IS TEMPLATED, DELIBERATELY.
 #
 # This profile's selector is every TR-181 CPE, and most of them have no
-# VoiceService tree. A literal path on a device that lacks it faults
-# 9005 for the whole GetParameterValues, taking the rest of the batch
-# with it. A templated path expands against the instances the device
-# actually reports, so a gateway without voice expands to nothing and
-# is never asked. That is why there is no VoiceServiceNumberOfEntries
-# here even though it would be the obvious thing to collect.
+# VoiceService tree. The collector fetches a templated path as a subtree
+# GetParameterValues scoped to its own prefix, so a device without the
+# tree costs one failed fetch under `Device.Services.VoiceService.` and
+# the GetParameterNames expansion behind it, and takes nothing else down
+# with it. A literal path carries no such prefix and no such fallback,
+# which is why there is no VoiceServiceNumberOfEntries here even though
+# it would be the obvious thing to collect.
 #
 # The SIP password is absent and must stay absent. The service module
 # declares it write-only for a reason: a credential that is collected
