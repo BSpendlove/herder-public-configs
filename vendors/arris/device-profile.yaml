@@ -66,12 +66,23 @@ spec:
           - {id: lan4, label: "4", kind: ethernet, entity: canonical.interface.lan.4}
           - {id: wifi24, label: 2.4 GHz, kind: wifi, entity: canonical.wifi.radio.1}
           - {id: wifi5, label: 5 GHz, kind: wifi, entity: canonical.wifi.radio.2}
+    # The radios and the air they run in, on one page: a channel is only
+    # a good choice against what else is on it, and the neighbour scan is
+    # the only thing that says what else is there.
     - key: wifi
       title: WiFi
       icon: wifi
-      component: module
+      component: stack
       config:
-        module: wifi
+        sections:
+          - key: wifi-neighbours
+            title: RF neighbours
+            component: neighbours
+          - key: wifi-radios
+            title: WiFi
+            component: module
+            config:
+              module: wifi
     - key: voice
       title: Voice
       icon: phone

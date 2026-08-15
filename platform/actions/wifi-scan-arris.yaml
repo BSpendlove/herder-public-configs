@@ -1,0 +1,61 @@
+# Neighbour scan for ARRIS NVG gateways, vendor diagnostic (TR-098).
+#
+# The TR-181 profile next door provides `wifi_scan` to anything with
+# `Device.WiFi.NeighboringWiFiDiagnostic`. An NVG has no such tree: its
+# site survey lives under `X_0000C5_Wireless.NeighboringWiFiDiagnostic`,
+# so before this profile existed a real NVG offered only `speedtest`
+# while every simulated TR-181 device could be scanned. Verified on the
+# hardware: GET /devices/{id}/actions returned speedtest alone.
+#
+# Everything in the TR-181 profile's reasoning applies unchanged. A scan
+# takes the radio off channel for 50-500 ms per channel, so it is a
+# capability an operator invokes rather than a parameter Herder polls,
+# and the cadence belongs in RF policy rather than here.
+#
+# WHAT THE HARDWARE ACTUALLY DID.
+#
+# Driven end to end on an NVG578LX (firmware 9.5.0h4d131):
+# DiagnosticsState went None -> Requested -> Complete and the table
+# filled with 80 neighbours across 2.4 and 5 GHz. Two findings shaped
+# this file:
+#
+#   * The vendor exposes a top-level `Radio` parameter that TR-181 has
+#     no equivalent for, seemingly to aim the sweep at one radio. It was
+#     empty before and after, and the scan swept both bands anyway, so
+#     this profile does not set it. If a firmware is found that refuses
+#     to sweep without it, that is a step to add, not a reason to set a
+#     value blind.
+#   * `Bandwidth` reads "Auto" rather than a width, so nothing here or
+#     downstream may assume it parses as a number.
+#
+# The timeout is the TR-181 profile's. Eighty results came back well
+# inside it, but an NVG in a dense block sweeping both bands is the
+# case the budget exists for.
+apiVersion: actions.herder.io/v1alpha1
+kind: ActionProfile
+metadata:
+  name: wifi-scan-arris
+spec:
+  capability: wifi_scan
+  # Above the TR-181 profile's 10. A device matching both (a vendor
+  # shipping the standard tree as well as its own) should use the tree
+  # its own firmware populates.
+  priority: 50
+  deviceSelector:
+    matchLabels:
+      oui: "0000C5"
+    matchExpressions:
+      - key: "dataModel:igd"
+        operator: Exists
+  timeout: 6m
+  steps:
+    - name: scan
+      set:
+        canonical.wifi.scan.state: Requested
+      awaitParam: canonical.wifi.scan.state
+      awaitNotIn: [Requested, None]
+      pollInterval: 10s
+      timeout: 4m
+      collect:
+        - InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.NeighboringWiFiDiagnostic.
+  normalize: platform/actions/wifi-scan-arris.ts

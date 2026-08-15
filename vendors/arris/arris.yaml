@@ -30,6 +30,11 @@ spec:
     - wifi-capability-tr098
     - interfaces-tr098
     - voice-tr104
+    # Neighbour scan under the vendor X_0000C5_ subtree. Binding it here
+    # is what gives an NVG the wifi_scan capability: the action sets
+    # canonical.wifi.scan.state, and without this table that canonical
+    # resolves to nothing on a TR-098 device.
+    - wifi-scan-arris
 ---
 # Telemetry profile: Arris TR-098 WiFi + mesh extensions.
 #

@@ -1,0 +1,92 @@
+# Neighbour-scan vocabulary for ARRIS NVG gateways (TR-098).
+#
+# This is the file baseline/tr181/wifi-scan.yaml describes when it says a
+# vendor exposing a site-survey table under its own `X_` subtree joins
+# the RF neighbourhood graph by copying it, changing the right-hand side
+# and scoping a profile at it. The left-hand side is identical, so the
+# graph, the coverage model and the channel views read an NVG exactly as
+# they read a TR-181 CPE.
+#
+# WRITTEN FROM A DEVICE, NOT FROM THE SPEC.
+#
+# Captured off a live NVG578LX on firmware 9.5.0h4d131 by
+# triggering a real sweep and reading the tree back: 80 neighbours,
+# DiagnosticsState moving None -> Requested -> Complete. That matters
+# because only one leaf name differs from TR-181 and it is not the one a
+# reader would guess:
+#
+#   * `Bandwidth`, where TR-181 says `OperatingChannelBandwidth`
+#   * everything else (BSSID, SSID, Channel, SignalStrength,
+#     OperatingFrequencyBand) keeps its TR-181 spelling under the
+#     vendor prefix
+#
+# The captured firmware reports `Bandwidth` as the literal string
+# "Auto" rather than a width in MHz, which is why the canonical stays a
+# string here exactly as it is in the TR-181 table. Anything deriving
+# overlap from it has to treat a non-numeric width as unknown rather
+# than as zero, or a whole NVG fleet reads as non-overlapping.
+#
+# LANDevice.1 IS FIXED, DELIBERATELY.
+#
+# The rest of the TR-098 tables in this repo address the wireless tree
+# as `LANDevice.1.WLANConfiguration.{i}`, and the diagnostic hangs off
+# the same LANDevice. An NVG exposes one. Writing `{i}` here would imply
+# a second LAN device whose scan results are a different measurement,
+# which is not a shape this hardware has.
+#
+# The vendor also reports `Result.{i}.Radio`, a reference to the
+# WLANConfiguration instance that heard the neighbour. There is no
+# canonical for it: the graph pivots on channel and band, and inventing
+# a fleet-wide canonical to carry one vendor's radio back-reference
+# would put a name in the vocabulary that nothing reads. It stays
+# available as a raw path.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: wifi-scan-arris
+spec:
+  mappings:
+    # The trigger and the state in one parameter, same contract as
+    # TR-181: writing "Requested" starts the sweep, the CPE moves it to
+    # a terminal value of its own spelling. The captured device settles
+    # on "Complete".
+    - canonical: canonical.wifi.scan.state
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.NeighboringWiFiDiagnostic.DiagnosticsState
+    # An empty table looks the same whether the CPE heard nobody or was
+    # never asked. This count is the only evidence of the first.
+    - canonical: canonical.wifi.scan.result_count
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.NeighboringWiFiDiagnostic.ResultNumberOfEntries
+    # The join key: a BSSID that resolves to another managed CPE is a
+    # measured adjacency between two homes. Exact match only.
+    - canonical: canonical.wifi.scan.result.{i}.bssid
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.NeighboringWiFiDiagnostic.Result.{i}.BSSID
+    # A neighbour's network name is third-party personal data and is
+    # never stored: the graph reduces it to a salted digest inside the
+    # statement that reads it, so a managed CPE that renumbered its
+    # BSSIDs after a firmware update can still be recognised. Declared
+    # because the value has to be readable to be hashed.
+    #
+    # The captured fleet contains SSIDs with an ampersand in them, which
+    # is worth knowing for anything that renders or re-serialises these.
+    - canonical: canonical.wifi.scan.result.{i}.ssid
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.NeighboringWiFiDiagnostic.Result.{i}.SSID
+    - canonical: canonical.wifi.scan.result.{i}.channel
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.NeighboringWiFiDiagnostic.Result.{i}.Channel
+    # dBm, negative. The captured device reports a true dBm figure
+    # (-21 to -92 across 80 neighbours), not a 0-100 quality percentage.
+    - canonical: canonical.wifi.scan.result.{i}.rssi
+      valueType: int
+      devicePath: InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.NeighboringWiFiDiagnostic.Result.{i}.SignalStrength
+    - canonical: canonical.wifi.scan.result.{i}.band
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.NeighboringWiFiDiagnostic.Result.{i}.OperatingFrequencyBand
+    # The one leaf whose name differs from TR-181. String, because the
+    # captured firmware answers "Auto".
+    - canonical: canonical.wifi.scan.result.{i}.bandwidth
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.NeighboringWiFiDiagnostic.Result.{i}.Bandwidth
