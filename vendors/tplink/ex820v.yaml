@@ -1,0 +1,116 @@
+# Device UI profile for the TP-Link EX820v (TR-181).
+#
+# The baseline TR-181 profile does not offer a Voice section, and it
+# should not: most of a residential fleet has no VoiceService tree, and
+# a tab that says "nothing resolved" on every device teaches an operator
+# to ignore tabs. The EX820v has two FXS ports, so on this hardware the
+# section is the point rather than an empty promise.
+#
+# That is the whole reason device profiles are selector-scoped. A
+# capability that some hardware has and most does not belongs to a
+# profile for that hardware, not to a baseline with a caveat.
+#
+# Everything else here matches the baseline, deliberately: a vendor
+# profile replaces rather than extends, so the sections an operator
+# expects on every device have to be restated to keep them.
+apiVersion: deviceprofiles.herder.io/v1alpha1
+kind: DeviceProfile
+metadata:
+  name: tplink-ex820v-ui
+spec:
+  priority: 50
+  deviceSelector:
+    matchExpressions:
+      - key: productClass
+        operator: In
+        values: [EX820v]
+  sections:
+    - key: overview
+      title: Overview
+      icon: gauge
+      component: overview
+    - key: status
+      title: Device status
+      icon: info
+      component: form
+      config:
+        groups:
+          - title: Identity
+            fields:
+              - {label: Manufacturer, canonical: canonical.device.manufacturer}
+              - {label: Model, canonical: canonical.device.model_name}
+              - {label: Product class, canonical: canonical.device.product_class}
+              - {label: Serial number, canonical: canonical.device.serial_number}
+              - {label: Hardware version, canonical: canonical.device.hardware_version}
+              - {label: Firmware, canonical: canonical.device.software_version}
+              - {label: Uptime, canonical: canonical.device.uptime, format: duration}
+          - title: WAN
+            fields:
+              - {label: Link status, canonical: canonical.interface.wan.status}
+              - {label: WAN IP address, canonical: canonical.interface.wan.ip_address}
+              - {label: WAN MAC, canonical: canonical.interface.wan.mac}
+          - title: Management
+            fields:
+              - {label: Connection request URL, canonical: canonical.mgmt.connection_request_url}
+              - {label: Inform interval, canonical: canonical.mgmt.periodic_inform_interval, format: seconds}
+    - key: interfaces
+      title: Interfaces
+      icon: ethernet-port
+      component: ports
+      config:
+        ports:
+          - {id: wan, label: WAN, kind: wan, entity: canonical.interface.wan}
+          - {id: lan1, label: "1", kind: ethernet, entity: canonical.interface.lan.1}
+          - {id: lan2, label: "2", kind: ethernet, entity: canonical.interface.lan.2}
+          - {id: lan3, label: "3", kind: ethernet, entity: canonical.interface.lan.3}
+          - {id: lan4, label: "4", kind: ethernet, entity: canonical.interface.lan.4}
+          - {id: wifi24, label: 2.4 GHz, kind: wifi, entity: canonical.wifi.radio.1}
+          - {id: wifi5, label: 5 GHz, kind: wifi, entity: canonical.wifi.radio.2}
+          - {id: voice1, label: Line 1, kind: voice, entity: canonical.voice.line.1}
+          - {id: voice2, label: Line 2, kind: voice, entity: canonical.voice.line.2}
+    - key: wifi
+      title: WiFi
+      icon: wifi
+      component: stack
+      config:
+        sections:
+          - key: wifi-neighbours
+            title: RF neighbours
+            component: neighbours
+          - key: wifi-radios
+            title: WiFi
+            component: module
+            config:
+              module: wifi
+    - key: voice
+      title: Voice
+      icon: phone
+      component: module
+      config:
+        module: voice
+    - key: network-map
+      title: Network map
+      icon: network
+      component: topology
+    - key: monitoring
+      title: Monitoring
+      icon: chart-line
+      component: dashboard
+      config:
+        dashboard: tr181-traffic
+    - key: actions
+      title: Actions
+      icon: zap
+      component: actions
+    - key: action-log
+      title: Action log
+      icon: history
+      component: tasks
+    - key: events
+      title: Events
+      icon: scroll-text
+      component: events
+    - key: maintenance
+      title: Maintenance
+      icon: wrench
+      component: maintenance

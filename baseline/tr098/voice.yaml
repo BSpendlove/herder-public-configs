@@ -44,3 +44,35 @@ spec:
     - canonical: canonical.voice.sip.proxy
       valueType: string
       devicePath: InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.SIP.ProxyServer
+---
+# Telemetry profile: TR-098 voice lines, the TR-104 issue 1 tree.
+#
+# Same reasoning as tr181-voice next door: the mapping table says where
+# the lines are, and nothing asks for them until a telemetry profile
+# does. Every path is templated so a gateway without a VoiceService
+# tree expands to nothing rather than faulting 9005 and taking the rest
+# of the collection batch with it, and the SIP password is absent
+# because the module declares it write-only.
+apiVersion: telemetry.herder.io/v1alpha1
+kind: TelemetryProfile
+metadata:
+  name: tr098-voice
+spec:
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:igd"
+        operator: Exists
+  parameters:
+    - path: "InternetGatewayDevice.Services.VoiceService.{i}.VoiceProfile.{i}.Line.{i}.Status"
+      interval: 0
+    - path: "InternetGatewayDevice.Services.VoiceService.{i}.VoiceProfile.{i}.Line.{i}.Enable"
+      interval: 0
+    - path: "InternetGatewayDevice.Services.VoiceService.{i}.VoiceProfile.{i}.Line.{i}.DirectoryNumber"
+      interval: 0
+    - path: "InternetGatewayDevice.Services.VoiceService.{i}.VoiceProfile.{i}.Line.{i}.SIP.AuthUserName"
+      interval: 0
+    - path: "InternetGatewayDevice.Services.VoiceService.{i}.VoiceProfile.{i}.SIP.RegistrarServer"
+      interval: 0
+    - path: "InternetGatewayDevice.Services.VoiceService.{i}.VoiceProfile.{i}.SIP.ProxyServer"
+      interval: 0
