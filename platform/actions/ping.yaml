@@ -1,0 +1,86 @@
+# Ping from the CPE: the subscriber's own gateway measuring reachability
+# from inside the home, which no probe of the WAN side can substitute
+# for. Two profiles, one per data model family, same capability and the
+# same canonical vocabulary (netdiag-tr098 / netdiag-tr181).
+#
+# The host is a per-run input, not config: a ping without a target is
+# not a ping, and baking targets into config would mean one profile per
+# destination. Repetitions and timeout stay config, because they are
+# fleet policy rather than the question being asked.
+apiVersion: actions.herder.io/v1alpha1
+kind: ActionProfile
+metadata:
+  name: ping-tr181
+spec:
+  capability: ping
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:device"
+        operator: Exists
+  timeout: 3m
+  inputs:
+    - name: host
+      description: Hostname or IP address to ping
+      required: true
+    # ProtocolVersion is TR-181's address-family selector. "Any" is the
+    # data model's own default: the CPE picks by DNS answer.
+    - name: protocol
+      description: Address family
+      enum: [Any, IPv4, IPv6]
+      default: Any
+  config:
+    repetitions: "4"
+    timeout_ms: "1000"
+  steps:
+    - name: ping
+      set:
+        canonical.diagnostics.ping.host: "{{ .input.host }}"
+        canonical.diagnostics.ping.protocol: "{{ .input.protocol }}"
+        canonical.diagnostics.ping.repetitions: "{{ .config.repetitions }}"
+        canonical.diagnostics.ping.timeout: "{{ .config.timeout_ms }}"
+        canonical.diagnostics.ping.state: Requested
+      awaitParam: canonical.diagnostics.ping.state
+      awaitNotIn: [Requested, None]
+      pollInterval: 5s
+      timeout: 2m
+      collect:
+        - Device.IP.Diagnostics.IPPing.
+  normalize: platform/actions/ping.ts
+---
+apiVersion: actions.herder.io/v1alpha1
+kind: ActionProfile
+metadata:
+  name: ping-tr098
+spec:
+  capability: ping
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:igd"
+        operator: Exists
+  timeout: 3m
+  # No protocol input: TR-098 has no ProtocolVersion, so the address
+  # family is the CPE's own choice. The ARRIS NVG exposes a vendor
+  # boolean for it, which ping-arris uses at a higher priority.
+  inputs:
+    - name: host
+      description: Hostname or IP address to ping
+      required: true
+  config:
+    repetitions: "4"
+    timeout_ms: "1000"
+  steps:
+    - name: ping
+      set:
+        canonical.diagnostics.ping.host: "{{ .input.host }}"
+        canonical.diagnostics.ping.repetitions: "{{ .config.repetitions }}"
+        canonical.diagnostics.ping.timeout: "{{ .config.timeout_ms }}"
+        canonical.diagnostics.ping.state: Requested
+      awaitParam: canonical.diagnostics.ping.state
+      awaitNotIn: [Requested, None]
+      pollInterval: 5s
+      timeout: 2m
+      collect:
+        - InternetGatewayDevice.IPPingDiagnostics.
+  normalize: platform/actions/ping.ts

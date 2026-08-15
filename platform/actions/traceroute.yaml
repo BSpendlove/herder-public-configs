@@ -1,0 +1,81 @@
+# Traceroute from the CPE. Same shape as ping: host as input, hop
+# budget as config, per-family profiles over one canonical vocabulary.
+apiVersion: actions.herder.io/v1alpha1
+kind: ActionProfile
+metadata:
+  name: traceroute-tr181
+spec:
+  capability: traceroute
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:device"
+        operator: Exists
+  timeout: 6m
+  inputs:
+    - name: host
+      description: Hostname or IP address to trace
+      required: true
+    - name: protocol
+      description: Address family
+      enum: [Any, IPv4, IPv6]
+      default: Any
+  config:
+    tries: "3"
+    timeout_ms: "5000"
+    max_hops: "30"
+  steps:
+    - name: traceroute
+      set:
+        canonical.diagnostics.traceroute.host: "{{ .input.host }}"
+        canonical.diagnostics.traceroute.protocol: "{{ .input.protocol }}"
+        canonical.diagnostics.traceroute.tries: "{{ .config.tries }}"
+        canonical.diagnostics.traceroute.timeout: "{{ .config.timeout_ms }}"
+        canonical.diagnostics.traceroute.max_hops: "{{ .config.max_hops }}"
+        canonical.diagnostics.traceroute.state: Requested
+      awaitParam: canonical.diagnostics.traceroute.state
+      awaitNotIn: [Requested, None]
+      pollInterval: 10s
+      # A route that dark-holes pays tries x timeout per hop; thirty
+      # hops of that is minutes, and cutting it short reports a partial
+      # route as if it were the whole one.
+      timeout: 5m
+      collect:
+        - Device.IP.Diagnostics.TraceRoute.
+  normalize: platform/actions/traceroute.ts
+---
+apiVersion: actions.herder.io/v1alpha1
+kind: ActionProfile
+metadata:
+  name: traceroute-tr098
+spec:
+  capability: traceroute
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:igd"
+        operator: Exists
+  timeout: 6m
+  inputs:
+    - name: host
+      description: Hostname or IP address to trace
+      required: true
+  config:
+    tries: "3"
+    timeout_ms: "5000"
+    max_hops: "30"
+  steps:
+    - name: traceroute
+      set:
+        canonical.diagnostics.traceroute.host: "{{ .input.host }}"
+        canonical.diagnostics.traceroute.tries: "{{ .config.tries }}"
+        canonical.diagnostics.traceroute.timeout: "{{ .config.timeout_ms }}"
+        canonical.diagnostics.traceroute.max_hops: "{{ .config.max_hops }}"
+        canonical.diagnostics.traceroute.state: Requested
+      awaitParam: canonical.diagnostics.traceroute.state
+      awaitNotIn: [Requested, None]
+      pollInterval: 10s
+      timeout: 5m
+      collect:
+        - InternetGatewayDevice.TraceRouteDiagnostics.
+  normalize: platform/actions/traceroute.ts

@@ -218,6 +218,7 @@ spec:
     - device-info-tr098
     - mgmt-tr098
     - diagnostics-tr098
+    - netdiag-tr098
     - wifi-tr098
     - wifi-bssid-tr098
     - wifi-capability-tr098

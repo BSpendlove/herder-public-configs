@@ -111,6 +111,10 @@ spec:
     - wifi-scan-tr181
     - wifi-capability-tr181
     - wifi-rf-tr181
+    # Ping, traceroute and DNS lookup: bound for the same reason as
+    # wifi-scan-tr181 above. The actions set and await these canonicals
+    # through the device's bound profile.
+    - netdiag-tr181
 ---
 # CWMP-only half of the TR-181 baseline: the `canonical.mgmt.*` table.
 #
@@ -154,6 +158,7 @@ spec:
     - wifi-scan-tr181
     - wifi-capability-tr181
     - wifi-rf-tr181
+    - netdiag-tr181
 
 ---
 # Canonical WiFi mappings for TR-181 (Device.*) devices.

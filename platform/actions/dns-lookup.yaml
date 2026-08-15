@@ -1,0 +1,72 @@
+# DNS lookup from the CPE: resolves a name with the resolver the
+# subscriber's devices actually use, which is the half of "the internet
+# is broken" a lookup from the ACS cannot see.
+#
+# The TR-098 profile sets only the hostname, the server and the
+# trigger. The spec gives NSLookupDiagnostics a Timeout and a
+# NumberOfRepetitions, and the captured NVG578LX implements neither;
+# an SPV batch is atomic, so setting them would fault the whole
+# trigger on hardware that runs the lookup fine.
+apiVersion: actions.herder.io/v1alpha1
+kind: ActionProfile
+metadata:
+  name: dns-lookup-tr181
+spec:
+  capability: dns_lookup
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:device"
+        operator: Exists
+  timeout: 3m
+  inputs:
+    - name: hostname
+      description: Name to resolve
+      required: true
+    - name: server
+      description: DNS server to ask; blank uses the CPE's own
+  steps:
+    - name: lookup
+      set:
+        canonical.diagnostics.dns.hostname: "{{ .input.hostname }}"
+        canonical.diagnostics.dns.server: "{{ .input.server }}"
+        canonical.diagnostics.dns.state: Requested
+      awaitParam: canonical.diagnostics.dns.state
+      awaitNotIn: [Requested, None]
+      pollInterval: 5s
+      timeout: 2m
+      collect:
+        - Device.DNS.Diagnostics.NSLookupDiagnostics.
+  normalize: platform/actions/dns-lookup.ts
+---
+apiVersion: actions.herder.io/v1alpha1
+kind: ActionProfile
+metadata:
+  name: dns-lookup-tr098
+spec:
+  capability: dns_lookup
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:igd"
+        operator: Exists
+  timeout: 3m
+  inputs:
+    - name: hostname
+      description: Name to resolve
+      required: true
+    - name: server
+      description: DNS server to ask; blank uses the CPE's own
+  steps:
+    - name: lookup
+      set:
+        canonical.diagnostics.dns.hostname: "{{ .input.hostname }}"
+        canonical.diagnostics.dns.server: "{{ .input.server }}"
+        canonical.diagnostics.dns.state: Requested
+      awaitParam: canonical.diagnostics.dns.state
+      awaitNotIn: [Requested, None]
+      pollInterval: 5s
+      timeout: 2m
+      collect:
+        - InternetGatewayDevice.NSLookupDiagnostics.
+  normalize: platform/actions/dns-lookup.ts

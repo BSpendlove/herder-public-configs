@@ -1,0 +1,93 @@
+# Canonical vocabulary for the TR-181 network diagnostics: ping,
+# traceroute and DNS lookup. Same left-hand side as netdiag-tr098, so
+# the actions, the API and the device page read either data model
+# identically.
+#
+# TR-181 adds what TR-098 never had: ProtocolVersion on ping and
+# traceroute, which is the address-family selector the ping action
+# exposes as its protocol input. NSLookup keeps its spec Timeout and
+# NumberOfRepetitions here; they are absent from the TR-098 table
+# because the captured hardware does not implement them and an SPV
+# batch is atomic.
+#
+# Result tables (RouteHops.{i}, Result.{i}) are deliberately not given
+# canonicals: the action collects the raw subtree for its normalizer,
+# and nothing else queries hops by name.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: netdiag-tr181
+spec:
+  mappings:
+    # --- Ping ---
+    - canonical: canonical.diagnostics.ping.state
+      valueType: string
+      devicePath: Device.IP.Diagnostics.IPPing.DiagnosticsState
+    - canonical: canonical.diagnostics.ping.host
+      valueType: string
+      devicePath: Device.IP.Diagnostics.IPPing.Host
+    - canonical: canonical.diagnostics.ping.protocol
+      valueType: string
+      devicePath: Device.IP.Diagnostics.IPPing.ProtocolVersion
+    - canonical: canonical.diagnostics.ping.repetitions
+      valueType: unsignedint
+      devicePath: Device.IP.Diagnostics.IPPing.NumberOfRepetitions
+    - canonical: canonical.diagnostics.ping.timeout
+      valueType: unsignedint
+      devicePath: Device.IP.Diagnostics.IPPing.Timeout
+    - canonical: canonical.diagnostics.ping.success_count
+      valueType: unsignedint
+      devicePath: Device.IP.Diagnostics.IPPing.SuccessCount
+    - canonical: canonical.diagnostics.ping.failure_count
+      valueType: unsignedint
+      devicePath: Device.IP.Diagnostics.IPPing.FailureCount
+    - canonical: canonical.diagnostics.ping.rtt_avg
+      valueType: unsignedint
+      devicePath: Device.IP.Diagnostics.IPPing.AverageResponseTime
+    - canonical: canonical.diagnostics.ping.rtt_min
+      valueType: unsignedint
+      devicePath: Device.IP.Diagnostics.IPPing.MinimumResponseTime
+    - canonical: canonical.diagnostics.ping.rtt_max
+      valueType: unsignedint
+      devicePath: Device.IP.Diagnostics.IPPing.MaximumResponseTime
+    # --- Traceroute ---
+    - canonical: canonical.diagnostics.traceroute.state
+      valueType: string
+      devicePath: Device.IP.Diagnostics.TraceRoute.DiagnosticsState
+    - canonical: canonical.diagnostics.traceroute.host
+      valueType: string
+      devicePath: Device.IP.Diagnostics.TraceRoute.Host
+    - canonical: canonical.diagnostics.traceroute.protocol
+      valueType: string
+      devicePath: Device.IP.Diagnostics.TraceRoute.ProtocolVersion
+    - canonical: canonical.diagnostics.traceroute.tries
+      valueType: unsignedint
+      devicePath: Device.IP.Diagnostics.TraceRoute.NumberOfTries
+    - canonical: canonical.diagnostics.traceroute.timeout
+      valueType: unsignedint
+      devicePath: Device.IP.Diagnostics.TraceRoute.Timeout
+    - canonical: canonical.diagnostics.traceroute.max_hops
+      valueType: unsignedint
+      devicePath: Device.IP.Diagnostics.TraceRoute.MaxHopCount
+    - canonical: canonical.diagnostics.traceroute.response_time
+      valueType: unsignedint
+      devicePath: Device.IP.Diagnostics.TraceRoute.ResponseTime
+    - canonical: canonical.diagnostics.traceroute.hop_count
+      valueType: unsignedint
+      devicePath: Device.IP.Diagnostics.TraceRoute.RouteHopsNumberOfEntries
+    # --- DNS lookup ---
+    - canonical: canonical.diagnostics.dns.state
+      valueType: string
+      devicePath: Device.DNS.Diagnostics.NSLookupDiagnostics.DiagnosticsState
+    - canonical: canonical.diagnostics.dns.hostname
+      valueType: string
+      devicePath: Device.DNS.Diagnostics.NSLookupDiagnostics.HostName
+    - canonical: canonical.diagnostics.dns.server
+      valueType: string
+      devicePath: Device.DNS.Diagnostics.NSLookupDiagnostics.DNSServer
+    - canonical: canonical.diagnostics.dns.success_count
+      valueType: unsignedint
+      devicePath: Device.DNS.Diagnostics.NSLookupDiagnostics.SuccessCount
+    - canonical: canonical.diagnostics.dns.result_count
+      valueType: unsignedint
+      devicePath: Device.DNS.Diagnostics.NSLookupDiagnostics.ResultNumberOfEntries
