@@ -12,6 +12,44 @@ metadata:
   name: interfaces-tr098
 spec:
   mappings:
+    # LAN ports, wildcarded. One declaration, however many ports the
+    # device has.
+    #
+    # This used to enumerate lan.1 through lan.4 because four is what a
+    # typical gateway has. It is not what every gateway has: the NVG
+    # this was built against exposes three, an ONT exposes one or two,
+    # a business gateway exposes eight or more. An enumeration invents
+    # the ports a device lacks and drops the ones past the end, and
+    # because an unresolved field is omitted from the device page
+    # rather than shown as unknown, both failures are invisible.
+    #
+    # {i} normalizes to a single-segment wildcard on both sides, and
+    # the resolver expands a templated entry against the device's own
+    # parameters rather than against the declared set. Arity therefore
+    # comes from the hardware.
+    #
+    # The counters are here because the device page asks every port for
+    # bytes sent and received, and a field an entity does not map is
+    # omitted from the detail rather than shown as unknown: without
+    # them a switch port reads as a name, a MAC and a link state with
+    # no traffic on it. An NVG578LX reports them under every
+    # LANEthernetInterfaceConfig instance it has, so nothing was
+    # missing on the device; the vocabulary had no name for it.
+    - canonical: canonical.interface.lan.{i}.status
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.{i}.Status
+    - canonical: canonical.interface.lan.{i}.enable
+      valueType: boolean
+      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.{i}.Enable
+    - canonical: canonical.interface.lan.{i}.mac
+      valueType: string
+      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.{i}.MACAddress
+    - canonical: canonical.interface.lan.{i}.bytes_sent
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.{i}.Stats.BytesSent
+    - canonical: canonical.interface.lan.{i}.bytes_received
+      valueType: unsignedint
+      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.{i}.Stats.BytesReceived
     - canonical: canonical.interface.wan.status
       valueType: string
       devicePath: InternetGatewayDevice.WANDevice.1.WANCommonInterfaceConfig.PhysicalLinkStatus
@@ -30,39 +68,3 @@ spec:
     - canonical: canonical.interface.wan.uptime
       valueType: unsignedint
       devicePath: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.Uptime
-    - canonical: canonical.interface.lan.1.status
-      valueType: string
-      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.1.Status
-    - canonical: canonical.interface.lan.1.enable
-      valueType: boolean
-      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.1.Enable
-    - canonical: canonical.interface.lan.1.mac
-      valueType: string
-      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.1.MACAddress
-    - canonical: canonical.interface.lan.2.status
-      valueType: string
-      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.2.Status
-    - canonical: canonical.interface.lan.2.enable
-      valueType: boolean
-      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.2.Enable
-    - canonical: canonical.interface.lan.2.mac
-      valueType: string
-      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.2.MACAddress
-    - canonical: canonical.interface.lan.3.status
-      valueType: string
-      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.3.Status
-    - canonical: canonical.interface.lan.3.enable
-      valueType: boolean
-      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.3.Enable
-    - canonical: canonical.interface.lan.3.mac
-      valueType: string
-      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.3.MACAddress
-    - canonical: canonical.interface.lan.4.status
-      valueType: string
-      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.4.Status
-    - canonical: canonical.interface.lan.4.enable
-      valueType: boolean
-      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.4.Enable
-    - canonical: canonical.interface.lan.4.mac
-      valueType: string
-      devicePath: InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.4.MACAddress

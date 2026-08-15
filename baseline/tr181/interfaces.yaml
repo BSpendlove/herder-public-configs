@@ -32,6 +32,58 @@ spec:
     - canonical: canonical.interface.wan.ip_address
       valueType: string
       devicePath: Device.IP.Interface.1.IPv4Address.1.IPAddress
+    # Per-port counters, same reasoning as the TR-098 table: the ports
+    # view asks every port for bytes_sent and bytes_received, and an
+    # unmapped field is silently dropped from the detail rather than
+    # shown as unknown, so a switch port without these renders as a
+    # link state with no traffic on it.
+    #
+    # The offset is deliberate. lan.{n} is Ethernet.Interface.{n+1}
+    # because Interface.1 is the WAN in this table, so the LAN ports
+    # start at 2 and the canonical index stays 1-based for the operator.
+    # WHY THESE STAY ENUMERATED WHILE TR-098's ARE WILDCARDED.
+    #
+    # The TR-098 table collapses to lan.{i} because
+    # LANEthernetInterfaceConfig is unambiguously the LAN switch: every
+    # instance in it is a LAN port, whatever the count.
+    #
+    # TR-181 has no such object. LAN and WAN ports are the same
+    # Device.Ethernet.Interface table and the difference is a property,
+    # Upstream, not a position. The offset below (lan.{n} is
+    # Interface.{n+1}) is a convention that holds for the profiles in
+    # this repo and for most gateways, not something the data model
+    # guarantees: a device that enumerates its WAN port second would be
+    # mapped exactly wrong by it.
+    #
+    # Wildcarding as-is would be worse than the enumeration, because
+    # lan.{i} to Interface.{i} makes the WAN appear as lan.1 on every
+    # TR-181 device. Doing this properly means selecting on Upstream
+    # rather than index, which the mapping layer cannot express today.
+    # Left enumerated deliberately, with the limitation written down.
+    - canonical: canonical.interface.lan.1.bytes_sent
+      valueType: unsignedint
+      devicePath: Device.Ethernet.Interface.2.Stats.BytesSent
+    - canonical: canonical.interface.lan.1.bytes_received
+      valueType: unsignedint
+      devicePath: Device.Ethernet.Interface.2.Stats.BytesReceived
+    - canonical: canonical.interface.lan.2.bytes_sent
+      valueType: unsignedint
+      devicePath: Device.Ethernet.Interface.3.Stats.BytesSent
+    - canonical: canonical.interface.lan.2.bytes_received
+      valueType: unsignedint
+      devicePath: Device.Ethernet.Interface.3.Stats.BytesReceived
+    - canonical: canonical.interface.lan.3.bytes_sent
+      valueType: unsignedint
+      devicePath: Device.Ethernet.Interface.4.Stats.BytesSent
+    - canonical: canonical.interface.lan.3.bytes_received
+      valueType: unsignedint
+      devicePath: Device.Ethernet.Interface.4.Stats.BytesReceived
+    - canonical: canonical.interface.lan.4.bytes_sent
+      valueType: unsignedint
+      devicePath: Device.Ethernet.Interface.5.Stats.BytesSent
+    - canonical: canonical.interface.lan.4.bytes_received
+      valueType: unsignedint
+      devicePath: Device.Ethernet.Interface.5.Stats.BytesReceived
     - canonical: canonical.interface.lan.1.status
       valueType: string
       devicePath: Device.Ethernet.Interface.2.Status
