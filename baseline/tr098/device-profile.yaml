@@ -99,6 +99,18 @@ spec:
       component: module
       config:
         module: remote-access
+        # Where the gateway's own UI answers, assembled from the WAN
+        # address plus this module's port and protocol. Declared here
+        # rather than inferred: which address a management UI listens on
+        # is an operator's question, and a console that guessed would be
+        # wrong on any deployment that terminates elsewhere. The console
+        # classifies the address and says plainly when it is private or
+        # behind CGNAT, so a link that cannot work does not look like one
+        # that can.
+        link:
+          address: canonical.interface.wan.ip_address
+          port: port
+          protocol: protocol
     - key: maintenance
       title: Maintenance
       icon: wrench
