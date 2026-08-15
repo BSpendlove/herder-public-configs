@@ -62,9 +62,37 @@ spec:
     - canonical: canonical.interface.wan.bytes_received
       valueType: unsignedint
       devicePath: InternetGatewayDevice.WANDevice.1.WANCommonInterfaceConfig.TotalBytesReceived
+    # The WAN connection instance is found, not assumed.
+    #
+    # WANIPConnection.1 is the obvious guess and it is wrong on real
+    # hardware: a live NVG578LX carries its IPv4 service on instance 2
+    # and stuffs IPv6 into instance 500, so the address and the uptime
+    # on its device page were blank while every field beside them
+    # resolved. Nothing in TR-098 promises instance 1, and a gateway
+    # that renumbers after a WAN reconfiguration would break the same
+    # way.
+    #
+    # ConnectionType is the discriminator because it is the one value
+    # spelled identically across the fleet: every WANIPConnection on
+    # every device here reports IP_Routed, where ConnectionStatus is
+    # "Connected" on some firmware and "connected" on others and an
+    # exact match cannot serve both. The lowest matching instance wins,
+    # which is the IPv4 service connection on the hardware that
+    # numbers past 1, and fallbackIndex keeps instance 1 for anything
+    # that reports no ConnectionType at all.
     - canonical: canonical.interface.wan.ip_address
       valueType: string
-      devicePath: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.ExternalIPAddress
+      instanceAlias:
+        object: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.
+        matchBy: ConnectionType
+        matchValue: IP_Routed
+        fallbackIndex: 1
+      pathTemplate: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.{index}.ExternalIPAddress
     - canonical: canonical.interface.wan.uptime
       valueType: unsignedint
-      devicePath: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.Uptime
+      instanceAlias:
+        object: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.
+        matchBy: ConnectionType
+        matchValue: IP_Routed
+        fallbackIndex: 1
+      pathTemplate: InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.{index}.Uptime
