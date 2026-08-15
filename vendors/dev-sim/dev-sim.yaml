@@ -15,3 +15,4 @@ spec:
     - device-info-tr098
     - mgmt-tr098
     - diagnostics-tr098
+    - netdiag-tr098

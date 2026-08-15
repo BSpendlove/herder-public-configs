@@ -31,13 +31,17 @@ const ROOTS = [
 ];
 let root = ROOTS[0];
 for (const r of ROOTS) {
+  let found = false;
   for (const key of Object.keys(p)) {
     if (key.indexOf(r) === 0) {
-      root = r;
+      found = true;
       break;
     }
   }
-  if (root === r) break;
+  if (found) {
+    root = r;
+    break;
+  }
 }
 
 function num(v: string | undefined): number | null {
@@ -54,7 +58,11 @@ const out: Result = {
   // word the firmware used.
   state: p[root + "DiagnosticsState"] ?? null,
   host: action.inputs["host"] ?? "",
-  protocol: p[root + "ProtocolVersion"] ?? action.inputs["protocol"] ?? null,
+  protocol:
+    p[root + "ProtocolVersion"] ??
+    p[root + "X_0000C5_IPv6Preferred"] ??
+    action.inputs["protocol"] ??
+    null,
   success_count: num(p[root + "SuccessCount"]),
   failure_count: num(p[root + "FailureCount"]),
   rtt_avg_ms: num(p[root + "AverageResponseTime"]),

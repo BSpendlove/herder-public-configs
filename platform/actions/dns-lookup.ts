@@ -68,7 +68,7 @@ for (let i = 1; i <= 32; i++) {
   attempts.push({
     status: status,
     answer_type: p[base + "AnswerType"] ?? "",
-    host_name_returned: p[base + "HostNameReturned"] ?? "",
+    host_name_returned: (p[base + "HostNameReturned"] ?? "").trim(),
     ip_addresses: ips,
     dns_server_ip: p[base + "DNSServerIP"] ?? "",
     response_time_ms: num(p[base + "ResponseTime"]),

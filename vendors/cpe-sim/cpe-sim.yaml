@@ -21,6 +21,7 @@ spec:
     - device-info-tr098
     - mgmt-tr098
     - diagnostics-tr098
+    - netdiag-tr098
     - wifi-tr098
     - wifi-bssid-tr098
     - wifi-capability-tr098
@@ -47,6 +48,7 @@ spec:
     - device-info-tr181
     - mgmt-tr181
     - firmware-tr181
+    - netdiag-tr181
     - wifi-tr181
     - wifi-rf-tr181
     - interfaces-tr181

@@ -1,0 +1,53 @@
+# Ping on the ARRIS NVG, with the address family the standard TR-098
+# object cannot express.
+#
+# TR-098 IPPingDiagnostics has no ProtocolVersion. This hardware adds
+# X_0000C5_IPv6Preferred, and a live run shows it holds the family as a
+# string ("IPv4"), not a boolean, so the input's enum values pass
+# through unchanged. Priority above the tr098 baseline profile: same
+# capability, more of the question answerable.
+#
+# Raw path in the set, deliberately. A canonical for one vendor's
+# family selector would put a name in the fleet vocabulary that only
+# this hardware resolves; the raw path passes through the mapper
+# untouched, which is what vendor subtrees are for.
+apiVersion: actions.herder.io/v1alpha1
+kind: ActionProfile
+metadata:
+  name: ping-arris
+spec:
+  capability: ping
+  priority: 50
+  deviceSelector:
+    matchLabels:
+      oui: "0000C5"
+    matchExpressions:
+      - key: "dataModel:igd"
+        operator: Exists
+  timeout: 3m
+  inputs:
+    - name: host
+      description: Hostname or IP address to ping
+      required: true
+    - name: protocol
+      description: Address family
+      enum: [IPv4, IPv6]
+      default: IPv4
+  config:
+    repetitions: "4"
+    timeout_ms: "1000"
+  steps:
+    - name: ping
+      set:
+        canonical.diagnostics.ping.host: "{{ .input.host }}"
+        InternetGatewayDevice.IPPingDiagnostics.X_0000C5_IPv6Preferred: "{{ .input.protocol }}"
+        canonical.diagnostics.ping.repetitions: "{{ .config.repetitions }}"
+        canonical.diagnostics.ping.timeout: "{{ .config.timeout_ms }}"
+        canonical.diagnostics.ping.state: Requested
+      awaitParam: canonical.diagnostics.ping.state
+      awaitNotIn: [Requested, None]
+      pollInterval: 5s
+      timeout: 2m
+      collect:
+        - InternetGatewayDevice.IPPingDiagnostics.
+  normalize: platform/actions/ping.ts
