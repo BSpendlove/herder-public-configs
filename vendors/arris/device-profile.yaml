@@ -89,6 +89,12 @@ spec:
       component: module
       config:
         module: voice
+    - key: port-forwards
+      title: Port forwards
+      icon: arrow-left-right
+      component: module
+      config:
+        module: port-forwards
     - key: network-map
       title: Network map
       icon: network

@@ -98,6 +98,12 @@ spec:
       title: Events
       icon: scroll-text
       component: events
+    - key: port-forwards
+      title: Port forwards
+      icon: arrow-left-right
+      component: module
+      config:
+        module: port-forwards
     - key: remote-access
       title: Remote access
       icon: shield

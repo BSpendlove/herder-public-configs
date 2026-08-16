@@ -1,0 +1,79 @@
+# NAT port-forward service module, over the canonical.nat.port_forward
+# namespace declared in baseline/tr181/nat.yaml, baseline/tr098/nat.yaml
+# and vendors/arris/nat.yaml.
+#
+# Every field lives in one collection ("port_forward"), so the module
+# API's collection lifecycle applies: POST to
+# /v1/devices/{id}/modules/port-forwards/collections/port_forward
+# creates a forward as one AddObject carrying the initial values, and
+# DELETE on an instance removes it. The device assigns instance
+# numbers.
+#
+# `status` is TR-181 only; TR-098 has no per-mapping status and reports
+# the field unresolved, which is the contract working, not a gap.
+apiVersion: modules.herder.io/v1alpha1
+kind: ServiceModule
+metadata:
+  name: port-forwards
+spec:
+  description: >-
+    NAT port forwards: the WAN-to-LAN mappings the gateway applies, per
+    forwarding rule.
+  fields:
+    - name: enabled
+      canonical: canonical.nat.port_forward.{i}.enabled
+      type: bool
+      writable: true
+      description: Whether the gateway applies this forward.
+    - name: description
+      canonical: canonical.nat.port_forward.{i}.description
+      type: string
+      writable: true
+      constraints:
+        maxLength: 256
+      description: Operator label for the forward.
+    - name: protocol
+      canonical: canonical.nat.port_forward.{i}.protocol
+      type: string
+      writable: true
+      constraints:
+        enum: ["TCP", "UDP"]
+      description: Transport protocol the forward matches.
+    - name: external_port
+      canonical: canonical.nat.port_forward.{i}.external_port
+      type: int
+      writable: true
+      constraints:
+        min: 0
+        max: 65535
+      description: WAN-side port. 0 matches all ports where the data model allows it.
+    - name: internal_port
+      canonical: canonical.nat.port_forward.{i}.internal_port
+      type: int
+      writable: true
+      constraints:
+        min: 1
+        max: 65535
+      description: LAN-side port on the target host.
+    - name: internal_client
+      canonical: canonical.nat.port_forward.{i}.internal_client
+      type: string
+      writable: true
+      description: LAN address the forward delivers to.
+    - name: remote_host
+      canonical: canonical.nat.port_forward.{i}.remote_host
+      type: string
+      writable: true
+      description: Source address the forward is restricted to. Empty means any.
+    - name: lease_duration
+      canonical: canonical.nat.port_forward.{i}.lease_duration
+      type: int
+      unit: s
+      writable: true
+      constraints:
+        min: 0
+      description: Seconds until the forward expires. 0 means permanent.
+    - name: status
+      canonical: canonical.nat.port_forward.{i}.status
+      type: string
+      description: The gateway's own state for the rule. TR-181 only.

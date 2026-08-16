@@ -225,6 +225,7 @@ spec:
     - wifi-capability-tr098
     - interfaces-tr098
     - voice-tr104
+    - nat-tr098
 
 ---
 # Canonical WiFi mappings for TR-098 (InternetGatewayDevice.*) devices.
