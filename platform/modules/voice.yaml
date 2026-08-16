@@ -24,6 +24,10 @@ spec:
       canonical: canonical.voice.line.{i}.status
       type: string
       description: Registration status of the line.
+    - name: call_state
+      canonical: canonical.voice.line.{i}.call_state
+      type: string
+      description: The line's current call state, Idle when no call is up.
     - name: line_enabled
       canonical: canonical.voice.line.{i}.enable
       type: string

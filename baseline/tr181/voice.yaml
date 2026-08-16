@@ -18,6 +18,9 @@ spec:
     - canonical: canonical.voice.line.1.number
       valueType: string
       devicePath: Device.Services.VoiceService.1.CallControl.Line.1.DirectoryNumber
+    - canonical: canonical.voice.line.1.call_state
+      valueType: string
+      devicePath: Device.Services.VoiceService.1.CallControl.Line.1.CallStatus
     - canonical: canonical.voice.line.1.sip.username
       valueType: string
       devicePath: Device.Services.VoiceService.1.SIP.Client.1.AuthUserName
@@ -33,6 +36,9 @@ spec:
     - canonical: canonical.voice.line.2.number
       valueType: string
       devicePath: Device.Services.VoiceService.1.CallControl.Line.2.DirectoryNumber
+    - canonical: canonical.voice.line.2.call_state
+      valueType: string
+      devicePath: Device.Services.VoiceService.1.CallControl.Line.2.CallStatus
     - canonical: canonical.voice.line.2.sip.username
       valueType: string
       devicePath: Device.Services.VoiceService.1.SIP.Client.2.AuthUserName
@@ -80,6 +86,8 @@ spec:
         operator: Exists
   parameters:
     - path: "Device.Services.VoiceService.{i}.CallControl.Line.{i}.Status"
+      interval: 0
+    - path: "Device.Services.VoiceService.{i}.CallControl.Line.{i}.CallStatus"
       interval: 0
     - path: "Device.Services.VoiceService.{i}.CallControl.Line.{i}.Enable"
       interval: 0

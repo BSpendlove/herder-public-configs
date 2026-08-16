@@ -17,6 +17,9 @@ spec:
     - canonical: canonical.voice.line.1.number
       valueType: string
       devicePath: InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.DirectoryNumber
+    - canonical: canonical.voice.line.1.call_state
+      valueType: string
+      devicePath: InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.CallState
     - canonical: canonical.voice.line.1.sip.username
       valueType: string
       devicePath: InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.1.SIP.AuthUserName
@@ -32,6 +35,9 @@ spec:
     - canonical: canonical.voice.line.2.number
       valueType: string
       devicePath: InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.2.DirectoryNumber
+    - canonical: canonical.voice.line.2.call_state
+      valueType: string
+      devicePath: InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.2.CallState
     - canonical: canonical.voice.line.2.sip.username
       valueType: string
       devicePath: InternetGatewayDevice.Services.VoiceService.1.VoiceProfile.1.Line.2.SIP.AuthUserName
@@ -65,6 +71,8 @@ spec:
         operator: Exists
   parameters:
     - path: "InternetGatewayDevice.Services.VoiceService.{i}.VoiceProfile.{i}.Line.{i}.Status"
+      interval: 0
+    - path: "InternetGatewayDevice.Services.VoiceService.{i}.VoiceProfile.{i}.Line.{i}.CallState"
       interval: 0
     - path: "InternetGatewayDevice.Services.VoiceService.{i}.VoiceProfile.{i}.Line.{i}.Enable"
       interval: 0

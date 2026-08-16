@@ -86,9 +86,25 @@ spec:
     - key: voice
       title: Voice
       icon: phone
-      component: module
+      component: stack
       config:
-        module: voice
+        sections:
+          - key: voice-lines
+            title: Lines
+            component: lines
+            config:
+              lines:
+                - id: line1
+                  label: Line 1
+                  entity: canonical.voice.line.1
+                - id: line2
+                  label: Line 2
+                  entity: canonical.voice.line.2
+          - key: voice-service
+            title: Voice service
+            component: module
+            config:
+              module: voice
     - key: port-forwards
       title: Port forwards
       icon: arrow-left-right
