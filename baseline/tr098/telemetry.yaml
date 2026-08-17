@@ -3,8 +3,11 @@
 # Collects device identity, firmware, and uptime — the minimum set
 # needed for fleet identity dashboards and firmware-distribution views.
 #
-# All params interval=0 (passive — one GPV per natural Inform session,
-# no Connection Request scheduling).
+# Intervals are the cost dial: identity and capability fields hourly,
+# slow state and health gauges every 15 minutes, live counters at
+# contact rate. Collection stays passive (natural Inform sessions, no
+# Connection Request scheduling); an interval only skips re-reading a
+# value inside its window.
 #
 # Scope: generic TR-098 baseline — match-all. Wildcard paths + standard
 # InternetGatewayDevice.* schema means this is safe to ship against any
@@ -33,64 +36,64 @@ spec:
     # Manufacturer, Model, Product class and Serial number on hardware
     # that has been telling us all four every session.
     - path: "InternetGatewayDevice.DeviceInfo.Manufacturer"
-      interval: 0
+      interval: 3600
     - path: "InternetGatewayDevice.DeviceInfo.ManufacturerOUI"
-      interval: 0
+      interval: 3600
     - path: "InternetGatewayDevice.DeviceInfo.ModelName"
-      interval: 0
+      interval: 3600
     - path: "InternetGatewayDevice.DeviceInfo.ProductClass"
-      interval: 0
+      interval: 3600
     - path: "InternetGatewayDevice.DeviceInfo.SerialNumber"
-      interval: 0
+      interval: 3600
     - path: "InternetGatewayDevice.DeviceInfo.Description"
-      interval: 0
+      interval: 3600
     - path: "InternetGatewayDevice.DeviceInfo.HardwareVersion"
-      interval: 0
+      interval: 3600
     - path: "InternetGatewayDevice.DeviceInfo.SoftwareVersion"
-      interval: 0
+      interval: 3600
     - path: "InternetGatewayDevice.DeviceInfo.UpTime"
-      interval: 0
+      interval: 900
     # The inform schedule the CPE is actually running, which is the one
     # number that says whether a quiet device is broken or simply on a
     # long interval. Credentials in this subtree are deliberately absent:
     # a collected password is a password in telemetry history.
     - path: "InternetGatewayDevice.ManagementServer.PeriodicInformEnable"
-      interval: 0
+      interval: 3600
     - path: "InternetGatewayDevice.ManagementServer.PeriodicInformInterval"
-      interval: 0
+      interval: 3600
     # Remote-access posture. Collected with identity because the fleet
     # question ("how many gateways answer management from the WAN") is
     # a posture question, and the support question needs current state
     # before it can be changed. Bisect and the availability cache keep
     # a firmware without the object from poisoning the batch.
     - path: "InternetGatewayDevice.UserInterface.RemoteAccess.Enable"
-      interval: 0
+      interval: 3600
     - path: "InternetGatewayDevice.UserInterface.RemoteAccess.Port"
-      interval: 0
+      interval: 3600
     - path: "InternetGatewayDevice.UserInterface.RemoteAccess.Protocol"
-      interval: 0
+      interval: 3600
     - path: "InternetGatewayDevice.UserInterface.RemoteAccess.SupportedProtocols"
-      interval: 0
+      interval: 3600
     # --- MemoryStatus (TR-098 §DeviceInfo.MemoryStatus) ---
     # Total/Free in KB. Memory-usage dashboards compute
     # (Total - Free) / Total * 100 with NULLIF on the denominator to
     # survive firmware that reports Total=0.
     - path: "InternetGatewayDevice.DeviceInfo.MemoryStatus.Total"
-      interval: 0
+      interval: 3600
     - path: "InternetGatewayDevice.DeviceInfo.MemoryStatus.Free"
-      interval: 0
+      interval: 900
     # --- ProcessStatus (TR-098 §DeviceInfo.ProcessStatus) ---
     # CPUUsage is a percentage (0-100) averaged across CPUs.
     - path: "InternetGatewayDevice.DeviceInfo.ProcessStatus.CPUUsage"
-      interval: 0
+      interval: 900
     # --- TemperatureStatus (firmware-dependent; wildcard-safe if absent) ---
     # Name is operator-facing label; Value in °C; Status is Enabled/Disabled/Error.
     - path: "InternetGatewayDevice.DeviceInfo.TemperatureStatus.TemperatureSensor.{i}.Name"
-      interval: 0
+      interval: 3600
     - path: "InternetGatewayDevice.DeviceInfo.TemperatureStatus.TemperatureSensor.{i}.Value"
-      interval: 0
+      interval: 900
     - path: "InternetGatewayDevice.DeviceInfo.TemperatureStatus.TemperatureSensor.{i}.Status"
-      interval: 0
+      interval: 900
 ---
 # Telemetry profile: TR-098 WAN link + L3 connection state.
 #
@@ -103,8 +106,11 @@ spec:
 #      WANPPPConnection (PPPoE/PPPoA) paths. Wildcard-safe: whichever
 #      the CPE doesn't use returns zero instances, no fault.
 #
-# All params interval=0 (passive — one GPV per natural Inform session,
-# no Connection Request scheduling).
+# Intervals are the cost dial: identity and capability fields hourly,
+# slow state and health gauges every 15 minutes, live counters at
+# contact rate. Collection stays passive (natural Inform sessions, no
+# Connection Request scheduling); an interval only skips re-reading a
+# value inside its window.
 #
 # Scope: generic TR-098 baseline — match-all. Wildcard paths + standard
 # InternetGatewayDevice.* schema means this is safe to ship against any
@@ -127,15 +133,15 @@ spec:
   parameters:
     # --- WANCommonInterfaceConfig: L1 state (always present) ---
     - path: "InternetGatewayDevice.WANDevice.{i}.WANCommonInterfaceConfig.WANAccessType"
-      interval: 0
+      interval: 3600
     - path: "InternetGatewayDevice.WANDevice.{i}.WANCommonInterfaceConfig.PhysicalLinkStatus"
-      interval: 0
+      interval: 900
     - path: "InternetGatewayDevice.WANDevice.{i}.WANCommonInterfaceConfig.EnabledForInternet"
-      interval: 0
+      interval: 3600
     - path: "InternetGatewayDevice.WANDevice.{i}.WANCommonInterfaceConfig.Layer1UpstreamMaxBitRate"
-      interval: 0
+      interval: 3600
     - path: "InternetGatewayDevice.WANDevice.{i}.WANCommonInterfaceConfig.Layer1DownstreamMaxBitRate"
-      interval: 0
+      interval: 3600
     # --- WANCommonInterfaceConfig: aggregate counters (covers both IP and PPP) ---
     - path: "InternetGatewayDevice.WANDevice.{i}.WANCommonInterfaceConfig.TotalBytesSent"
       interval: 0
@@ -147,21 +153,21 @@ spec:
       interval: 0
     # --- WANIPConnection: L3 DHCP/static (wildcard-safe if absent) ---
     - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.ConnectionStatus"
-      interval: 0
+      interval: 900
     - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.ConnectionType"
-      interval: 0
+      interval: 3600
     - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.Uptime"
-      interval: 0
+      interval: 900
     - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.LastConnectionError"
-      interval: 0
+      interval: 900
     - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.AddressingType"
-      interval: 0
+      interval: 3600
     - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.ExternalIPAddress"
-      interval: 0
+      interval: 900
     - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.SubnetMask"
-      interval: 0
+      interval: 900
     - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.DefaultGateway"
-      interval: 0
+      interval: 900
     - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.DNSServers"
       interval: 0
     - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.MACAddress"
@@ -178,15 +184,15 @@ spec:
       interval: 0
     # --- WANPPPConnection: L3 PPPoE/PPPoA (wildcard-safe if absent) ---
     - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANPPPConnection.{i}.ConnectionStatus"
-      interval: 0
+      interval: 900
     - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANPPPConnection.{i}.ConnectionType"
-      interval: 0
+      interval: 3600
     - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANPPPConnection.{i}.Uptime"
-      interval: 0
+      interval: 900
     - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANPPPConnection.{i}.LastConnectionError"
-      interval: 0
+      interval: 900
     - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANPPPConnection.{i}.ExternalIPAddress"
-      interval: 0
+      interval: 900
     - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANPPPConnection.{i}.DNSServers"
       interval: 0
     - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANPPPConnection.{i}.MACAddress"
@@ -225,8 +231,11 @@ spec:
 #      vendor-specific X_<VENDOR>_* extensions on TR-098 CPE. Operators
 #      wanting per-client signal strength layer a vendor profile on top.
 #
-# All params interval=0 (passive — one GPV per natural Inform session,
-# no Connection Request scheduling).
+# Intervals are the cost dial: identity and capability fields hourly,
+# slow state and health gauges every 15 minutes, live counters at
+# contact rate. Collection stays passive (natural Inform sessions, no
+# Connection Request scheduling); an interval only skips re-reading a
+# value inside its window.
 #
 # Scope: generic TR-098 baseline — match-all. Wildcard paths + standard
 # InternetGatewayDevice.* schema means this is safe to ship against any
@@ -266,7 +275,7 @@ spec:
     # Spectrum capability grading and the channel planner's rollback
     # record. Static per firmware, so the cost is one GPV per session.
     - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.PossibleChannels"
-      interval: 0
+      interval: 3600
     - path: "InternetGatewayDevice.LANDevice.{i}.WLANConfiguration.{i}.AutoChannelEnable"
       interval: 0
     # --- Security / auth posture ---
@@ -313,8 +322,11 @@ spec:
 # Error/discard/multicast/unicast/packet counters deliberately excluded —
 # operationally low-value for day-1 operator dashboards.
 #
-# All params interval=0 (passive — one GPV per natural Inform session,
-# no Connection Request scheduling).
+# Intervals are the cost dial: identity and capability fields hourly,
+# slow state and health gauges every 15 minutes, live counters at
+# contact rate. Collection stays passive (natural Inform sessions, no
+# Connection Request scheduling); an interval only skips re-reading a
+# value inside its window.
 #
 # Scope: generic TR-098 baseline — match-all. Wildcard paths + standard
 # InternetGatewayDevice.* schema means this is safe to ship against any
@@ -355,8 +367,11 @@ spec:
 # LeaseTimeRemaining deliberately excluded — it counts down every second,
 # a poor time-series fit (pure noise in the history hypertable).
 #
-# All params interval=0 (passive — one GPV per natural Inform session,
-# no Connection Request scheduling).
+# Intervals are the cost dial: identity and capability fields hourly,
+# slow state and health gauges every 15 minutes, live counters at
+# contact rate. Collection stays passive (natural Inform sessions, no
+# Connection Request scheduling); an interval only skips re-reading a
+# value inside its window.
 #
 # Scope: generic TR-098 baseline — match-all. Wildcard paths + standard
 # InternetGatewayDevice.* schema means this is safe to ship against any

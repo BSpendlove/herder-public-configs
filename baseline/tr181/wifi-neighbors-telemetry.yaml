@@ -84,33 +84,33 @@ spec:
     # looks identical, and an operator cannot tell a quiet RF
     # environment from a broken trigger.
     - path: "Device.WiFi.NeighboringWiFiDiagnostic.DiagnosticsState"
-      interval: 0
+      interval: 900
     - path: "Device.WiFi.NeighboringWiFiDiagnostic.ResultNumberOfEntries"
-      interval: 0
+      interval: 900
     # --- Per-neighbour scan results ---
     # Radio back-reference: which of the CPE's own radios heard this
     # neighbour. Required to attribute contention to a band, since a
     # 2.4GHz and a 5GHz radio scan different spectrum.
     - path: "Device.WiFi.NeighboringWiFiDiagnostic.Result.{i}.Radio"
-      interval: 0
+      interval: 900
     # No SSID entry here; see the exclusion list in the header.
     # BSSID is the join key for the neighbour graph: matching a
     # scanned BSSID against Device.WiFi.SSID.{i}.BSSID on another
     # managed device is what turns two independent scans into an edge
     # between two subscribers.
     - path: "Device.WiFi.NeighboringWiFiDiagnostic.Result.{i}.BSSID"
-      interval: 0
+      interval: 900
     - path: "Device.WiFi.NeighboringWiFiDiagnostic.Result.{i}.Channel"
-      interval: 0
+      interval: 900
     - path: "Device.WiFi.NeighboringWiFiDiagnostic.Result.{i}.SignalStrength"
       interval: 0
     - path: "Device.WiFi.NeighboringWiFiDiagnostic.Result.{i}.OperatingFrequencyBand"
-      interval: 0
+      interval: 900
     # Bandwidth decides whether two different channels actually
     # overlap. A 160MHz neighbour on channel 36 contends with a
     # 20MHz AP on channel 48; comparing channel numbers alone would
     # score that pair as clean.
     - path: "Device.WiFi.NeighboringWiFiDiagnostic.Result.{i}.OperatingChannelBandwidth"
-      interval: 0
+      interval: 900
     - path: "Device.WiFi.NeighboringWiFiDiagnostic.Result.{i}.Noise"
       interval: 0
