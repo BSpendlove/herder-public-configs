@@ -97,12 +97,14 @@ spec:
         showSparkline: false
         showPriorPeriodDelta: false
         icon: device
-    - id: panel-wildcard
+    # A stat renders one query, so the two roots are two panels sharing
+    # the column, mirroring the answered pair.
+    - id: panel-wildcard-igd
       kind: stat
-      title: Partial-path references
-      description: Devices reporting ParameterWildCardSupported true at either root
+      title: Wildcards, InternetGatewayDevice.
+      description: Devices reporting ParameterWildCardSupported true at the TR-098 root
       descriptionPlacement: bottom
-      layout: {x: 9, y: 0, w: 3, h: 4}
+      layout: {x: 9, y: 0, w: 3, h: 2}
       queries:
         - refId: A
           version: 1
@@ -111,6 +113,28 @@ spec:
             agg: count
             filters:
               path: "InternetGatewayDevice.BulkData.ParameterWildCardSupported"
+              value: "true"
+      config:
+        unit: null
+        format: number
+        thresholds: []
+        showSparkline: false
+        showPriorPeriodDelta: false
+        icon: device
+    - id: panel-wildcard-device
+      kind: stat
+      title: Wildcards, Device.
+      description: Devices reporting ParameterWildCardSupported true at the TR-181 root
+      descriptionPlacement: bottom
+      layout: {x: 9, y: 2, w: 3, h: 2}
+      queries:
+        - refId: A
+          version: 1
+          datasource: device_parameters
+          query:
+            agg: count
+            filters:
+              path: "Device.BulkData.ParameterWildCardSupported"
               value: "true"
       config:
         unit: null
