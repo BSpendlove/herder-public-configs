@@ -75,7 +75,8 @@ editing anything in `baseline/`.
 
 Every profile, rule and dashboard carries a `deviceSelector` deciding which
 devices it applies to. Selectors match labels Herder derives per device at
-evaluation time, from `backend/internal/mapping/selector/labels.go`:
+evaluation time (the full model is in the
+[Device Selectors guide](https://docs.herder.ispx.co/guides/device-selectors/)):
 
 | Key | Source | Example |
 |-----|--------|---------|
@@ -103,6 +104,33 @@ either, which is normally what you want. Reach for `protocol:` when the
 behaviour is protocol-bound, such as a rule issuing CWMP session RPCs that
 would be meaningless against a USP agent.
 
+## Editing
+
+YAML gets completion and inline validation from the published JSON
+Schemas. The `.vscode/settings.json` in this repo turns it on for VS
+Code with the YAML extension; any editor speaking yaml-language-server
+takes the same one-line association:
+
+```json
+{
+  "yaml.schemas": {
+    "https://docs.herder.ispx.co/schemas/resource.schema.json": ["**/*.yaml"]
+  }
+}
+```
+
+Scripts type against `types/sdk.d.ts`, the same SDK contract the
+upload-time type-check enforces. Herder checks each script as its own
+program, so the equivalent local check is per file:
+
+```bash
+npx tsc --noEmit --target ES2017 --lib es2017 --strict <script>.ts types/sdk.d.ts
+```
+
+A repo-wide tsconfig would put every script in one shared global scope,
+which is not how they run, and it reports false name collisions between
+unrelated scripts. Check per file.
+
 ## Contributing
 
 Vendor support is the most useful thing to add: a `vendors/<name>/` file with
@@ -114,7 +142,12 @@ Two rules worth knowing before opening a PR. Baseline files must stay
 vendor-neutral, since they match every device with the matching data model.
 And paths use `{i}` for instance wildcards, not `*` or a literal index.
 
-Guides for each content type live in
-[ispx-limited/herder-docs](https://github.com/ispx-limited/herder-docs)
-under `docs/guides/`, including `device-selectors.md`, `mapping-profiles.md`,
-`telemetry-profiles.md`, `provisioning-rules.md` and `script-sdk.md`.
+Guides for each content type live at
+[docs.herder.ispx.co](https://docs.herder.ispx.co/), including
+[Vendor Onboarding](https://docs.herder.ispx.co/guides/vendor-onboarding/),
+the end-to-end path from an unknown CPE to a working `vendors/` directory,
+plus [Device Selectors](https://docs.herder.ispx.co/guides/device-selectors/),
+[Mapping Profiles](https://docs.herder.ispx.co/guides/mapping-profiles/),
+[Telemetry Profiles](https://docs.herder.ispx.co/guides/telemetry-profiles/),
+[Provisioning Rules](https://docs.herder.ispx.co/guides/provisioning-rules/)
+and the [Script SDK](https://docs.herder.ispx.co/guides/script-sdk/).
