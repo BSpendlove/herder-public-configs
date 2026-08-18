@@ -10,10 +10,9 @@
 // 100k a boot storm's evals went from milliseconds to seconds on
 // exactly those round-trips, and the queue died of old age.
 
-// Set up connection request credentials (deterministic per device).
-const crUsername = device.oui + "-" + (device.serialNumber || "");
-device.set("canonical.mgmt.connection_request_username", crUsername);
-device.set("canonical.mgmt.connection_request_password", crUsername);
+// Set up connection request credentials (deterministic per device),
+// from the same helper the boot and periodic seeds call.
+provision.run("lib/mgmt_credentials.ts");
 
 // Enable and configure periodic inform. PeriodicInformTime carries a
 // deterministic per-device phase offset (hash of the serial spread over
