@@ -87,6 +87,101 @@ spec:
 #
 # Carries device-info only. `Device.DeviceInfo.*` is part of the data
 # model on both protocols, so this is safe for every TR-181 device.
+# TR-143 throughput diagnostics on the TR-181 tree.
+#
+# The reserved canonical.diagnostics.* namespace is how the API triggers
+# a test and how the dashboards read its results, so a TR-181 device
+# without this table cannot run TR-143 diagnostics at all: the trigger
+# fails with canonical_unmapped before anything reaches the CPE. The
+# per-device coverage endpoint reports the whole feature dark, which is
+# how this gap was found.
+#
+# Paths verified against TR-181 2.20.1. Upload has no test/total split;
+# TR-143 defines the one TotalBytesSent counter, and the reserved
+# namespace mirrors that.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: diagnostics-tr181
+spec:
+  mappings:
+    # --- Download diagnostics: writable inputs ---
+    - canonical: canonical.diagnostics.download.url
+      valueType: string
+      devicePath: Device.IP.Diagnostics.DownloadDiagnostics.DownloadURL
+    - canonical: canonical.diagnostics.download.state
+      valueType: string
+      devicePath: Device.IP.Diagnostics.DownloadDiagnostics.DiagnosticsState
+    - canonical: canonical.diagnostics.download.dscp
+      valueType: unsignedint
+      devicePath: Device.IP.Diagnostics.DownloadDiagnostics.DSCP
+    - canonical: canonical.diagnostics.download.ethernet_priority
+      valueType: unsignedint
+      devicePath: Device.IP.Diagnostics.DownloadDiagnostics.EthernetPriority
+    - canonical: canonical.diagnostics.download.interface
+      valueType: string
+      devicePath: Device.IP.Diagnostics.DownloadDiagnostics.Interface
+    # --- Download diagnostics: read-only outputs (populated by CPE on COMPLETE) ---
+    - canonical: canonical.diagnostics.download.rom_time
+      valueType: datetime
+      devicePath: Device.IP.Diagnostics.DownloadDiagnostics.ROMTime
+    - canonical: canonical.diagnostics.download.bom_time
+      valueType: datetime
+      devicePath: Device.IP.Diagnostics.DownloadDiagnostics.BOMTime
+    - canonical: canonical.diagnostics.download.eom_time
+      valueType: datetime
+      devicePath: Device.IP.Diagnostics.DownloadDiagnostics.EOMTime
+    - canonical: canonical.diagnostics.download.test_bytes_received
+      valueType: unsignedint
+      devicePath: Device.IP.Diagnostics.DownloadDiagnostics.TestBytesReceived
+    - canonical: canonical.diagnostics.download.total_bytes_received
+      valueType: unsignedint
+      devicePath: Device.IP.Diagnostics.DownloadDiagnostics.TotalBytesReceived
+    - canonical: canonical.diagnostics.download.tcp_open_request_time
+      valueType: datetime
+      devicePath: Device.IP.Diagnostics.DownloadDiagnostics.TCPOpenRequestTime
+    - canonical: canonical.diagnostics.download.tcp_open_response_time
+      valueType: datetime
+      devicePath: Device.IP.Diagnostics.DownloadDiagnostics.TCPOpenResponseTime
+    # --- Upload diagnostics: writable inputs ---
+    - canonical: canonical.diagnostics.upload.url
+      valueType: string
+      devicePath: Device.IP.Diagnostics.UploadDiagnostics.UploadURL
+    - canonical: canonical.diagnostics.upload.state
+      valueType: string
+      devicePath: Device.IP.Diagnostics.UploadDiagnostics.DiagnosticsState
+    - canonical: canonical.diagnostics.upload.test_file_length
+      valueType: unsignedint
+      devicePath: Device.IP.Diagnostics.UploadDiagnostics.TestFileLength
+    - canonical: canonical.diagnostics.upload.dscp
+      valueType: unsignedint
+      devicePath: Device.IP.Diagnostics.UploadDiagnostics.DSCP
+    - canonical: canonical.diagnostics.upload.ethernet_priority
+      valueType: unsignedint
+      devicePath: Device.IP.Diagnostics.UploadDiagnostics.EthernetPriority
+    - canonical: canonical.diagnostics.upload.interface
+      valueType: string
+      devicePath: Device.IP.Diagnostics.UploadDiagnostics.Interface
+    # --- Upload diagnostics: read-only outputs ---
+    - canonical: canonical.diagnostics.upload.rom_time
+      valueType: datetime
+      devicePath: Device.IP.Diagnostics.UploadDiagnostics.ROMTime
+    - canonical: canonical.diagnostics.upload.bom_time
+      valueType: datetime
+      devicePath: Device.IP.Diagnostics.UploadDiagnostics.BOMTime
+    - canonical: canonical.diagnostics.upload.eom_time
+      valueType: datetime
+      devicePath: Device.IP.Diagnostics.UploadDiagnostics.EOMTime
+    - canonical: canonical.diagnostics.upload.total_bytes_sent
+      valueType: unsignedint
+      devicePath: Device.IP.Diagnostics.UploadDiagnostics.TotalBytesSent
+    - canonical: canonical.diagnostics.upload.tcp_open_request_time
+      valueType: datetime
+      devicePath: Device.IP.Diagnostics.UploadDiagnostics.TCPOpenRequestTime
+    - canonical: canonical.diagnostics.upload.tcp_open_response_time
+      valueType: datetime
+      devicePath: Device.IP.Diagnostics.UploadDiagnostics.TCPOpenResponseTime
+---
 apiVersion: mapping.herder.io/v1alpha1
 kind: MappingProfile
 metadata:
@@ -100,6 +195,7 @@ spec:
   parameterMappings:
     - device-info-tr181
     - firmware-tr181
+    - diagnostics-tr181
     - wifi-tr181
     - interfaces-tr181
     - voice-tr104i2
@@ -154,6 +250,7 @@ spec:
     - device-info-tr181
     - firmware-tr181
     - mgmt-tr181
+    - diagnostics-tr181
     - wifi-tr181
     - interfaces-tr181
     - voice-tr104i2
