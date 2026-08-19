@@ -9,7 +9,7 @@
 #
 # WRITTEN FROM A DEVICE, NOT FROM THE SPEC.
 #
-# Captured off a live NVG578LX on firmware 9.5.0h4d131 by
+# Captured off a live NVG578LX on a production firmware build by
 # triggering a real sweep and reading the tree back: 80 neighbours,
 # DiagnosticsState moving None -> Requested -> Complete. That matters
 # because only one leaf name differs from TR-181 and it is not the one a

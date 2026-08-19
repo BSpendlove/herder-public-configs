@@ -14,7 +14,7 @@
 #
 # WHAT THE HARDWARE ACTUALLY DID.
 #
-# Driven end to end on an NVG578LX (firmware 9.5.0h4d131):
+# Driven end to end on an NVG578LX (a production firmware build):
 # DiagnosticsState went None -> Requested -> Complete and the table
 # filled with 80 neighbours across 2.4 and 5 GHz. Two findings shaped
 # this file:

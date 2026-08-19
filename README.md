@@ -84,7 +84,7 @@ evaluation time (the full model is in the
 | `manufacturer` | Identity enrichment | `manufacturer: "ARRIS"` |
 | `model` | Identity enrichment | `model: "NVG578LX"` |
 | `productClass` | CWMP DeviceID envelope, or identity enrichment | `productClass: "NVG578LX"` |
-| `firmwareVersion` | Identity enrichment | `firmwareVersion: "9.3.0h0d70"` |
+| `firmwareVersion` | Identity enrichment | `firmwareVersion: "7.2.1b3405"` |
 | `tag:<value>` | `devices.tags`, one label per tag, empty value | `{key: "tag:vip", operator: Exists}` |
 | `dataModel:<id>` | Path-prefix detection during telemetry | `dataModel:igd` for TR-098, `dataModel:device` for TR-181 |
 | `protocol:<value>` | `devices.protocols` | `protocol:cwmp`, `protocol:usp` |

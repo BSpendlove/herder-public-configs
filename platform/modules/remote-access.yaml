@@ -58,7 +58,7 @@ spec:
       canonical: canonical.mgmt.remote_access.acl
       type: string
       writable: true
-      # Verified on ARRIS NVG578LX firmware 9.5.0h4d131: empty is allow,
+      # Verified on ARRIS NVG578LX a production firmware build: empty is allow,
       # not deny, and a listed source is enforced at the transport layer.
       # Nobody can guess that, and guessing it the wrong way leaves a
       # gateway open while its ACL field looks configured.
