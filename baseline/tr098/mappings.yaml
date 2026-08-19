@@ -185,11 +185,11 @@ spec:
 #
 # Priority 10 with a `dataModel:igd` Exists selector, so it binds to
 # every device that ever reported an `InternetGatewayDevice.*` path.
-# Mapping profile selection picks the LOWEST priority number (see
-# backend/internal/mapping/selector/resolve.go, ascending sort, first
-# wins; the opposite of telemetry, where matching profiles merge and
-# the highest number wins on conflicts). A vendor profile that should
-# outbind this baseline therefore ships at a priority BELOW 10, and it
+# Mapping profile selection picks the HIGHEST priority number, the
+# same direction as telemetry. A device's mapping-binding endpoint
+# shows which profile won and why (decided_by: priority). A vendor
+# profile that should outbind this baseline ships at a priority ABOVE
+# 10, conventionally 50, and it
 # must repeat the whole baseline vocabulary it still needs, because
 # binding is single-profile: a vendor profile that names only its own
 # tables strips the device of canonical.mgmt.connection_request_url
