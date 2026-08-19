@@ -7,7 +7,7 @@
 // contact seeds, so it lives in lib/ and runs from here.
 
 provision.run("lib/mgmt_credentials.ts");
-provision.run("lib/periodic_inform.ts", { base: 900, spread: 300 });
+provision.run("lib/periodic_inform.ts", ctx.configGet("informPacing", { base: 900, spread: 300 }));
 
 // Tag device as recently booted (operators can track reboots).
 device.addTag("boot-seen");
