@@ -80,6 +80,10 @@ spec:
       title: Dashboard
       icon: layout-grid
       component: dashboard
+    - key: compliance
+      title: Compliance
+      icon: shield-alert
+      component: compliance
     - key: actions
       title: Actions
       icon: zap

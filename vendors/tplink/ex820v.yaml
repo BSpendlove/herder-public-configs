@@ -98,6 +98,10 @@ spec:
       component: dashboard
       config:
         dashboard: tr181-traffic
+    - key: compliance
+      title: Compliance
+      icon: shield-alert
+      component: compliance
     - key: actions
       title: Actions
       icon: zap

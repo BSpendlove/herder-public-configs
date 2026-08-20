@@ -1,0 +1,85 @@
+# Vulnerability tracking, both halves of it.
+#
+# The Advisory is a vulnerability an operator recorded themselves, and
+# it is the half that carries the weight on a residential fleet.
+# Gateway vendors ship security notices to their ISP customers through
+# support portals, and plenty of published research never gets a CVE at
+# all. It needs no feed and no public identifier, so it works the same
+# on a deployment with no egress.
+#
+# The CpeBinding is the automatic floor underneath: it names the CPE
+# product a cohort corresponds to, and the compliance role refreshes
+# that product's public records daily and matches them against each
+# device's reported firmware.
+#
+# Both examples below describe real, published vulnerabilities in real
+# hardware. Nothing here is illustrative: an example that invented a
+# flaw would teach the wrong shape, and one that invented a vendor
+# would not match anything an operator could test against.
+apiVersion: compliance.herder.io/v1alpha1
+kind: Advisory
+metadata:
+  name: arris-nvg599-sharknatto
+spec:
+  title: SSH enabled by default with hardcoded credentials, and an unauthenticated caserver
+  severity: critical
+  description: >-
+    The 2017 SharknAT&To research found firmware 9.2.2h0d83 shipping
+    with SSH enabled and hardcoded credentials, and on the NVG599 a
+    caserver on port 49955 reachable as user "tech" with no password,
+    accepting firmware upload and configuration commands.
+  remediation: >-
+    Upgrade past 9.2.2h0d83, then confirm SSH and the port 49955
+    listener are closed from the WAN.
+  references:
+    - https://www.theregister.com/2017/09/01/att_customers_with_arris_modems_at_risk_claim_infosec_bods/
+    - https://threatpost.com/bugs-in-arris-modems-distributed-by-att-vulnerable-to-trivial-attacks/127753/
+  deviceSelector:
+    matchLabels:
+      manufacturer: ARRIS
+      productClass: NVG599
+    matchExpressions:
+      # No CVE was ever assigned to these findings, so no feed will
+      # produce this match. That is the entire reason the Advisory kind
+      # exists: an ACS reconciling only against public CVE feeds reports
+      # a fleet of these as clean.
+      #
+      # The fence is an exact build rather than a SemverRange because
+      # this vendor's firmware strings are not semver, and a version
+      # that does not parse never matches, which would report the fleet
+      # clean just as silently.
+      - key: firmwareVersion
+        operator: In
+        values:
+          - "9.2.2h0d83"
+---
+# A real product identity, and a statement of fact rather than a
+# security claim: the Sagemcom F@ST 5280 is catalogued under this CPE
+# product name, and the public record against it is pinned to one exact
+# firmware, which is the shape most consumer-gateway records take.
+#
+# A deployment with no bindings makes no outbound request at all. That
+# is the whole mechanism for an air-gapped install: egress follows from
+# declaring a product, not from a setting.
+apiVersion: compliance.herder.io/v1alpha1
+kind: CpeBinding
+metadata:
+  name: sagemcom-fast5280
+spec:
+  deviceSelector:
+    matchLabels:
+      manufacturer: Sagemcom
+      productClass: FAST5280
+  # Written unescaped. Herder applies the escaping the feed's query
+  # format needs, which matters here: the public API returns nothing
+  # for a bare "@".
+  cpe: "cpe:2.3:o:sagemcom:f@st_5280_router_firmware"
+  # This vendor reports a bare dotted version, so the expression only
+  # has to strip anything a future build might prepend. A device whose
+  # firmware the expression cannot read is skipped and counted, never
+  # guessed at.
+  versionExtract: "^([0-9][0-9.]*)"
+  # Records naming the product with no version at all are skipped. Set
+  # this to match only when a product is end of life and every build
+  # should be treated as affected.
+  unspecifiedVersions: ignore
