@@ -95,8 +95,8 @@ spec:
           calcs: [last, mean, max]
     - id: panel-ssid-throughput
       kind: line
-      title: SSID throughput
-      description: SA is SSID 1, SB is SSID 2
+      title: WiFi network throughput
+      description: One pair per configured network. SA is network 1, SB is network 2
       layout: {x: 0, y: 8, w: 12, h: 8}
       queries:
         - refId: SATX
@@ -129,10 +129,10 @@ spec:
         yAxis: {kind: auto}
         unit: " B/s"
         seriesLabels:
-          SATX: SSID 1 up
-          SARX: SSID 1 down
-          SBTX: SSID 2 up
-          SBRX: SSID 2 down
+          SATX: Network 1 up
+          SARX: Network 1 down
+          SBTX: Network 2 up
+          SBRX: Network 2 down
         legend:
           displayMode: table
           placement: bottom
