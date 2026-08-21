@@ -180,6 +180,30 @@ spec:
       interval: 0
     - path: "InternetGatewayDevice.LANDevice.1.LANEthernetInterfaceConfig.{i}.X_0000C5_OperatingFrequencyBand"
       interval: 0
+    # --- Neighbour scan results, the vendor table ---
+    # The NVG keeps the last scan's results under X_0000C5_Wireless, and
+    # the wifi-scan-arris mapping table reads them as canonical.wifi.scan.
+    # Until this block they were only ever stored when an operator ran
+    # the wifi_scan action, so the RF neighbours section was empty on
+    # every gateway nobody had clicked. Same leaf set and cadence as the
+    # TR-181 baseline, and no SSID: a neighbour's network name is third
+    # party data the graph does not need.
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.NeighboringWiFiDiagnostic.DiagnosticsState"
+      interval: 900
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.NeighboringWiFiDiagnostic.ResultNumberOfEntries"
+      interval: 900
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.NeighboringWiFiDiagnostic.Result.{i}.Radio"
+      interval: 900
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.NeighboringWiFiDiagnostic.Result.{i}.BSSID"
+      interval: 900
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.NeighboringWiFiDiagnostic.Result.{i}.Channel"
+      interval: 900
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.NeighboringWiFiDiagnostic.Result.{i}.SignalStrength"
+      interval: 0
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.NeighboringWiFiDiagnostic.Result.{i}.OperatingFrequencyBand"
+      interval: 900
+    - path: "InternetGatewayDevice.LANDevice.1.X_0000C5_Wireless.NeighboringWiFiDiagnostic.Result.{i}.Bandwidth"
+      interval: 900
 ---
 # Reference enrichment rule: Arris TR-098 per-client WiFi labels.
 #

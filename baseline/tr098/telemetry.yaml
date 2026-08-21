@@ -416,3 +416,37 @@ spec:
     # --- IPv6: modern instance-table form ---
     - path: "InternetGatewayDevice.LANDevice.{i}.Hosts.Host.{i}.IPv6Address.{i}.IPAddress"
       interval: 0
+---
+# Port forwards, TR-098. Wildcarded at every table level because the
+# routed connection is not always instance 1: the ARRIS NVG family
+# carries it on WANIPConnection.2, and a profile pinned to .1 would
+# collect a table that gateway never populates.
+apiVersion: telemetry.herder.io/v1alpha1
+kind: TelemetryProfile
+metadata:
+  name: tr098-nat
+spec:
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:igd"
+        operator: Exists
+  parameters:
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.PortMappingNumberOfEntries"
+      interval: 0
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.PortMapping.{i}.PortMappingEnabled"
+      interval: 0
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.PortMapping.{i}.PortMappingDescription"
+      interval: 0
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.PortMapping.{i}.PortMappingProtocol"
+      interval: 0
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.PortMapping.{i}.ExternalPort"
+      interval: 0
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.PortMapping.{i}.InternalPort"
+      interval: 0
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.PortMapping.{i}.InternalClient"
+      interval: 0
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.PortMapping.{i}.RemoteHost"
+      interval: 0
+    - path: "InternetGatewayDevice.WANDevice.{i}.WANConnectionDevice.{i}.WANIPConnection.{i}.PortMapping.{i}.PortMappingLeaseDuration"
+      interval: 0

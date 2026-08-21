@@ -516,3 +516,41 @@ spec:
     # profile used to name faulted 9005 on every spec-compliant CPE.
     - path: "Device.WiFi.Radio.{i}.Stats.FCSErrorCount"
       interval: 0
+---
+# Port forwards. The port-forwards service module reads these through
+# canonical.nat.port_forward.*, and until this profile existed nothing
+# collected them: the module resolved against stored parameters that no
+# profile ever stored, so every gateway showed an empty table whatever
+# its NAT configuration was. Configuration-class, so interval 0 reads
+# once per qualifying session and change-suppression does the rest.
+apiVersion: telemetry.herder.io/v1alpha1
+kind: TelemetryProfile
+metadata:
+  name: tr181-nat
+spec:
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "dataModel:device"
+        operator: Exists
+  parameters:
+    - path: "Device.NAT.PortMappingNumberOfEntries"
+      interval: 0
+    - path: "Device.NAT.PortMapping.{i}.Enable"
+      interval: 0
+    - path: "Device.NAT.PortMapping.{i}.Status"
+      interval: 0
+    - path: "Device.NAT.PortMapping.{i}.Description"
+      interval: 0
+    - path: "Device.NAT.PortMapping.{i}.Protocol"
+      interval: 0
+    - path: "Device.NAT.PortMapping.{i}.ExternalPort"
+      interval: 0
+    - path: "Device.NAT.PortMapping.{i}.InternalPort"
+      interval: 0
+    - path: "Device.NAT.PortMapping.{i}.InternalClient"
+      interval: 0
+    - path: "Device.NAT.PortMapping.{i}.RemoteHost"
+      interval: 0
+    - path: "Device.NAT.PortMapping.{i}.LeaseDuration"
+      interval: 0
