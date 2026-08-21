@@ -1,0 +1,20 @@
+apiVersion: provisioning.herder.io/v1alpha1
+kind: ProvisioningRule
+metadata:
+  name: cohort-tags
+spec:
+  triggers:
+    - first_contact
+  # Every gateway, whichever protocol it speaks: the tags describe the
+  # household, not the data model. Every matching script rule on a
+  # trigger runs independently, so this sits beside the protocol seed
+  # rules rather than replacing them; the priority only orders it after
+  # them.
+  deviceSelector:
+    matchExpressions:
+      - key: "oui"
+        operator: Exists
+  desired:
+    script: "cohort_tags.ts"
+  priority: 40
+  enabled: true
