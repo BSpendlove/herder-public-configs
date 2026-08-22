@@ -1,0 +1,61 @@
+# USP sampled WAN throughput baseline profile.
+#
+# The first profile that streams. A `sampled:` block becomes a
+# `Device.BulkData.Profile.{i}.` row on the agent with
+# `Protocol=USPEventNotif` and `EncodingType=JSON`. The agent collects
+# the declared parameter set every `interval` seconds and delivers each
+# report as that profile's `Push!` event over whatever MTP it is on;
+# the platform holds an Event subscription on that path, decodes the
+# report, and stores the values on the same raw paths a session-time
+# collection stores them on. Nothing rides a session and the platform
+# does no per-sample work.
+#
+# Why sampled rather than a subscription. A byte counter changes
+# continuously, so ValueChange on one is a notification per increment:
+# most agents decline to honour it and a controller that got it would
+# be reading a storm. NotifType Periodic is an empty heartbeat on
+# Device.LocalAgent.Periodic! and carries no values at all. Bulk data
+# is the mechanism TR-369 has for "this set of parameters, on this
+# cadence", which is what a throughput chart needs.
+#
+# Sixty seconds, both directions, on the first Ethernet interface. That
+# is one report per device per minute and enough resolution for the one
+# hour preset on the traffic dashboard to step at a minute instead of
+# interpolating across the gaps a session cadence leaves. A CPE whose
+# WAN is not Ethernet.Interface.1 needs a narrower profile at a higher
+# priority naming its own interface; this file stays with the interface
+# the TR-181 baseline already collects on.
+#
+# `retain: 10` is NumberOfRetainedFailedReports. When the MTP is down
+# the agent keeps up to ten reports and sends them ahead of the next
+# one once it reconnects, so a broker restart costs a few minutes of
+# resolution rather than a hole. Each retained collection carries its
+# own collection time and is stored at that time, and a collection
+# delivered twice is stored once.
+#
+# Selector: `protocol:usp` and `dataModel:device`. USPEventNotif exists
+# only on a TR-369 agent, so a TR-069 device on the same data model
+# must not match this profile.
+#
+# Priority 10: baseline tier, matching the shipped baselines, so an
+# operator profile at a higher priority still wins on any overlapping
+# path.
+
+apiVersion: telemetry.herder.io/v1alpha1
+kind: TelemetryProfile
+metadata:
+  name: usp-wan-sampled
+spec:
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "protocol:usp"
+        operator: Exists
+      - key: "dataModel:device"
+        operator: Exists
+  sampled:
+    - interval: 60
+      retain: 10
+      parameters:
+        - Device.Ethernet.Interface.1.Stats.BytesSent
+        - Device.Ethernet.Interface.1.Stats.BytesReceived

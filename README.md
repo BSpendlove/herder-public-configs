@@ -20,7 +20,7 @@ are easier to read together than scattered across four directories.
 baseline/            Vendor-neutral defaults, keyed by data model
 ├── tr098/           TR-098 (InternetGatewayDevice.*) mappings, telemetry, dashboards
 ├── tr181/           TR-181 (Device.*) mappings and telemetry
-├── usp/             USP-specific telemetry (subscription-driven, not polled)
+├── usp/             USP-specific telemetry (pushed and sampled, not polled)
 ├── identity.yaml    Identity enrichment for CWMP and USP
 └── client-wifi-labels.yaml + generic-client-rssi-labels.ts
 
