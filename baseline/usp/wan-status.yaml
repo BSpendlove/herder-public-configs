@@ -1,0 +1,72 @@
+# USP WAN status baseline profile.
+#
+# The device's own account of an outage.
+#
+# When a home's uplink fails, the CPE cannot say so: the path it would
+# say it over is the path that failed. Herder learns the home has gone
+# dark from the broker instead, which sees the agent's MQTT session
+# lapse within about a keepalive. That says a home went dark. It does
+# not say why, and it cannot distinguish a cut uplink from a power cut,
+# because both look identical from outside: one moment there was a
+# session, the next there was not.
+#
+# The difference arrives when the device comes back. A CPE whose WAN
+# dropped was up the whole time and knows exactly what happened to its
+# interface; a CPE that lost power rebooted and has nothing to report
+# but a reset uptime. This profile subscribes to the leaves that carry
+# the first account, so the first notification after a reconnect
+# carries it:
+#
+#   * ValueChange on `Device.IP.Interface.{i}.Status` and
+#     `Device.PPP.Interface.{i}.Status` - the transition itself, Down
+#     and then Up. Both layers because a WAN is IP over Ethernet on
+#     some fleets and PPP on others, and a profile that guessed would
+#     be silent on half of them.
+#
+#   * ValueChange on the matching `LastChange` leaves. TR-181 counts
+#     LastChange in seconds since the interface entered its current
+#     state, so the value reported alongside a transition is how long
+#     the previous state lasted: the length of the outage, from the
+#     device rather than from the platform's clock.
+#
+# LastChange is best effort. Agents are allowed to declare
+# VALUE_CHANGE_WILL_IGNORE on counters, and one that does simply sends
+# nothing for it; the Status transitions still arrive, and the outage
+# window is still on the device page from the presence events either
+# side of it. The same caveat the wifi baseline records for RSSI.
+#
+# Deliberate exclusions (do not add without amendment):
+#
+#   * `Device.Ethernet.Interface.{i}.Status` - the physical ports. On a
+#     gateway most of these are LAN, so subscribing turns every cable a
+#     subscriber unplugs into fleet telemetry. The WAN port's own state
+#     is already implied by the IP or PPP interface above it going down.
+#
+#   * `Device.IP.Interface.{i}.Enable` - an operator's intent, not the
+#     link's behaviour. A WAN that was administratively disabled is not
+#     an outage, and mixing the two would put planned work in the
+#     outage view.
+#
+# Selector: `protocol:usp` AND `dataModel:device`, the same scoping the
+# other USP baselines use. Priority 10, the baseline tier; operator
+# vendor profiles at 50+ extend or narrow it.
+
+apiVersion: telemetry.herder.io/v1alpha1
+kind: TelemetryProfile
+metadata:
+  name: usp-wan-status
+spec:
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "protocol:usp"
+        operator: Exists
+      - key: "dataModel:device"
+        operator: Exists
+  subscriptions:
+    - notifType: ValueChange
+      referenceList:
+        - Device.IP.Interface.{i}.Status
+        - Device.IP.Interface.{i}.LastChange
+        - Device.PPP.Interface.{i}.Status
+        - Device.PPP.Interface.{i}.LastChange
