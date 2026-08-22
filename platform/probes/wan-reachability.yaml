@@ -1,0 +1,34 @@
+# A synthetic probe: the gateway pinging a public resolver on a
+# schedule, so the WAN service level has evidence even from homes whose
+# subscribers are asleep. The worst run in the sample decides nothing;
+# every device's run is graded on its own and summed into minutes.
+#
+# The measurement is the `ping` capability (an ActionProfile answers it
+# per data model); the grading is the expectations below. samplePct
+# keeps the cost bounded: 5% of the matched fleet each run, the same
+# homes every run because the cohort is seeded by the probe name.
+apiVersion: probes.herder.io/v1alpha1
+kind: SyntheticProbe
+metadata:
+  name: wan-reachability
+spec:
+  capability: ping
+  inputs:
+    host: 1.1.1.1
+  deviceSelector:
+    matchExpressions:
+      - key: oui
+        operator: Exists
+  samplePct: 5
+  schedule: "*/30 * * * *"
+  maxConcurrentPct: 20
+  serviceLevel:
+    name: wan_reachability
+    minutes: 30
+    expect:
+      - field: success_count
+        min: 1
+        classifier: unreachable
+      - field: rtt_avg_ms
+        max: 150
+        classifier: high_latency
