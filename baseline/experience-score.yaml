@@ -13,8 +13,13 @@
 # band tags (experience:<dimension>:<good|fair|poor>) land on the
 # device, so selectors can target e.g. tag:experience:wifi:poor.
 #
+# The same inputs also report three service levels (coverage,
+# throughput, wan) through sle.report: every minute since the last run
+# either met the expectation or carries a classifier saying why not.
+# Thresholds are the sle* keys below.
+#
 # Gate posture: triggerPaths limits runs to informs that actually carry
-# WiFi/WAN state; the 5m coalesce bounds cost on chatty CPEs (#493).
+# WiFi/WAN state; the 5m coalesce bounds cost on chatty CPEs.
 apiVersion: telemetry.herder.io/v1alpha1
 kind: EnrichmentRule
 metadata:
@@ -25,6 +30,7 @@ spec:
     matchExpressions:
       - key: oui
         operator: Exists
+  coalesceWindow: 5m
   triggerPaths:
     - "Device.WiFi.AccessPoint.*"
     - "Device.Ethernet.Interface.*"
@@ -54,6 +60,14 @@ spec:
     # Dimension weights inside overall.
     weightOverallWifi: 0.5
     weightOverallWan: 0.5
+    # Service level expectations. Coverage fails when any client is
+    # below this signal; throughput when any client negotiated below
+    # this rate; wan when the link flapped inside this many seconds or
+    # sheds more than this share of packets.
+    sleCoverageRssiMinDbm: -75
+    sleThroughputRateMinMbps: 20
+    sleWanErrorRateMax: 0.005
+    sleWanUptimeMinSeconds: 300
     # Band thresholds for the experience:* tags.
     bandPoorBelow: 60
     bandFairBelow: 80

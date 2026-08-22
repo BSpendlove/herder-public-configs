@@ -19,6 +19,14 @@ const RATE_CEIL = ctx.configGet<number>("rateCeilMbps", 100);
 const WAN_ERR_CEIL = ctx.configGet<number>("wanErrorRateCeil", 0.01);
 const WAN_UPTIME_GOOD = ctx.configGet<number>("wanUptimeGoodSeconds", 86400);
 
+// Service level expectations. A score grades the home on a slope; a
+// service level is a line: every minute since the last run either met
+// the expectation or did not, and the failed ones carry a reason.
+const SLE_RSSI_MIN = ctx.configGet<number>("sleCoverageRssiMinDbm", -75);
+const SLE_RATE_MIN = ctx.configGet<number>("sleThroughputRateMinMbps", 20);
+const SLE_WAN_ERR_MAX = ctx.configGet<number>("sleWanErrorRateMax", 0.005);
+const SLE_WAN_UPTIME_MIN = ctx.configGet<number>("sleWanUptimeMinSeconds", 300);
+
 // --- Helpers ------------------------------------------------------------
 
 function toNum(s: unknown): number | null {
@@ -167,6 +175,38 @@ if (wifiRateScore !== null) {
   score.set("wifi", wifiRateScore, { component: "phy_rate" });
 }
 
+// Coverage: every connected client hears the gateway well enough. The
+// worst client decides, because the subscriber holding it is the one on
+// the phone. Throughput: every client negotiated a usable rate.
+if (worstRssi !== null) {
+  if (worstRssi >= SLE_RSSI_MIN) {
+    sle.report("coverage", true);
+  } else {
+    sle.report("coverage", false, {
+      classifier: "weak_signal",
+      worst_client_mac: worstMac,
+      worst_rssi_dbm: worstRssi,
+    });
+  }
+}
+let worstMbps: number | null = null;
+for (let i = 0; i < clients.length; i++) {
+  const rate = clients[i].rate;
+  if (rate === null || rate === 0) continue;
+  const mbps = rate > 10000 ? rate / 1000 : rate;
+  if (worstMbps === null || mbps < worstMbps) worstMbps = mbps;
+}
+if (worstMbps !== null) {
+  if (worstMbps >= SLE_RATE_MIN) {
+    sle.report("throughput", true);
+  } else {
+    sle.report("throughput", false, {
+      classifier: "low_phy_rate",
+      worst_rate_mbps: worstMbps,
+    });
+  }
+}
+
 const wifiScore = weightedMean([
   { value: wifiRssiScore, weight: ctx.configGet<number>("weightWifiClientRssi", 0.7) },
   { value: wifiRateScore, weight: ctx.configGet<number>("weightWifiPhyRate", 0.3) },
@@ -274,6 +314,23 @@ if (bestUptime !== null) {
     component: "stability",
     uptime_seconds: bestUptime,
   });
+}
+
+// WAN: the link is up, has been up long enough not to be a flap, and
+// is not shedding packets. One service level with three reasons, in
+// the order a NOC would rank them.
+if (worstErrRate !== null || bestUptime !== null) {
+  if (bestUptime !== null && bestUptime < SLE_WAN_UPTIME_MIN) {
+    sle.report("wan", false, { classifier: "wan_flap", uptime_seconds: bestUptime });
+  } else if (worstErrRate !== null && worstErrRate > SLE_WAN_ERR_MAX) {
+    sle.report("wan", false, {
+      classifier: "wan_errors",
+      worst_interface: worstErrIface,
+      error_rate: worstErrRate,
+    });
+  } else {
+    sle.report("wan", true);
+  }
 }
 
 const wanScore = weightedMean([
