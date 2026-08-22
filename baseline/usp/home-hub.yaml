@@ -1,0 +1,55 @@
+# The home hub app's readings, streamed: ValueChange on the lights and
+# the thermostat so a light switched at the wall and a temperature
+# that drifts reach the platform without polling, and ObjectDeletion on
+# the app's object so its parameters leave the device's view when the
+# app is uninstalled.
+#
+# Scoped to the same tag as the Home section on the device page
+# (baseline/tr181/device-profile.yaml). An agent does accept a
+# subscription on a path it does not have yet, so this would work
+# fleet-wide, but it would put five subscriptions on every TR-181 USP
+# gateway to watch objects that will never appear on most of them. One
+# tag decides both who has the product and who is watched for it.
+#
+# The parameters list repeats the paths so the consumer stores every
+# change as history (interval 0).
+#
+# Priority 11: baseline tier, above the software module profile it
+# reads the results of.
+apiVersion: telemetry.herder.io/v1alpha1
+kind: TelemetryProfile
+metadata:
+  name: usp-home-hub
+spec:
+  priority: 11
+  deviceSelector:
+    matchExpressions:
+      - key: "protocol:usp"
+        operator: Exists
+      - key: "dataModel:device"
+        operator: Exists
+      - key: "tag:app:home-hub"
+        operator: Exists
+  subscriptions:
+    - notifType: ValueChange
+      referenceList:
+        - Device.X_ISPX_Home.Light.{i}.On
+        - Device.X_ISPX_Home.Light.{i}.Brightness
+        - Device.X_ISPX_Home.Thermostat.{i}.Temperature
+        - Device.X_ISPX_Home.Thermostat.{i}.Setpoint
+        - Device.X_ISPX_Home.Thermostat.{i}.Mode
+    - notifType: ObjectDeletion
+      referenceList:
+        - Device.X_ISPX_Home.
+  parameters:
+    - path: "Device.X_ISPX_Home.Light.{i}.On"
+      interval: 0
+    - path: "Device.X_ISPX_Home.Light.{i}.Brightness"
+      interval: 0
+    - path: "Device.X_ISPX_Home.Thermostat.{i}.Temperature"
+      interval: 0
+    - path: "Device.X_ISPX_Home.Thermostat.{i}.Setpoint"
+      interval: 0
+    - path: "Device.X_ISPX_Home.Thermostat.{i}.Mode"
+      interval: 0
+

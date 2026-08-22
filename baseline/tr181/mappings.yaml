@@ -213,6 +213,10 @@ spec:
     - netdiag-tr181
     - remote-access-tr181
     - nat-tr181
+    # Software modules and the home hub app's objects; see
+    # software-modules.yaml.
+    - software-tr181
+    - home-hub-tr181
 ---
 # CWMP-only half of the TR-181 baseline: the `canonical.mgmt.*` table.
 #
@@ -260,6 +264,10 @@ spec:
     - netdiag-tr181
     - remote-access-tr181
     - nat-tr181
+    # Software modules and the home hub app's objects; see
+    # software-modules.yaml.
+    - software-tr181
+    - home-hub-tr181
 
 ---
 # Canonical WiFi mappings for TR-181 (Device.*) devices.

@@ -1,0 +1,172 @@
+# Software modules on TR-181 (Device.SoftwareModules.): the install
+# command an InstallDU campaign invokes over USP, and the deployment
+# and execution unit inventories under canonical names so a script or
+# the API can ask what a gateway runs without naming the tree.
+#
+# The install command is bound here the way canonical.firmware.download
+# is: USP has no install message, the operation is a command on the
+# data model, and where the command lives is the device's business.
+# Uninstall() needs no binding, it lives on the deployment unit
+# instance and the dispatcher finds the instance from the UUID the
+# device reports.
+#
+# Inventories enumerate four slots each, for the reason the WiFi table
+# enumerates radios: an instance exists northbound only if it is
+# written out here. A gateway running more apps than that gets a
+# higher-priority table.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: software-tr181
+spec:
+  mappings:
+    - canonical: canonical.software.install
+      valueType: string
+      devicePath: Device.SoftwareModules.InstallDU()
+    - canonical: canonical.software.exec_env.1.name
+      valueType: string
+      devicePath: Device.SoftwareModules.ExecEnv.1.Name
+    - canonical: canonical.software.exec_env.1.status
+      valueType: string
+      devicePath: Device.SoftwareModules.ExecEnv.1.Status
+    - canonical: canonical.software.exec_env.1.enable
+      valueType: boolean
+      devicePath: Device.SoftwareModules.ExecEnv.1.Enable
+    - canonical: canonical.software.deployment_unit.1.uuid
+      valueType: string
+      devicePath: Device.SoftwareModules.DeploymentUnit.1.UUID
+    - canonical: canonical.software.deployment_unit.1.name
+      valueType: string
+      devicePath: Device.SoftwareModules.DeploymentUnit.1.Name
+    - canonical: canonical.software.deployment_unit.1.version
+      valueType: string
+      devicePath: Device.SoftwareModules.DeploymentUnit.1.Version
+    - canonical: canonical.software.deployment_unit.1.status
+      valueType: string
+      devicePath: Device.SoftwareModules.DeploymentUnit.1.Status
+    - canonical: canonical.software.deployment_unit.2.uuid
+      valueType: string
+      devicePath: Device.SoftwareModules.DeploymentUnit.2.UUID
+    - canonical: canonical.software.deployment_unit.2.name
+      valueType: string
+      devicePath: Device.SoftwareModules.DeploymentUnit.2.Name
+    - canonical: canonical.software.deployment_unit.2.version
+      valueType: string
+      devicePath: Device.SoftwareModules.DeploymentUnit.2.Version
+    - canonical: canonical.software.deployment_unit.2.status
+      valueType: string
+      devicePath: Device.SoftwareModules.DeploymentUnit.2.Status
+    - canonical: canonical.software.deployment_unit.3.uuid
+      valueType: string
+      devicePath: Device.SoftwareModules.DeploymentUnit.3.UUID
+    - canonical: canonical.software.deployment_unit.3.name
+      valueType: string
+      devicePath: Device.SoftwareModules.DeploymentUnit.3.Name
+    - canonical: canonical.software.deployment_unit.3.version
+      valueType: string
+      devicePath: Device.SoftwareModules.DeploymentUnit.3.Version
+    - canonical: canonical.software.deployment_unit.3.status
+      valueType: string
+      devicePath: Device.SoftwareModules.DeploymentUnit.3.Status
+    - canonical: canonical.software.deployment_unit.4.uuid
+      valueType: string
+      devicePath: Device.SoftwareModules.DeploymentUnit.4.UUID
+    - canonical: canonical.software.deployment_unit.4.name
+      valueType: string
+      devicePath: Device.SoftwareModules.DeploymentUnit.4.Name
+    - canonical: canonical.software.deployment_unit.4.version
+      valueType: string
+      devicePath: Device.SoftwareModules.DeploymentUnit.4.Version
+    - canonical: canonical.software.deployment_unit.4.status
+      valueType: string
+      devicePath: Device.SoftwareModules.DeploymentUnit.4.Status
+    - canonical: canonical.software.execution_unit.1.name
+      valueType: string
+      devicePath: Device.SoftwareModules.ExecutionUnit.1.Name
+    - canonical: canonical.software.execution_unit.1.status
+      valueType: string
+      devicePath: Device.SoftwareModules.ExecutionUnit.1.Status
+    - canonical: canonical.software.execution_unit.1.references
+      valueType: string
+      devicePath: Device.SoftwareModules.ExecutionUnit.1.References
+    - canonical: canonical.software.execution_unit.2.name
+      valueType: string
+      devicePath: Device.SoftwareModules.ExecutionUnit.2.Name
+    - canonical: canonical.software.execution_unit.2.status
+      valueType: string
+      devicePath: Device.SoftwareModules.ExecutionUnit.2.Status
+    - canonical: canonical.software.execution_unit.2.references
+      valueType: string
+      devicePath: Device.SoftwareModules.ExecutionUnit.2.References
+    - canonical: canonical.software.execution_unit.3.name
+      valueType: string
+      devicePath: Device.SoftwareModules.ExecutionUnit.3.Name
+    - canonical: canonical.software.execution_unit.3.status
+      valueType: string
+      devicePath: Device.SoftwareModules.ExecutionUnit.3.Status
+    - canonical: canonical.software.execution_unit.3.references
+      valueType: string
+      devicePath: Device.SoftwareModules.ExecutionUnit.3.References
+    - canonical: canonical.software.execution_unit.4.name
+      valueType: string
+      devicePath: Device.SoftwareModules.ExecutionUnit.4.Name
+    - canonical: canonical.software.execution_unit.4.status
+      valueType: string
+      devicePath: Device.SoftwareModules.ExecutionUnit.4.Status
+    - canonical: canonical.software.execution_unit.4.references
+      valueType: string
+      devicePath: Device.SoftwareModules.ExecutionUnit.4.References
+---
+# The home hub app's objects (Device.X_ISPX_Home.), aliased into
+# canonical.home.* so the home service module, scripts and the API
+# never name the app's vendor prefix. Bound in the baseline profile
+# beside the software table: a gateway without the app installed
+# resolves these to nothing, which a module renders as unresolved
+# rather than as an error.
+#
+# Two lights and one thermostat, what the shipped app declares.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: home-hub-tr181
+spec:
+  mappings:
+    - canonical: canonical.home.light.1.name
+      valueType: string
+      devicePath: Device.X_ISPX_Home.Light.1.Name
+    - canonical: canonical.home.light.1.room
+      valueType: string
+      devicePath: Device.X_ISPX_Home.Light.1.Room
+    - canonical: canonical.home.light.1.on
+      valueType: boolean
+      devicePath: Device.X_ISPX_Home.Light.1.On
+    - canonical: canonical.home.light.1.brightness
+      valueType: unsignedint
+      devicePath: Device.X_ISPX_Home.Light.1.Brightness
+    - canonical: canonical.home.light.2.name
+      valueType: string
+      devicePath: Device.X_ISPX_Home.Light.2.Name
+    - canonical: canonical.home.light.2.room
+      valueType: string
+      devicePath: Device.X_ISPX_Home.Light.2.Room
+    - canonical: canonical.home.light.2.on
+      valueType: boolean
+      devicePath: Device.X_ISPX_Home.Light.2.On
+    - canonical: canonical.home.light.2.brightness
+      valueType: unsignedint
+      devicePath: Device.X_ISPX_Home.Light.2.Brightness
+    - canonical: canonical.home.thermostat.1.name
+      valueType: string
+      devicePath: Device.X_ISPX_Home.Thermostat.1.Name
+    - canonical: canonical.home.thermostat.1.mode
+      valueType: string
+      devicePath: Device.X_ISPX_Home.Thermostat.1.Mode
+    - canonical: canonical.home.thermostat.1.setpoint
+      valueType: int
+      devicePath: Device.X_ISPX_Home.Thermostat.1.Setpoint
+    - canonical: canonical.home.thermostat.1.temperature
+      valueType: int
+      devicePath: Device.X_ISPX_Home.Thermostat.1.Temperature
+    - canonical: canonical.home.thermostat.1.schedule
+      valueType: string
+      devicePath: Device.X_ISPX_Home.Thermostat.1.Schedule

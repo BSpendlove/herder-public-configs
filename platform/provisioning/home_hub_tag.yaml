@@ -1,0 +1,27 @@
+apiVersion: provisioning.herder.io/v1alpha1
+kind: ProvisioningRule
+metadata:
+  name: home-hub-tag
+spec:
+  triggers:
+    - first_contact
+    - boot
+  # TR-181 over USP: the fleet the home hub app is built for, and the
+  # one the install campaign runs against. A TR-098 gateway that gained
+  # the tag would carry a Home section it can never fill.
+  #
+  # Both triggers because a USP agent has no periodic trigger: it
+  # announces itself once on bootstrap and again on Device.Boot!, and a
+  # gateway that was already onboarded when this rule landed picks the
+  # tag up on its next boot. The guard in the script makes the second
+  # run a no-op.
+  deviceSelector:
+    matchExpressions:
+      - key: "protocol:usp"
+        operator: Exists
+      - key: "dataModel:device"
+        operator: Exists
+  desired:
+    script: "home_hub_tag.ts"
+  priority: 40
+  enabled: true

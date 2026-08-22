@@ -1,0 +1,52 @@
+# USP software module baseline profile.
+#
+# An InstallDU or Uninstall over USP is an asynchronous command, and
+# TR-369 delivers its outcome only to Controllers subscribed to it:
+# OperationComplete on the command settles the task (the command key is
+# the task id), the DUStateChange! event carries the deployment unit's
+# state, version and fault, and value and object changes under the two
+# inventories keep the platform's view of what is installed honest
+# when an app is installed or removed from outside the ACS.
+#
+# The parameters list repeats the subscribed paths: the telemetry
+# consumer stores a change only for a path a profile names.
+#
+# Selector: TR-181 USP devices, same scoping as the firmware baseline.
+apiVersion: telemetry.herder.io/v1alpha1
+kind: TelemetryProfile
+metadata:
+  name: usp-software-modules
+spec:
+  priority: 10
+  deviceSelector:
+    matchExpressions:
+      - key: "protocol:usp"
+        operator: Exists
+      - key: "dataModel:device"
+        operator: Exists
+  subscriptions:
+    - notifType: OperationComplete
+      referenceList:
+        - Device.SoftwareModules.InstallDU()
+        - Device.SoftwareModules.DeploymentUnit.{i}.Uninstall()
+        - Device.SoftwareModules.DeploymentUnit.{i}.Update()
+    - notifType: Event
+      referenceList:
+        - Device.SoftwareModules.DUStateChange!
+    - notifType: ValueChange
+      referenceList:
+        - Device.SoftwareModules.DeploymentUnit.{i}.Status
+        - Device.SoftwareModules.ExecutionUnit.{i}.Status
+    - notifType: ObjectCreation
+      referenceList:
+        - Device.SoftwareModules.DeploymentUnit.
+        - Device.SoftwareModules.ExecutionUnit.
+    - notifType: ObjectDeletion
+      referenceList:
+        - Device.SoftwareModules.DeploymentUnit.
+        - Device.SoftwareModules.ExecutionUnit.
+  parameters:
+    - path: "Device.SoftwareModules.DeploymentUnit.{i}.Status"
+      interval: 0
+    - path: "Device.SoftwareModules.ExecutionUnit.{i}.Status"
+      interval: 0

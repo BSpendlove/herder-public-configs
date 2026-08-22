@@ -1,0 +1,53 @@
+# Home service module: what the home hub app exposes on a gateway,
+# lights and heating, through canonical.home.* (baseline/tr181/
+# software-modules.yaml). Read-only: the hub's readings as the app
+# reports them, a light toggled at the wall showing up within seconds
+# through the ValueChange subscription in baseline/usp/home-hub.yaml.
+apiVersion: modules.herder.io/v1alpha1
+kind: ServiceModule
+metadata:
+  name: home
+spec:
+  description: >-
+    Lights and heating from the home hub app, as the gateway reports
+    them.
+  fields:
+    - name: light_name
+      canonical: canonical.home.light.{i}.name
+      type: string
+      description: The light's name.
+    - name: light_room
+      canonical: canonical.home.light.{i}.room
+      type: string
+      description: The room the light is in.
+    - name: light_on
+      canonical: canonical.home.light.{i}.on
+      type: bool
+      description: Whether the light is on.
+    - name: light_brightness
+      canonical: canonical.home.light.{i}.brightness
+      type: int
+      unit: "%"
+      description: Brightness, 0 to 100.
+    - name: thermostat_name
+      canonical: canonical.home.thermostat.{i}.name
+      type: string
+      description: The thermostat's name.
+    - name: thermostat_mode
+      canonical: canonical.home.thermostat.{i}.mode
+      type: string
+      description: Heating mode.
+    - name: thermostat_setpoint
+      canonical: canonical.home.thermostat.{i}.setpoint
+      type: int
+      unit: C
+      description: The target temperature.
+    - name: thermostat_temperature
+      canonical: canonical.home.thermostat.{i}.temperature
+      type: int
+      unit: C
+      description: The temperature the thermostat reads.
+    - name: thermostat_schedule
+      canonical: canonical.home.thermostat.{i}.schedule
+      type: string
+      description: Heating schedule.
