@@ -54,6 +54,18 @@ spec:
       type: string
       writable: true
       widget: color
+      # The palette the hub's bulbs ship with: warm white, candle,
+      # daylight, and the four scene colours its own app offers. Any
+      # other hex value is accepted.
+      presets:
+        - "#ffd27f"
+        - "#ffb347"
+        - "#fff4e0"
+        - "#e0f0ff"
+        - "#2e86de"
+        - "#2ecc71"
+        - "#9b59b6"
+        - "#e74c3c"
       constraints:
         pattern: "#[0-9a-fA-F]{6}"
       description: The light's colour, as a CSS hex value.
