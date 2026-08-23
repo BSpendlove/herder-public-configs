@@ -1,0 +1,92 @@
+# Oriel Home service module: what the Oriel Home app exposes on a
+# gateway, lights and heating, through canonical.oriel_home.*
+# (baseline/tr181/software-modules.yaml). A light switched at the wall shows up within
+# seconds through the ValueChange subscription in baseline/usp/
+# oriel-home.yaml.
+#
+# Drawn as cards, one per light and one per thermostat, with the
+# controls a support agent uses: a switch and a brightness slider drawn
+# in the light's own colour, a colour swatch, a setpoint slider and a
+# heating mode. Every control writes
+# through the module API, so a subscriber app drives the same fields.
+# The readings the agent cannot change (the room temperature, the
+# schedule) stay plain values.
+apiVersion: modules.herder.io/v1alpha1
+kind: ServiceModule
+metadata:
+  name: oriel-home
+spec:
+  description: Lights and heating from the Oriel Home app.
+  app: oriel-home
+  layout: cards
+  fields:
+    - name: light_name
+      canonical: canonical.oriel_home.light.{i}.name
+      type: string
+      role: title
+      description: The light's name.
+    - name: light_room
+      canonical: canonical.oriel_home.light.{i}.room
+      type: string
+      role: subtitle
+      description: The room the light is in.
+    - name: light_on
+      canonical: canonical.oriel_home.light.{i}.on
+      type: bool
+      writable: true
+      widget: toggle
+      tint: light_color
+      description: Whether the light is on.
+    - name: light_brightness
+      canonical: canonical.oriel_home.light.{i}.brightness
+      type: int
+      unit: "%"
+      writable: true
+      widget: slider
+      tint: light_color
+      constraints:
+        min: 0
+        max: 100
+        step: 5
+      description: Brightness, 0 to 100.
+    - name: light_color
+      canonical: canonical.oriel_home.light.{i}.color
+      type: string
+      writable: true
+      widget: color
+      constraints:
+        pattern: "#[0-9a-fA-F]{6}"
+      description: The light's colour, as a CSS hex value.
+    - name: thermostat_name
+      canonical: canonical.oriel_home.thermostat.{i}.name
+      type: string
+      role: title
+      description: The thermostat's name.
+    - name: thermostat_mode
+      canonical: canonical.oriel_home.thermostat.{i}.mode
+      type: string
+      writable: true
+      widget: select
+      constraints:
+        enum: [Auto, Heat, Eco, "Off"]
+      description: Heating mode.
+    - name: thermostat_setpoint
+      canonical: canonical.oriel_home.thermostat.{i}.setpoint
+      type: int
+      unit: C
+      writable: true
+      widget: slider
+      constraints:
+        min: 5
+        max: 30
+        step: 1
+      description: The target temperature.
+    - name: thermostat_temperature
+      canonical: canonical.oriel_home.thermostat.{i}.temperature
+      type: int
+      unit: C
+      description: The temperature the thermostat reads.
+    - name: thermostat_schedule
+      canonical: canonical.oriel_home.thermostat.{i}.schedule
+      type: string
+      description: Heating schedule.

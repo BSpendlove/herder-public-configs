@@ -131,12 +131,12 @@ spec:
       icon: wrench
       component: maintenance
 ---
-# The same page with a Home section, for the gateways that carry the
-# home hub app.
+# The same page with an Oriel Home section, for the gateways that carry the
+# Oriel Home app.
 #
 # A device profile replaces rather than extends, so every section the
 # baseline shows is restated here to keep it. That restatement is what
-# scoping a section costs. The alternative is a Home tab on every
+# scoping a section costs. The alternative is an Oriel Home tab on every
 # TR-181 device, which on a gateway without the app reads "Nothing
 # resolved for this device."
 #
@@ -152,14 +152,14 @@ spec:
 apiVersion: deviceprofiles.herder.io/v1alpha1
 kind: DeviceProfile
 metadata:
-  name: home-hub-tr181-ui
+  name: oriel-home-ui
 spec:
   priority: 20
   deviceSelector:
     matchExpressions:
       - key: "dataModel:device"
         operator: Exists
-      - key: "tag:app:home-hub"
+      - key: "tag:app:oriel-home"
         operator: Exists
   sections:
     - key: overview
@@ -252,12 +252,12 @@ spec:
       component: module
       config:
         module: port-forwards
-    - key: home
-      title: Home
+    - key: oriel-home
+      title: Oriel Home
       icon: house
       component: module
       config:
-        module: home
+        module: oriel-home
     - key: remote-access
       title: Remote access
       icon: shield

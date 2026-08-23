@@ -117,8 +117,8 @@ spec:
       valueType: string
       devicePath: Device.SoftwareModules.ExecutionUnit.4.References
 ---
-# The home hub app's objects (Device.X_ISPX_Home.), aliased into
-# canonical.home.* so the home service module, scripts and the API
+# The Oriel Home app's objects (Device.X_ORIEL_Home.), aliased into
+# canonical.oriel_home.* so the home service module, scripts and the API
 # never name the app's vendor prefix. Bound in the baseline profile
 # beside the software table: a gateway without the app installed
 # resolves these to nothing, which a module renders as unresolved
@@ -128,45 +128,51 @@ spec:
 apiVersion: mapping.herder.io/v1alpha1
 kind: MappingTable
 metadata:
-  name: home-hub-tr181
+  name: oriel-home-tr181
 spec:
   mappings:
-    - canonical: canonical.home.light.1.name
+    - canonical: canonical.oriel_home.light.1.name
       valueType: string
-      devicePath: Device.X_ISPX_Home.Light.1.Name
-    - canonical: canonical.home.light.1.room
+      devicePath: Device.X_ORIEL_Home.Light.1.Name
+    - canonical: canonical.oriel_home.light.1.room
       valueType: string
-      devicePath: Device.X_ISPX_Home.Light.1.Room
-    - canonical: canonical.home.light.1.on
+      devicePath: Device.X_ORIEL_Home.Light.1.Room
+    - canonical: canonical.oriel_home.light.1.on
       valueType: boolean
-      devicePath: Device.X_ISPX_Home.Light.1.On
-    - canonical: canonical.home.light.1.brightness
+      devicePath: Device.X_ORIEL_Home.Light.1.On
+    - canonical: canonical.oriel_home.light.1.brightness
       valueType: unsignedint
-      devicePath: Device.X_ISPX_Home.Light.1.Brightness
-    - canonical: canonical.home.light.2.name
+      devicePath: Device.X_ORIEL_Home.Light.1.Brightness
+    - canonical: canonical.oriel_home.light.1.color
       valueType: string
-      devicePath: Device.X_ISPX_Home.Light.2.Name
-    - canonical: canonical.home.light.2.room
+      devicePath: Device.X_ORIEL_Home.Light.1.Color
+    - canonical: canonical.oriel_home.light.2.name
       valueType: string
-      devicePath: Device.X_ISPX_Home.Light.2.Room
-    - canonical: canonical.home.light.2.on
+      devicePath: Device.X_ORIEL_Home.Light.2.Name
+    - canonical: canonical.oriel_home.light.2.room
+      valueType: string
+      devicePath: Device.X_ORIEL_Home.Light.2.Room
+    - canonical: canonical.oriel_home.light.2.on
       valueType: boolean
-      devicePath: Device.X_ISPX_Home.Light.2.On
-    - canonical: canonical.home.light.2.brightness
+      devicePath: Device.X_ORIEL_Home.Light.2.On
+    - canonical: canonical.oriel_home.light.2.brightness
       valueType: unsignedint
-      devicePath: Device.X_ISPX_Home.Light.2.Brightness
-    - canonical: canonical.home.thermostat.1.name
+      devicePath: Device.X_ORIEL_Home.Light.2.Brightness
+    - canonical: canonical.oriel_home.light.2.color
       valueType: string
-      devicePath: Device.X_ISPX_Home.Thermostat.1.Name
-    - canonical: canonical.home.thermostat.1.mode
+      devicePath: Device.X_ORIEL_Home.Light.2.Color
+    - canonical: canonical.oriel_home.thermostat.1.name
       valueType: string
-      devicePath: Device.X_ISPX_Home.Thermostat.1.Mode
-    - canonical: canonical.home.thermostat.1.setpoint
+      devicePath: Device.X_ORIEL_Home.Thermostat.1.Name
+    - canonical: canonical.oriel_home.thermostat.1.mode
+      valueType: string
+      devicePath: Device.X_ORIEL_Home.Thermostat.1.Mode
+    - canonical: canonical.oriel_home.thermostat.1.setpoint
       valueType: int
-      devicePath: Device.X_ISPX_Home.Thermostat.1.Setpoint
-    - canonical: canonical.home.thermostat.1.temperature
+      devicePath: Device.X_ORIEL_Home.Thermostat.1.Setpoint
+    - canonical: canonical.oriel_home.thermostat.1.temperature
       valueType: int
-      devicePath: Device.X_ISPX_Home.Thermostat.1.Temperature
-    - canonical: canonical.home.thermostat.1.schedule
+      devicePath: Device.X_ORIEL_Home.Thermostat.1.Temperature
+    - canonical: canonical.oriel_home.thermostat.1.schedule
       valueType: string
-      devicePath: Device.X_ISPX_Home.Thermostat.1.Schedule
+      devicePath: Device.X_ORIEL_Home.Thermostat.1.Schedule
