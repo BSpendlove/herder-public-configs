@@ -27,6 +27,12 @@ spec:
     - canonical: canonical.mgmt.remote_access.password
       valueType: string
       devicePath: InternetGatewayDevice.UserInterface.User.3.Password
+    # The same slot's username, read-only on the module: the login the
+    # rotated password belongs to. Follows the slot above when an
+    # operator changes it.
+    - canonical: canonical.mgmt.remote_access.username
+      valueType: string
+      devicePath: InternetGatewayDevice.UserInterface.User.3.Username
 ---
 # Collect the vendor's remote-access extras alongside the standard
 # leaves the baseline system profiles gather.
@@ -48,4 +54,8 @@ spec:
     - path: "InternetGatewayDevice.UserInterface.RemoteAccess.X_0000C5_ACL"
       interval: 0
     - path: "InternetGatewayDevice.UserInterface.RemoteAccess.X_0000C5_IdleTimeout"
+      interval: 0
+    # The remote account's username, never its password: a collected
+    # password is a password in telemetry history.
+    - path: "InternetGatewayDevice.UserInterface.User.3.Username"
       interval: 0

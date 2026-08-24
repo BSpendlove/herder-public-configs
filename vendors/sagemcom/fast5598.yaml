@@ -53,6 +53,12 @@ spec:
     - canonical: canonical.mgmt.remote_access.password
       valueType: string
       devicePath: Device.Users.User.5.Password
+    # The same slot's username, read-only on the module: the login the
+    # rotated password belongs to. Follows the slot above when an
+    # operator changes it.
+    - canonical: canonical.mgmt.remote_access.username
+      valueType: string
+      devicePath: Device.Users.User.5.Username
 ---
 # A mapping profile replaces rather than extends, so the baseline
 # TR-181-over-CWMP list is restated to keep it; the restatement is what
@@ -90,4 +96,21 @@ spec:
     - nat-tr181
     - software-tr181
     - oriel-home-tr181
+---
+# Collect the remote account's username, never its password: a
+# collected password is a password in telemetry history.
+apiVersion: telemetry.herder.io/v1alpha1
+kind: TelemetryProfile
+metadata:
+  name: sagemcom-fast5598-remote-access
+spec:
+  priority: 50
+  deviceSelector:
+    matchExpressions:
+      - key: productClass
+        operator: In
+        values: [FAST5598]
+  parameters:
+    - path: "Device.Users.User.5.Username"
+      interval: 0
 

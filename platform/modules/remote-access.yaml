@@ -63,6 +63,9 @@ spec:
       # Nobody can guess that, and guessing it the wrong way leaves a
       # gateway open while its ACL field looks configured.
       description: Empty allows any source. Accepts an address, a list, or CIDR.
+    - name: username
+      canonical: canonical.mgmt.remote_access.username
+      description: The login the remote management password belongs to.
     - name: password
       canonical: canonical.mgmt.remote_access.password
       writable: true
