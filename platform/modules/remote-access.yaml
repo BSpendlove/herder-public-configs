@@ -63,6 +63,13 @@ spec:
       # Nobody can guess that, and guessing it the wrong way leaves a
       # gateway open while its ACL field looks configured.
       description: Empty allows any source. Accepts an address, a list, or CIDR.
+    - name: password
+      canonical: canonical.mgmt.remote_access.password
+      writable: true
+      secret: true
+      description: >-
+        The remote management account's password. Write-only; a grant
+        with generate rotates it and shows the credential once.
     - name: idle_timeout
       canonical: canonical.mgmt.remote_access.idle_timeout
       type: int

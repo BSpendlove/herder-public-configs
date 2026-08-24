@@ -36,3 +36,54 @@ spec:
       interval: 0
     - path: "Device.DeviceInfo.UpTime"
       interval: 0
+---
+# The remote management account's password. This firmware keeps its
+# local accounts in the standard Device.Users.User table, and user 5 is
+# the remote one; rotating it means writing this exact instance.
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingTable
+metadata:
+  name: remote-access-fast5598
+spec:
+  mappings:
+    - canonical: canonical.mgmt.remote_access.password
+      valueType: string
+      devicePath: Device.Users.User.5.Password
+---
+# A mapping profile replaces rather than extends, so the baseline
+# TR-181-over-CWMP list is restated to keep it; the restatement is what
+# scoping the password table to this model costs. Keep the list in step
+# with baseline-tr181-cwmp (baseline/tr181/mappings.yaml).
+apiVersion: mapping.herder.io/v1alpha1
+kind: MappingProfile
+metadata:
+  name: sagemcom-fast5598-tr181
+spec:
+  priority: 50
+  deviceSelector:
+    matchExpressions:
+      - key: productClass
+        operator: In
+        values: [FAST5598]
+      - key: "dataModel:device"
+        operator: Exists
+      - key: "protocol:cwmp"
+        operator: Exists
+  parameterMappings:
+    - device-info-tr181
+    - firmware-tr181
+    - mgmt-tr181
+    - diagnostics-tr181
+    - wifi-tr181
+    - interfaces-tr181
+    - voice-tr104i2
+    - wifi-scan-tr181
+    - wifi-capability-tr181
+    - wifi-rf-tr181
+    - netdiag-tr181
+    - remote-access-tr181
+    - remote-access-fast5598
+    - nat-tr181
+    - software-tr181
+    - oriel-home-tr181
+
