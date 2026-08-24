@@ -18,8 +18,12 @@ spec:
       valueType: unsignedint
       devicePath: InternetGatewayDevice.UserInterface.RemoteAccess.X_0000C5_IdleTimeout
     # The remote management account's password. NVG firmware keeps its
-    # local accounts in a vendor table under UserInterface, and user 3
-    # is the remote one; rotating it means writing this exact instance.
+    # local accounts in a vendor table under UserInterface; WHICH
+    # instance is the remote account is this deployment's provisioning
+    # convention, not a property of the firmware. User 3 is ours. An
+    # operator whose fleet provisions a different slot changes the
+    # instance here, or overrides this one row from a higher-priority
+    # table without touching this file.
     - canonical: canonical.mgmt.remote_access.password
       valueType: string
       devicePath: InternetGatewayDevice.UserInterface.User.3.Password

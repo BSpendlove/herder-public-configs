@@ -38,8 +38,12 @@ spec:
       interval: 0
 ---
 # The remote management account's password. This firmware keeps its
-# local accounts in the standard Device.Users.User table, and user 5 is
-# the remote one; rotating it means writing this exact instance.
+# local accounts in the standard Device.Users.User table; WHICH
+# instance is the remote account is this deployment's provisioning
+# convention, not a property of the firmware. User 5 is ours. An
+# operator whose fleet provisions a different slot changes the
+# instance here, or overrides this one row from a higher-priority
+# table.
 apiVersion: mapping.herder.io/v1alpha1
 kind: MappingTable
 metadata:
